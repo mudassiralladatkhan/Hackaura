@@ -8,8 +8,8 @@ interface TimeLeft {
 }
 
 export function CountdownTimer() {
-  const targetDate = new Date('2025-11-26T19:00:00').getTime();
-  
+  const targetDate = new Date('2026-02-10T00:00:00').getTime();
+
   const calculateTimeLeft = (): TimeLeft => {
     const now = new Date().getTime();
     const difference = targetDate - now;
@@ -49,7 +49,7 @@ export function CountdownTimer() {
 
   return (
     <div className="grid grid-cols-2 xl:grid-cols-4 gap-4 max-w-2xl mx-auto">
-      {timeBlocks.map((block, index) => (
+      {timeBlocks.map((block) => (
         <div
           key={block.label}
           className="glass-effect border border-primary/30 rounded-3xl p-6 text-center transition-all duration-300 hover:scale-105 hover:border-primary/60 neon-glow-cyan"
