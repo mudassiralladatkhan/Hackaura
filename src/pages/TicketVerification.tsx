@@ -8,6 +8,8 @@ import { ParticleBackground } from '@/components/ui/particle-background';
 interface TeamDetails {
     teamName: string;
     leaderName: string;
+    leaderEmail: string;
+    leaderPhone: string;
     college: string;
     domain: string;
     members: string[];
