@@ -73,137 +73,149 @@ function onFormSubmit(e) {
       <!DOCTYPE html>
       <html>
       <head>
-        <meta charset="utf-8">
         <style>
-          @import url('https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;700;800&display=swap');
+          @import url('https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;800&display=swap');
         </style>
       </head>
-      <body style="margin: 0; padding: 0; background-color: #000000; font-family: 'Outfit', 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; color: #e2e8f0; -webkit-font-smoothing: antialiased;">
+      <body style="margin: 0; padding: 0; background-color: #000000; font-family: 'Outfit', 'Segoe UI', sans-serif; color: #e2e8f0;">
         
-        <!-- CENTER WRAPPER -->
-        <table border="0" cellpadding="0" cellspacing="0" width="100%">
-          <tr>
-            <td align="center" style="padding: 20px 0;">
+        <!-- MAIN CONTAINER -->
+        <div style="max-width: 600px; margin: 0 auto; background-color: #0f172a; overflow: hidden; font-size: 16px; line-height: 1.6;">
+          
+          <!-- HERO HEADER -->
+          <div style="background: linear-gradient(135deg, #0f172a 0%, #1e1b4b 100%); padding: 40px 20px; text-align: center; border-bottom: 1px solid #334155;">
+             <h1 style="margin: 0; color: #ffffff; font-size: 38px; font-weight: 800; letter-spacing: 2px; text-transform: uppercase;">
+               <span style="color: #22d3ee;">HACK</span>AURA <span style="font-size: 20px; vertical-align: top; color: #a855f7;">2026</span>
+             </h1>
+             <p style="margin: 10px 0 0; color: #94a3b8; font-size: 14px; letter-spacing: 1px; text-transform: uppercase;">National Level 24H Hackathon</p>
+          </div>
+
+          <!-- CONTENT -->
+          <div style="padding: 30px 25px;">
+            
+            <p style="font-size: 18px; color: #ffffff;">Hello <strong>${leaderName}</strong>, 👋</p>
+            <p style="color: #cbd5e1;">Correction! Your registration for <strong>HACKAURA 2026</strong> is confirmed. We are thrilled to have your team onboard.</p>
+
+
+            <!-- TICKET CARD -->
+            <div style="margin: 30px 0; background: linear-gradient(180deg, rgba(30, 41, 59, 0.7) 0%, rgba(15, 23, 42, 1) 100%); border: 1px solid #334155; border-radius: 16px; overflow: hidden; position: relative;">
+              <!-- Top Accent -->
+              <div style="height: 4px; background: linear-gradient(90deg, #22d3ee, #a855f7, #f472b6); width: 100%;"></div>
               
-              <!-- MAIN CONTAINER -->
-              <table border="0" cellpadding="0" cellspacing="0" width="100%" style="max-width: 600px; background-color: #0f172a; border-radius: 20px; overflow: hidden; border: 1px solid #1e293b; box-shadow: 0 0 80px rgba(34, 211, 238, 0.15);">
-                
-                <!-- 1. HERO HEADER (Geometric Mesh Gradient) -->
-                <tr>
-                   <td align="center" style="padding: 50px 20px; background-color: #0f172a; background-image: radial-gradient(circle at 10% 20%, rgba(34, 211, 238, 0.2) 0%, transparent 20%), radial-gradient(circle at 90% 80%, rgba(168, 85, 247, 0.2) 0%, transparent 20%); border-bottom: 1px solid #1e293b;">
-                      
-                      <p style="margin: 0 0 10px; color: #94a3b8; font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: 3px;">Invitation Confirmed</p>
-                      
-                      <h1 style="margin: 0; color: #ffffff; font-size: 48px; font-weight: 800; line-height: 1; letter-spacing: -1px;">
-                         HACK<span style="color: #22d3ee; text-shadow: 0 0 30px rgba(34, 211, 238, 0.6);">AURA</span>
-                      </h1>
-                      
-                      <div style="margin-top: 15px; display: inline-block; padding: 6px 16px; border: 1px solid #334155; border-radius: 50px; background: rgba(255,255,255,0.02);">
-                         <span style="color: #a855f7; font-weight: 600; font-size: 14px;">2026 Season</span>
-                         <span style="color: #475569; margin: 0 8px;">|</span>
-                         <span style="color: #e2e8f0; font-size: 14px;">Official Entry Pass</span>
-                      </div>
+              <div style="padding: 25px;">
+                <div style="display: table; width: 100%;">
+                  <!-- Row 1 -->
+                  <div style="display: table-row;">
+                    <div style="display: table-cell; padding-bottom: 20px;">
+                      <span style="display: block; font-size: 11px; text-transform: uppercase; color: #64748b; letter-spacing: 1px;">Team Name</span>
+                      <span style="font-size: 20px; font-weight: 700; color: #ffffff;">${teamName}</span>
+                    </div>
+                    <div style="display: table-cell; padding-bottom: 20px; text-align: right;">
+                      <span style="display: block; font-size: 11px; text-transform: uppercase; color: #64748b; letter-spacing: 1px;">Ticket ID</span>
+                      <span style="font-size: 20px; font-weight: 700; color: #22d3ee; font-family: monospace;">${ticketId}</span>
+                    </div>
+                  </div>
+                  <!-- Row 2 -->
+                  <div style="display: table-row;">
+                    <div style="display: table-cell; vertical-align: top;">
+                      <span style="display: block; font-size: 11px; text-transform: uppercase; color: #64748b; letter-spacing: 1px;">Domain</span>
+                      <span style="font-size: 16px; color: #cbd5e1;">${domain || 'Open Innovation'}</span>
+                    </div>
+                    <div style="display: table-cell; text-align: right; vertical-align: top;">
+                      <span style="display: block; font-size: 11px; text-transform: uppercase; color: #64748b; letter-spacing: 1px;">College</span>
+                      <span style="font-size: 16px; color: #cbd5e1;">${college}</span>
+                    </div>
+                  </div>
 
-                   </td>
-                </tr>
+                  <!-- QR Code Row -->
+                  <div style="display: table-row;">
+                    <div style="display: table-cell; padding-top: 25px; text-align: center;" colspan="2">
+                       <img src="https://api.qrserver.com/v1/create-qr-code/?size=150x150&data=${encodeURIComponent('https://hackaura2026.netlify.app/verify?ticketId=' + ticketId)}" alt="Ticket QR" width="150" height="150" style="border: 4px solid #ffffff; border-radius: 8px; display: inline-block;">
+                       <p style="margin: 10px 0 0; font-size: 12px; color: #64748b;">Scan to Verify Ticket</p>
+                       <a href="https://hackaura2026.netlify.app/verify?ticketId=${ticketId}" style="display: block; margin-top: 5px; color: #22d3ee; font-size: 11px; text-decoration: none;">(or click here to verify)</a>
+                    </div>
+                  </div>
 
-                <!-- 2. CONTENT AREA -->
-                <tr>
-                   <td style="padding: 40px 30px;">
-                      
-                      <!-- Greeting -->
-                      <p style="margin: 0 0 5px; color: #64748b; font-size: 13px; font-weight: 600; text-transform: uppercase; letter-spacing: 1px;">Welcome Team Leader</p>
-                      <h2 style="margin: 0 0 25px; color: #f8fafc; font-size: 28px; font-weight: 700;">${leaderName}</h2>
+                </div>
+              </div>
+              
+              <!-- Cutout Line -->
+              <div style="border-top: 2px dashed #334155; position: relative;">
+                <div style="position: absolute; left: -10px; top: -10px; width: 20px; height: 20px; background-color: #0f172a; border-radius: 50%;"></div>
+                <div style="position: absolute; right: -10px; top: -10px; width: 20px; height: 20px; background-color: #0f172a; border-radius: 50%;"></div>
+              </div>
 
-                      <!-- TICKET CARD (Glassmorphism) -->
-                      <table border="0" cellpadding="0" cellspacing="0" width="100%" style="background-color: #1e293b; border: 1px solid #334155; border-radius: 16px; overflow: hidden; margin-bottom: 30px; box-shadow: 0 10px 30px -10px rgba(0,0,0,0.5);">
-                         
-                         <!-- Color Bar -->
-                         <tr>
-                            <td colspan="2" style="height: 6px; background: linear-gradient(90deg, #22d3ee, #a855f7, #f472b6);"></td>
-                         </tr>
+              <!-- Event Details footer -->
+              <div style="padding: 20px 25px; background-color: rgba(30, 41, 59, 0.3);">
+                <div style="display: table; width: 100%;">
+                   <div style="display: table-cell; vertical-align: middle;">
+                      <span style="font-size: 14px; font-weight: 600; color: #f8fafc;">📅 ${CONFIG.EVENT_DATE}</span>
+                   </div>
+                   <div style="display: table-cell; text-align: right; vertical-align: middle;">
+                      <span style="font-size: 14px; font-weight: 600; color: #f8fafc;">📍 VSMIT, Nipani</span>
+                   </div>
+                </div>
+              </div>
+            </div>
 
-                         <tr>
-                            <td valign="top" style="padding: 25px;">
-                               <p style="margin: 0 0 5px; color: #64748b; font-size: 10px; text-transform: uppercase; font-weight: 700;">Team Name</p>
-                               <h3 style="margin: 0 0 20px; color: #ffffff; font-size: 22px; font-weight: 700;">${teamName}</h3>
+            <!-- ACTIONS -->
+            <div style="text-align: center; margin-bottom: 40px;">
+              <p style="margin-bottom: 15px; font-size: 14px; color: #94a3b8;">👇 Join the group for important updates 👇</p>
+              <a href="${CONFIG.WHATSAPP_LINK}" style="display: inline-block; background: #22c55e; color: #ffffff; padding: 14px 30px; border-radius: 50px; text-decoration: none; font-weight: 700; font-size: 16px; box-shadow: 0 4px 15px rgba(34, 197, 94, 0.3);">
+                Join WhatsApp Group
+              </a>
+              <div style="margin-top: 15px;">
+                <a href="${CONFIG.VENUE_MAP}" style="color: #22d3ee; text-decoration: none; font-size: 13px;">View Venue on Maps ↗</a>
+              </div>
+            </div>
 
-                               <p style="margin: 0 0 5px; color: #64748b; font-size: 10px; text-transform: uppercase; font-weight: 700;">Track / Domain</p>
-                               <p style="margin: 0 0 20px; color: #cbd5e1; font-size: 15px;">${domain || 'Open Innovation'}</p>
+            <!-- REMINDERS -->
+            <div style="background-color: #1e293b; border-radius: 12px; padding: 20px; margin-bottom: 30px;">
+              <h3 style="margin-top: 0; color: #f8fafc; font-size: 16px;">🚀 Next Steps</h3>
+              <ul style="padding-left: 20px; margin-bottom: 0; color: #cbd5e1; font-size: 14px;">
+                <li style="margin-bottom: 8px;">Keep this ticket safe (Save screenshot).</li>
+                <li style="margin-bottom: 8px;">Bring your valid College ID Card.</li>
+                <li>Report at venue by <strong>${CONFIG.REPORTING_TIME}</strong>.</li>
+              </ul>
+            </div>
 
-                               <table width="100%">
-                                  <tr>
-                                     <td>
-                                        <p style="margin: 0 0 5px; color: #64748b; font-size: 10px; text-transform: uppercase; font-weight: 700;">College</p>
-                                        <p style="margin: 0; color: #cbd5e1; font-size: 14px;">${college}</p>
-                                     </td>
-                                     <td>
-                                        <p style="margin: 0 0 5px; color: #64748b; font-size: 10px; text-transform: uppercase; font-weight: 700;">Ticket ID</p>
-                                        <p style="margin: 0; color: #22d3ee; font-size: 14px; font-family: monospace;">${ticketId}</p>
-                                     </td>
-                                  </tr>
-                               </table>
-                            </td>
-                            <td valign="middle" align="center" style="padding: 25px; width: 120px; border-left: 1px dashed #334155;">
-                               <img src="https://api.qrserver.com/v1/create-qr-code/?size=150x150&data=${encodeURIComponent('https://hackaura2026.netlify.app/verify?ticketId=' + ticketId)}" width="110" height="110" style="display: block; border-radius: 8px; border: 4px solid #ffffff;" alt="QR">
-                               <a href="https://hackaura2026.netlify.app/verify?ticketId=${ticketId}" style="display: block; margin-top: 10px; font-size: 11px; text-decoration: none; color: #22d3ee; font-weight: 600;">View Ticket &rarr;</a>
-                            </td>
-                         </tr>
-                         <!-- Ticket Footer -->
-                         <tr>
-                            <td colspan="2" style="padding: 15px 25px; background-color: #172033; border-top: 1px solid #334155;">
-                               <p style="margin: 0; color: #94a3b8; font-size: 12px; font-weight: 500;">📅 March 1-2, 2026  &nbsp;&nbsp;•&nbsp;&nbsp;  📍 VSMIT, Nipani</p>
-                            </td>
-                         </tr>
-                      </table>
+            <!-- COORDINATORS -->
+            <div style="border-top: 1px solid #334155; padding-top: 30px; text-align: center;">
+              <p style="text-transform: uppercase; letter-spacing: 1px; font-size: 12px; color: #64748b; font-weight: 700; margin-bottom: 20px;">Event Coordinators</p>
+              
+              <div style="display: inline-block; text-align: left;">
+                <div style="margin-bottom: 10px;">
+                  <span style="color: #e2e8f0; font-size: 14px; font-weight: 600;">Abdulwahab Mulla</span>
+                  <span style="color: #94a3b8; font-size: 13px; display: block;">+91 73497 58871</span>
+                </div>
+                <div style="margin-bottom: 10px;">
+                  <span style="color: #e2e8f0; font-size: 14px; font-weight: 600;">Sandesh Birannavar</span>
+                  <span style="color: #94a3b8; font-size: 13px; display: block;">+91 77950 31246</span>
+                </div>
+              </div>
+              <div style="display: inline-block; text-align: left; margin-left: 30px; vertical-align: top;">
+                <div style="margin-bottom: 10px;">
+                  <span style="color: #e2e8f0; font-size: 14px; font-weight: 600;">Rakshita Halluri</span>
+                  <span style="color: #94a3b8; font-size: 13px; display: block;">+91 72040 33630</span>
+                </div>
+                <div style="margin-bottom: 10px;">
+                  <span style="color: #e2e8f0; font-size: 14px; font-weight: 600;">Sana Ravat</span>
+                  <span style="color: #94a3b8; font-size: 13px; display: block;">+91 80959 81415</span>
+                </div>
+              </div>
+            </div>
 
-                      <!-- CTA Button -->
-                      <div style="text-align: center;">
-                         <a href="${CONFIG.WHATSAPP_LINK}" style="background-color: #22c55e; color: #ffffff; padding: 16px 32px; border-radius: 50px; text-decoration: none; font-weight: 700; font-size: 16px; display: inline-block; box-shadow: 0 10px 25px -5px rgba(34, 197, 94, 0.4);">
-                            Click to Join WhatsApp Group
-                         </a>
-                      </div>
+          </div>
 
-                   </td>
-                </tr>
+          <!-- FOOTER -->
+          <div style="background-color: #000000; padding: 20px; text-align: center; border-top: 1px solid #334155;">
+            <p style="color: #475569; font-size: 12px; margin: 0;">Hosted by VSM's Institute of Technology, Nipani</p>
+          </div>
 
-                <!-- 3. FOOTER INFO -->
-                <tr>
-                   <td style="padding: 30px; background-color: #0c1220; border-top: 1px solid #1e293b;">
-                      <p style="margin: 0 0 20px; color: #475569; font-size: 11px; font-weight: 700; text-transform: uppercase; text-align: center; letter-spacing: 1px;">Event Coordinators</p>
-                      
-                      <table width="100%" style="margin-bottom: 20px;">
-                         <tr>
-                            <td width="50%" valign="top">
-                               <p style="margin: 0; color: #cbd5e1; font-size: 13px; font-weight: 600;">Abdulwahab Mulla</p>
-                               <p style="margin: 2px 0 15px; color: #64748b; font-size: 12px;">+91 73497 58871</p>
-
-                               <p style="margin: 0; color: #cbd5e1; font-size: 13px; font-weight: 600;">Sandesh Birannavar</p>
-                               <p style="margin: 2px 0 0; color: #64748b; font-size: 12px;">+91 77950 31246</p>
-                            </td>
-                            <td width="50%" valign="top">
-                               <p style="margin: 0; color: #cbd5e1; font-size: 13px; font-weight: 600;">Rakshita Halluri</p>
-                               <p style="margin: 2px 0 15px; color: #64748b; font-size: 12px;">+91 72040 33630</p>
-
-                               <p style="margin: 0; color: #cbd5e1; font-size: 13px; font-weight: 600;">Sana Ravat</p>
-                               <p style="margin: 2px 0 0; color: #64748b; font-size: 12px;">+91 80959 81415</p>
-                            </td>
-                         </tr>
-                      </table>
-
-                      <p style="margin: 0; color: #334155; font-size: 11px; text-align: center;">&copy; 2026 HACKAURA • Secured by Digital Pass System</p>
-                   </td>
-                </tr>
-
-              </table>
-
-            </td>
-          </tr>
-        </table>
+        </div>
       </body>
       </html>
     `;
-
 
         // 4. SEND EMAIL
         if (email) {
