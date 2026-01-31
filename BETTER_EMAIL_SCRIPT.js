@@ -1,3 +1,10 @@
+// TEST FUNCTION - Run this to grant Drive permissions
+function testDrivePermissions() {
+    var folder = DriveApp.getFoldersByName("Hackaura Signatures");
+    Logger.log("Drive access granted!");
+    return "Success - Drive permissions are working!";
+}
+
 /* 
    --------------------------------------------------------------
    🚀 HACKAURA 2026 - ULTIMATE REGISTRATION SCRIPT
@@ -359,7 +366,8 @@ function doGet(e) {
                             data[i][getHeaderIndex(headers, ['Member 2 Name', 'Member 2'])],
                             data[i][getHeaderIndex(headers, ['Member 3 Name', 'Member 3'])]
                         ].filter(Boolean).join(", "),
-                        checkInTime: data[i][getHeaderIndex(headers, ['Check-In Time', 'Arrival Time'])] || 'N/A'
+                        checkInTime: data[i][getHeaderIndex(headers, ['Check-In Time', 'Arrival Time'])] || 'N/A',
+                        signature: data[i][getHeaderIndex(headers, ['Signature', 'Signed', 'Digital Signature'])] || null
                     });
                 }
             }
@@ -458,25 +466,26 @@ function doPost(e) {
                 return ContentService.createTextOutput(JSON.stringify({ 'result': 'error', 'message': 'Invalid Ticket ID' })).setMimeType(ContentService.MimeType.JSON);
             }
 
-            // Save Image to Drive
-            var folderName = "Hackaura Signatures";
-            var folders = DriveApp.getFoldersByName(folderName);
-            var folder;
-            if (folders.hasNext()) {
-                folder = folders.next();
-            } else {
-                folder = DriveApp.createFolder(folderName);
-            }
+            // Save signature as data URL directly in sheet (no Drive needed!)
+            // This avoids all Drive permission issues
+            var signatureDataUrl = imageBase64; // Already in data:image/png;base64,... format
 
-            var decodedImage = Utilities.base64Decode(imageBase64.split(',')[1]);
-            var blob = Utilities.newBlob(decodedImage, MimeType.PNG, ticketId + "_Signature.png");
-            var file = folder.createFile(blob);
-            var fileUrl = file.getUrl();
+            // Log signature length for debugging
+            Logger.log("Signature length: " + signatureDataUrl.length + " characters");
+
+            // Google Sheets has a 50,000 character limit per cell
+            // If signature is too large, save a note instead
+            if (signatureDataUrl.length > 50000) {
+                signatureDataUrl = "Signature too large (" + signatureDataUrl.length + " chars). Saved: " + signatureDataUrl.substring(0, 100) + "...";
+            }
 
             // Update Sheet with BOTH Signature AND Attendance
             var signatureCol = getHeaderIndex(headers, ['Signature', 'Signed', 'Digital Signature']) + 1;
             var attendanceCol = getHeaderIndex(headers, ['Attendance', 'Status']) + 1;
             var timeCol = getHeaderIndex(headers, ['Check-In Time', 'Arrival Time']) + 1;
+
+            Logger.log("Signature column index: " + signatureCol);
+            Logger.log("Attendance column index: " + attendanceCol);
 
             if (signatureCol === 0) {
                 return ContentService.createTextOutput(JSON.stringify({ 'result': 'error', 'message': 'Column "Signature" not found in Sheet' })).setMimeType(ContentService.MimeType.JSON);
@@ -491,7 +500,7 @@ function doPost(e) {
             // Mark attendance AND save signature in one operation
             sheet.getRange(rowNum, attendanceCol).setValue("Checked In");
             if (timeCol > 0) sheet.getRange(rowNum, timeCol).setValue(timestamp);
-            sheet.getRange(rowNum, signatureCol).setValue(fileUrl);
+            sheet.getRange(rowNum, signatureCol).setValue(signatureDataUrl);
 
             // Get team name for response
             var teamName = sheet.getRange(rowNum, getHeaderIndex(headers, ['Team Name', 'Team']) + 1).getValue();
@@ -501,7 +510,7 @@ function doPost(e) {
                 'message': 'Checked In Successfully!',
                 'teamName': teamName,
                 'timestamp': timestamp,
-                'signatureUrl': fileUrl
+                'signatureUrl': signatureDataUrl
             })).setMimeType(ContentService.MimeType.JSON);
         }
 

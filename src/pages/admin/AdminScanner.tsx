@@ -268,7 +268,9 @@ export default function AdminScanner() {
                     }
                 }, 2000);
             } else {
-                setScanResult({ id: currentTicketId, status: 'error', message: result.message });
+                // Show detailed error for debugging
+                alert(`Backend Error:\n${JSON.stringify(result, null, 2)}`);
+                setScanResult({ id: currentTicketId, status: 'error', message: result.message || 'Unknown error from backend' });
                 setTimeout(() => {
                     setShowSignaturePad(false);
                     setScanResult(null);
@@ -280,6 +282,7 @@ export default function AdminScanner() {
             }
         } catch (err) {
             console.error("Signature upload error:", err);
+            alert(`Network Error:\n${err}`);
             setScanResult({ id: currentTicketId, status: 'error', message: "Failed to upload signature" });
         } finally {
             setLoading(false);

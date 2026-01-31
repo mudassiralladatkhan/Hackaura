@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react';
 import { NeonButton } from '@/components/ui/neon-button';
-import { Loader2, Printer, ArrowLeft, RefreshCw } from 'lucide-react';
+import { Printer, ArrowLeft, RefreshCw } from 'lucide-react';
 import { Link } from 'react-router-dom';
 
 const GOOGLE_SCRIPT_API_URL = "https://script.google.com/macros/s/AKfycbysAGugBZQJYH9bgb14_x3MXwN91KXsgGads4NQCAjGuBOunoOtbtYr02czk7LwKwCS/exec";
@@ -96,7 +96,18 @@ export default function AttendanceSheet() {
                                         <td className="border border-black p-2 text-center font-mono text-xs">
                                             {team.checkInTime ? team.checkInTime.split(',')[1] : '-'}
                                         </td>
-                                        <td className="border border-black p-2"></td>
+                                        <td className="border border-black p-2 text-center">
+                                            {team.signature ? (
+                                                <img
+                                                    src={team.signature}
+                                                    alt="Signature"
+                                                    className="max-w-[120px] max-h-[60px] mx-auto"
+                                                    style={{ imageRendering: 'auto' }}
+                                                />
+                                            ) : (
+                                                <span className="text-slate-400">-</span>
+                                            )}
+                                        </td>
                                     </tr>
                                 ))
                             )}
