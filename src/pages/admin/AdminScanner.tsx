@@ -14,6 +14,8 @@ export default function AdminScanner() {
     const [manualId, setManualId] = useState('');
     const [recentScans, setRecentScans] = useState<any[]>([]);
     const [cameraError, setCameraError] = useState<string | null>(null);
+    const [resetting, setResetting] = useState(false);
+
 
     // Signature States
     const [showSignaturePad, setShowSignaturePad] = useState(false);
@@ -162,6 +164,32 @@ export default function AdminScanner() {
         if (manualId) handleCheckIn(manualId);
     };
 
+    const handleResetAttendance = async () => {
+        const confirmed = window.confirm(
+            "⚠️ WARNING: This will clear ALL attendance data (check-ins, timestamps, and signatures).\n\nRegistration data will NOT be affected.\n\nAre you sure you want to proceed?"
+        );
+
+        if (!confirmed) return;
+
+        setResetting(true);
+        try {
+            const response = await fetch(`${GOOGLE_SCRIPT_API_URL}?action=resetAttendance`);
+            const result = await response.json();
+
+            if (result.result === 'success') {
+                alert(`✅ Success! Cleared attendance data for ${result.rowsCleared} rows.`);
+                setRecentScans([]); // Clear recent scans display
+            } else {
+                alert(`❌ Error: ${result.message || 'Failed to reset attendance'}`);
+            }
+        } catch (err) {
+            console.error("Reset error:", err);
+            alert("❌ Network error while resetting attendance");
+        } finally {
+            setResetting(false);
+        }
+    };
+
     // Signature Drawing Functions
     const startDrawing = (e: React.MouseEvent<HTMLCanvasElement> | React.TouchEvent<HTMLCanvasElement>) => {
         if (!contextRef.current || !canvasRef.current) return;
@@ -268,11 +296,25 @@ export default function AdminScanner() {
                         <h1 className="text-2xl font-bold text-white tracking-tighter">ADMIN <span className="text-cyan-400">SCANNER</span></h1>
                         <p className="text-xs text-slate-500 uppercase tracking-widest">Hackaura 2026 Admin Portal</p>
                     </div>
-                    <Link to="/admin/print">
-                        <NeonButton variant="secondary" className="!p-2">
-                            <Printer className="w-5 h-5" />
-                        </NeonButton>
-                    </Link>
+                    <div className="flex gap-2">
+                        <button
+                            onClick={handleResetAttendance}
+                            disabled={resetting}
+                            className="p-2 bg-red-900/30 hover:bg-red-900/50 border border-red-700/50 rounded-lg transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+                            title="Reset Attendance"
+                        >
+                            {resetting ? (
+                                <Loader2 className="w-5 h-5 text-red-400 animate-spin" />
+                            ) : (
+                                <RotateCcw className="w-5 h-5 text-red-400" />
+                            )}
+                        </button>
+                        <Link to="/admin/print">
+                            <NeonButton variant="secondary" className="!p-2">
+                                <Printer className="w-5 h-5" />
+                            </NeonButton>
+                        </Link>
+                    </div>
                 </div>
 
                 {/* Main Scanner Card */}

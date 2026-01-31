@@ -370,6 +370,36 @@ function doGet(e) {
             })).setMimeType(ContentService.MimeType.JSON);
         }
 
+        // ACTION: RESET ATTENDANCE (Clear all attendance data for testing)
+        if (e.parameter.action === 'resetAttendance') {
+            var attendanceIdx = getHeaderIndex(headers, ['Attendance', 'Status']);
+            var timeIdx = getHeaderIndex(headers, ['Check-In Time', 'Arrival Time']);
+            var signatureIdx = getHeaderIndex(headers, ['Signature', 'Signed', 'Digital Signature']);
+
+            var clearedCount = 0;
+
+            // Clear all attendance-related columns
+            for (var i = 1; i < data.length; i++) {
+                var rowNum = i + 1;
+                if (attendanceIdx > -1) {
+                    sheet.getRange(rowNum, attendanceIdx + 1).clearContent();
+                }
+                if (timeIdx > -1) {
+                    sheet.getRange(rowNum, timeIdx + 1).clearContent();
+                }
+                if (signatureIdx > -1) {
+                    sheet.getRange(rowNum, signatureIdx + 1).clearContent();
+                }
+                clearedCount++;
+            }
+
+            return ContentService.createTextOutput(JSON.stringify({
+                'result': 'success',
+                'message': 'Attendance data cleared',
+                'rowsCleared': clearedCount
+            })).setMimeType(ContentService.MimeType.JSON);
+        }
+
         // --------------------------
 
         var teamIdx = getHeaderIndex(headers, ['Team', 'Team Name']);
