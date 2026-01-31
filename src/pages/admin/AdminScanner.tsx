@@ -1,8 +1,8 @@
 import { useEffect, useState, useRef } from 'react';
-import { Html5QrcodeScanner } from 'html5-qrcode';
+import { Html5Qrcode } from 'html5-qrcode';
 import { NeonButton } from '@/components/ui/neon-button';
 import { GlassCard } from '@/components/ui/glass-card';
-import { Loader2, CheckCircle2, XCircle, Search, Printer, History } from 'lucide-react';
+import { Loader2, CheckCircle2, XCircle, Search, Printer, History, Camera, StopCircle } from 'lucide-react';
 import { Link } from 'react-router-dom';
 
 const GOOGLE_SCRIPT_API_URL = "https://script.google.com/macros/s/AKfycbysAGugBZQJYH9bgb14_x3MXwN91KXsgGads4NQCAjGuBOunoOtbtYr02czk7LwKwCS/exec";
@@ -10,76 +10,63 @@ const GOOGLE_SCRIPT_API_URL = "https://script.google.com/macros/s/AKfycbysAGugBZ
 export default function AdminScanner() {
     const [scanResult, setScanResult] = useState<any>(null);
     const [loading, setLoading] = useState(false);
+    const [scanning, setScanning] = useState(false);
     const [manualId, setManualId] = useState('');
     const [recentScans, setRecentScans] = useState<any[]>([]);
-    const scannerRef = useRef<Html5QrcodeScanner | null>(null);
+    const [cameraError, setCameraError] = useState<string | null>(null);
+
+    // We use a ref to hold the instance
+    const scannerRef = useRef<Html5Qrcode | null>(null);
 
     useEffect(() => {
-        // Initialize Scanner
-        if (!scannerRef.current) {
-            const scanner = new Html5QrcodeScanner(
-                "reader",
-                {
-                    fps: 10,
-                    qrbox: { width: 250, height: 250 },
-                    aspectRatio: 1.0,
-                    showTorchButtonIfSupported: true
-                },
-                /* verbose= */ false
-            );
-
-            scanner.render(onScanSuccess, (err) => console.log(err));
-            scannerRef.current = scanner;
-        }
-
+        // Cleanup on unmount
         return () => {
-            if (scannerRef.current) {
-                scannerRef.current.clear().catch(error => console.error("Failed to clear html5-qrcode scanner. ", error));
+            if (scannerRef.current && scannerRef.current.isScanning) {
+                scannerRef.current.stop().catch(e => console.error(e));
             }
         };
     }, []);
 
-    // Custom CSS to Fix Visibility of "Start Scanning" Button
-    // The library creates elements that are often invisible in dark mode (black text on transparent/black bg)
-    const scannerStyles = `
-      #reader {
-        border: none !important;
-      }
-      #reader__scan_region {
-        background: rgba(0,0,0,0.5);
-      }
-      #reader__dashboard_section_csr button {
-        background-color: #22d3ee !important;
-        color: #000 !important;
-        border: none !important;
-        padding: 10px 20px !important;
-        border-radius: 6px !important;
-        font-weight: bold !important;
-        font-family: inherit !important;
-        margin-top: 15px !important;
-        cursor: pointer !important;
-        text-transform: uppercase;
-        letter-spacing: 1px;
-        box-shadow: 0 0 10px rgba(34, 211, 238, 0.5);
-      }
-      #reader__dashboard_section_swaplink {
-        display: none !important;
-      }
-      #reader__status_span {
-        color: #94a3b8 !important;
-        font-family: monospace !important;
-        font-size: 12px !important;
-      }
-      #reader__header_message {
-        display: none !important;
-      }
-      /* Hide the 'stop scanning' button if it looks ugly, or style it too */
-      #reader__dashboard_section_csr span button {
-         background-color: #ef4444 !important;
-         color: white !important;
-         box-shadow: 0 0 10px rgba(239, 68, 68, 0.5);
-      }
-    `;
+    const startCamera = async () => {
+        setCameraError(null);
+        try {
+            // If instance exists, use it, else create new
+            if (!scannerRef.current) {
+                scannerRef.current = new Html5Qrcode("reader");
+            }
+
+            const scanner = scannerRef.current;
+
+            await scanner.start(
+                { facingMode: "environment" },
+                {
+                    fps: 10,
+                    qrbox: { width: 250, height: 250 },
+                    aspectRatio: 1.0
+                },
+                onScanSuccess,
+                (errorMessage) => {
+                    // console.log("Scanning..."); // Ignore frame errors
+                }
+            );
+            setScanning(true);
+        } catch (err: any) {
+            console.error("Error starting camera:", err);
+            setCameraError(err?.message || "Camera permission denied or camera not found.");
+            setScanning(false);
+        }
+    };
+
+    const stopCamera = async () => {
+        if (scannerRef.current) {
+            try {
+                await scannerRef.current.stop();
+                setScanning(false);
+            } catch (err) {
+                console.error("Failed to stop", err);
+            }
+        }
+    };
 
     const onScanSuccess = (decodedText: string) => {
         // Handle URL or Direct ID
@@ -89,7 +76,9 @@ export default function AdminScanner() {
                 ticketId = decodedText.split('ticketId=')[1];
             }
 
-            // Debounce: prevent duplicate scans in short time
+            // Pause scanning logic temporarily
+            if (scannerRef.current) scannerRef.current.pause();
+
             handleCheckIn(ticketId);
         } catch (err) {
             console.error(err);
@@ -97,13 +86,10 @@ export default function AdminScanner() {
     };
 
     const handleCheckIn = async (ticketId: string) => {
-        if (loading) return; // Prevent double firing
+        if (loading) return;
         setLoading(true);
 
         try {
-            // Pause scanner momentarily if needed or show overlay
-            if (scannerRef.current) scannerRef.current.pause();
-
             const response = await fetch(`${GOOGLE_SCRIPT_API_URL}?action=markAttendance&ticketId=${ticketId}`);
             const result = await response.json();
 
@@ -116,7 +102,6 @@ export default function AdminScanner() {
                 };
                 setScanResult(newScan);
                 setRecentScans(prev => [newScan, ...prev]);
-                // Play success sound?
             } else {
                 setScanResult({ id: ticketId, status: 'error', message: result.message });
             }
@@ -125,10 +110,14 @@ export default function AdminScanner() {
             setScanResult({ id: ticketId, status: 'error', message: "Network Error" });
         } finally {
             setLoading(false);
-            // Resume scanner after 2 seconds
+            // Resume scanner after 3 seconds
             setTimeout(() => {
-                if (scannerRef.current) scannerRef.current.resume();
                 setScanResult(null); // Clear overlay
+                if (scannerRef.current) {
+                    try {
+                        scannerRef.current.resume();
+                    } catch (e) { console.warn("Scanner resume failed", e) }
+                }
             }, 3000);
         }
     };
@@ -157,7 +146,6 @@ export default function AdminScanner() {
 
                 {/* Main Scanner Card */}
                 <GlassCard className="p-4 bg-slate-900/50 border-slate-800 relative overflow-hidden">
-                    <style>{scannerStyles}</style>
 
                     {/* Active Overlay for Result */}
                     {scanResult && (
@@ -183,14 +171,42 @@ export default function AdminScanner() {
                     {loading && !scanResult && (
                         <div className="absolute inset-0 z-40 flex flex-col items-center justify-center bg-black/80 backdrop-blur-sm">
                             <Loader2 className="w-12 h-12 text-cyan-400 animate-spin" />
-                            <p className="mt-4 text-cyan-400 font-mono animate-pulse">Verifying...</p>
+                        </div>
+                    )}
+
+                    {/* Custom Error Message */}
+                    {cameraError && (
+                        <div className="absolute inset-0 z-30 flex flex-col items-center justify-center bg-slate-900 p-4 text-center">
+                            <XCircle className="w-12 h-12 text-red-500 mb-2" />
+                            <p className="text-red-400 text-sm font-bold">{cameraError}</p>
+                            <NeonButton onClick={startCamera} className="mt-4 !py-2 !text-xs">
+                                Retry Config
+                            </NeonButton>
+                        </div>
+                    )}
+
+                    {!scanning && !cameraError && (
+                        <div className="absolute inset-0 z-30 flex flex-col items-center justify-center bg-slate-950/90">
+                            <Camera className="w-16 h-16 text-slate-700 mb-4" />
+                            <NeonButton onClick={startCamera} className="!w-48 !py-3">
+                                Start Camera
+                            </NeonButton>
+                            <p className="text-slate-500 text-xs mt-4">Takes a moment to load</p>
                         </div>
                     )}
 
                     <div id="reader" className="w-full h-64 bg-black rounded-lg overflow-hidden border-2 border-slate-700"></div>
-                    <div className="mt-4 text-center">
-                        <p className="text-xs text-slate-500 uppercase tracking-widest animate-pulse">Camera Active • Scanning</p>
-                    </div>
+
+                    {scanning && (
+                        <div className="mt-4 flex justify-between items-center">
+                            <p className="text-xs text-green-400 uppercase tracking-widest animate-pulse flex items-center gap-2">
+                                <span className="w-2 h-2 rounded-full bg-green-500"></span> Live
+                            </p>
+                            <button onClick={stopCamera} className="text-slate-400 hover:text-red-400 transition-colors">
+                                <StopCircle className="w-6 h-6" />
+                            </button>
+                        </div>
+                    )}
                 </GlassCard>
 
                 {/* Manual Entry */}
