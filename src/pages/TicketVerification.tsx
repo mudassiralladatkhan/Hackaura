@@ -2,7 +2,7 @@ import { useEffect, useState, useRef } from 'react';
 import { useSearchParams, useNavigate } from 'react-router-dom';
 import { GlassCard } from '@/components/ui/glass-card';
 import { NeonButton } from '@/components/ui/neon-button';
-import { Loader2, CheckCircle2, XCircle, Users, School, Award, ArrowLeft, ShieldCheck } from 'lucide-react';
+import { Loader2, CheckCircle2, XCircle, Users, School, Award, ArrowLeft, ShieldCheck, User } from 'lucide-react';
 import { ParticleBackground } from '@/components/ui/particle-background';
 
 interface TeamDetails {

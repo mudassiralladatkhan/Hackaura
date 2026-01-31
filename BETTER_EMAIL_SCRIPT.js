@@ -130,9 +130,9 @@ function onFormSubmit(e) {
                   <!-- QR Code Row -->
                   <div style="display: table-row;">
                     <div style="display: table-cell; padding-top: 25px; text-align: center;" colspan="2">
-                       <img src="https://api.qrserver.com/v1/create-qr-code/?size=150x150&data=${encodeURIComponent('https://hackaura.netlify.app/verify?ticketId=' + ticketId)}" alt="Ticket QR" width="150" height="150" style="border: 4px solid #ffffff; border-radius: 8px; display: inline-block;">
+                       <img src="https://api.qrserver.com/v1/create-qr-code/?size=150x150&data=${encodeURIComponent('https://hackaura2026.netlify.app/verify?ticketId=' + ticketId)}" alt="Ticket QR" width="150" height="150" style="border: 4px solid #ffffff; border-radius: 8px; display: inline-block;">
                        <p style="margin: 10px 0 0; font-size: 12px; color: #64748b;">Scan to Verify Ticket</p>
-                       <a href="https://hackaura.netlify.app/verify?ticketId=${ticketId}" style="display: block; margin-top: 5px; color: #22d3ee; font-size: 11px; text-decoration: none;">(or click here to verify)</a>
+                       <a href="https://hackaura2026.netlify.app/verify?ticketId=${ticketId}" style="display: block; margin-top: 5px; color: #22d3ee; font-size: 11px; text-decoration: none;">(or click here to verify)</a>
                     </div>
                   </div>
 
