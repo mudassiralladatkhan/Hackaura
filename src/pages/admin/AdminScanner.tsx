@@ -19,7 +19,12 @@ export default function AdminScanner() {
         if (!scannerRef.current) {
             const scanner = new Html5QrcodeScanner(
                 "reader",
-                { fps: 10, qrbox: { width: 250, height: 250 } },
+                {
+                    fps: 10,
+                    qrbox: { width: 250, height: 250 },
+                    aspectRatio: 1.0,
+                    showTorchButtonIfSupported: true
+                },
                 /* verbose= */ false
             );
 
@@ -33,6 +38,48 @@ export default function AdminScanner() {
             }
         };
     }, []);
+
+    // Custom CSS to Fix Visibility of "Start Scanning" Button
+    // The library creates elements that are often invisible in dark mode (black text on transparent/black bg)
+    const scannerStyles = `
+      #reader {
+        border: none !important;
+      }
+      #reader__scan_region {
+        background: rgba(0,0,0,0.5);
+      }
+      #reader__dashboard_section_csr button {
+        background-color: #22d3ee !important;
+        color: #000 !important;
+        border: none !important;
+        padding: 10px 20px !important;
+        border-radius: 6px !important;
+        font-weight: bold !important;
+        font-family: inherit !important;
+        margin-top: 15px !important;
+        cursor: pointer !important;
+        text-transform: uppercase;
+        letter-spacing: 1px;
+        box-shadow: 0 0 10px rgba(34, 211, 238, 0.5);
+      }
+      #reader__dashboard_section_swaplink {
+        display: none !important;
+      }
+      #reader__status_span {
+        color: #94a3b8 !important;
+        font-family: monospace !important;
+        font-size: 12px !important;
+      }
+      #reader__header_message {
+        display: none !important;
+      }
+      /* Hide the 'stop scanning' button if it looks ugly, or style it too */
+      #reader__dashboard_section_csr span button {
+         background-color: #ef4444 !important;
+         color: white !important;
+         box-shadow: 0 0 10px rgba(239, 68, 68, 0.5);
+      }
+    `;
 
     const onScanSuccess = (decodedText: string) => {
         // Handle URL or Direct ID
@@ -110,6 +157,7 @@ export default function AdminScanner() {
 
                 {/* Main Scanner Card */}
                 <GlassCard className="p-4 bg-slate-900/50 border-slate-800 relative overflow-hidden">
+                    <style>{scannerStyles}</style>
 
                     {/* Active Overlay for Result */}
                     {scanResult && (
