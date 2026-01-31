@@ -30,29 +30,45 @@ export default function AdminScanner() {
     const startCamera = async () => {
         setCameraError(null);
         try {
-            // If instance exists, use it, else create new
+            // Check if instance exists, or create new
             if (!scannerRef.current) {
                 scannerRef.current = new Html5Qrcode("reader");
             }
-
             const scanner = scannerRef.current;
 
-            await scanner.start(
-                { facingMode: "environment" },
-                {
-                    fps: 10,
-                    qrbox: { width: 250, height: 250 },
-                    aspectRatio: 1.0
-                },
-                onScanSuccess,
-                (errorMessage) => {
-                    // console.log("Scanning..."); // Ignore frame errors
+            // 1. Get List of Cameras
+            let cameraId = null;
+            try {
+                const devices = await Html5Qrcode.getCameras();
+                if (devices && devices.length > 0) {
+                    // Try to find one with 'back' or 'environment' in list if multiple
+                    const backCamera = devices.find(d => d.label.toLowerCase().includes('back') || d.label.toLowerCase().includes('environment'));
+                    cameraId = backCamera ? backCamera.id : devices[0].id; // Default to first if no back cam found
                 }
-            );
+            } catch (e) {
+                console.warn("Failed to get camera list, trying generic mode", e);
+            }
+
+            // 2. Start Scanning
+            const config = {
+                fps: 10,
+                qrbox: { width: 250, height: 250 },
+                aspectRatio: 1.0
+            };
+
+            // If we found a specific camera ID, use it. Otherwise use generic facingMode logic.
+            if (cameraId) {
+                await scanner.start(cameraId, config, onScanSuccess, undefined);
+            } else {
+                await scanner.start({ facingMode: "environment" }, config, onScanSuccess, undefined);
+            }
+
             setScanning(true);
+
         } catch (err: any) {
-            console.error("Error starting camera:", err);
-            setCameraError(err?.message || "Camera permission denied or camera not found.");
+            console.error("Camera Start Error:", err);
+            // Display EXACT error for debugging
+            setCameraError(err?.message || "Permission Denied: Could not access camera.");
             setScanning(false);
         }
     };
@@ -178,7 +194,8 @@ export default function AdminScanner() {
                     {cameraError && (
                         <div className="absolute inset-0 z-30 flex flex-col items-center justify-center bg-slate-900 p-4 text-center">
                             <XCircle className="w-12 h-12 text-red-500 mb-2" />
-                            <p className="text-red-400 text-sm font-bold">{cameraError}</p>
+                            <p className="text-red-400 text-sm font-bold block mb-2">{cameraError}</p>
+                            <p className="text-slate-500 text-xs mb-4">Ensure you are using HTTPS and have allowed permissions.</p>
                             <NeonButton onClick={startCamera} className="mt-4 !py-2 !text-xs">
                                 Retry Config
                             </NeonButton>
