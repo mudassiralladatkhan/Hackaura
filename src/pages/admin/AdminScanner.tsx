@@ -125,16 +125,17 @@ export default function AdminScanner() {
         setLoading(true);
 
         try {
-            const response = await fetch(`${GOOGLE_SCRIPT_API_URL}?action=markAttendance&ticketId=${ticketId}`);
+            // Just validate the ticket exists, don't mark attendance yet
+            const response = await fetch(`${GOOGLE_SCRIPT_API_URL}?action=getTeamDetails&ticketId=${ticketId}`);
             const result = await response.json();
 
             if (result.result === 'success') {
-                // Show signature pad instead of immediate success
+                // Show signature pad - we'll mark attendance AFTER signature
                 setCurrentTicketId(ticketId);
                 setShowSignaturePad(true);
-                setScanResult({ id: ticketId, team: result.teamName, time: result.timestamp, status: 'pending_signature' });
+                setScanResult({ id: ticketId, team: result.teamName, status: 'pending_signature' });
             } else {
-                setScanResult({ id: ticketId, status: 'error', message: result.message });
+                setScanResult({ id: ticketId, status: 'error', message: result.message || 'Invalid Ticket' });
                 setTimeout(() => {
                     setScanResult(null);
                     if (scannerRef.current) {
@@ -215,12 +216,17 @@ export default function AdminScanner() {
             const result = await response.json();
 
             if (result.result === 'success') {
-                // Update scan result to success
-                setScanResult(prev => ({ ...prev, status: 'success' }));
+                // Update scan result to success with data from backend
+                setScanResult({
+                    id: currentTicketId,
+                    team: result.teamName,
+                    time: result.timestamp,
+                    status: 'success'
+                });
                 setRecentScans(prev => [{
                     id: currentTicketId,
-                    team: scanResult.team,
-                    time: scanResult.time,
+                    team: result.teamName,
+                    time: result.timestamp,
                     status: 'success'
                 }, ...prev]);
 

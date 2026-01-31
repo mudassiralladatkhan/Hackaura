@@ -443,22 +443,35 @@ function doPost(e) {
             var file = folder.createFile(blob);
             var fileUrl = file.getUrl();
 
-            // Update Sheet
+            // Update Sheet with BOTH Signature AND Attendance
             var signatureCol = getHeaderIndex(headers, ['Signature', 'Signed', 'Digital Signature']) + 1;
+            var attendanceCol = getHeaderIndex(headers, ['Attendance', 'Status']) + 1;
+            var timeCol = getHeaderIndex(headers, ['Check-In Time', 'Arrival Time']) + 1;
 
             if (signatureCol === 0) {
-                // If column doesn't exist, we can't write safely without risking overwriting data.
-                // However, if we are in doPost, we can assume user might have added it.
-                // Let's return error to be safe, urging user to add column.
                 return ContentService.createTextOutput(JSON.stringify({ 'result': 'error', 'message': 'Column "Signature" not found in Sheet' })).setMimeType(ContentService.MimeType.JSON);
             }
 
+            if (attendanceCol === 0) {
+                return ContentService.createTextOutput(JSON.stringify({ 'result': 'error', 'message': 'Column "Attendance" not found in Sheet' })).setMimeType(ContentService.MimeType.JSON);
+            }
+
+            var timestamp = new Date().toLocaleString('en-IN', { timeZone: 'Asia/Kolkata' });
+
+            // Mark attendance AND save signature in one operation
+            sheet.getRange(rowNum, attendanceCol).setValue("Checked In");
+            if (timeCol > 0) sheet.getRange(rowNum, timeCol).setValue(timestamp);
             sheet.getRange(rowNum, signatureCol).setValue(fileUrl);
+
+            // Get team name for response
+            var teamName = sheet.getRange(rowNum, getHeaderIndex(headers, ['Team Name', 'Team']) + 1).getValue();
 
             return ContentService.createTextOutput(JSON.stringify({
                 'result': 'success',
-                'message': 'Signature Saved',
-                'url': fileUrl
+                'message': 'Checked In Successfully!',
+                'teamName': teamName,
+                'timestamp': timestamp,
+                'signatureUrl': fileUrl
             })).setMimeType(ContentService.MimeType.JSON);
         }
 
