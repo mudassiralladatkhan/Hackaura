@@ -119,23 +119,38 @@ export default function TicketVerification() {
                                 </div>
 
                                 {/* MEMBERS LIST */}
-                                <div className="p-4 rounded-xl bg-slate-900/50 border border-slate-800">
-                                    <div className="flex items-center gap-2 mb-3 pb-3 border-b border-slate-800">
-                                        <Users className="w-4 h-4 text-cyan-400" />
-                                        <p className="text-xs text-slate-500 uppercase tracking-wider font-bold">Team Members</p>
+                                {/* TEAM LEADER (HIGHLIGHTED) */}
+                                <div className="p-5 rounded-xl bg-gradient-to-r from-cyan-900/20 to-blue-900/20 border border-cyan-500/30 relative overflow-hidden group">
+                                    <div className="absolute top-0 right-0 p-2 opacity-10 group-hover:opacity-20 transition-opacity">
+                                        <User className="w-16 h-16 text-cyan-400" />
                                     </div>
-                                    <div className="space-y-2">
-                                        <div className="flex items-center justify-between">
-                                            <span className="text-sm text-slate-300 font-medium">{data?.leaderName}</span>
-                                            <span className="text-[10px] px-2 py-0.5 rounded bg-cyan-500/20 text-cyan-400 border border-cyan-500/20">Leader</span>
-                                        </div>
-                                        {data?.members.map((member, idx) => (
-                                            <div key={idx} className="flex items-center justify-between">
-                                                <span className="text-sm text-slate-400">{member}</span>
-                                            </div>
-                                        ))}
+                                    <div className="flex items-center gap-2 mb-2">
+                                        <ShieldCheck className="w-4 h-4 text-cyan-400" />
+                                        <p className="text-xs text-cyan-400 uppercase tracking-widest font-bold">Team Leader</p>
                                     </div>
+                                    <p className="text-xl font-bold text-white tracking-wide">{data?.leaderName}</p>
+                                    <p className="text-xs text-cyan-200/50 mt-1">Authorized Representative</p>
                                 </div>
+
+                                {/* MEMBERS GRID */}
+                                {data?.members && data.members.length > 0 && (
+                                    <div className="p-4 rounded-xl bg-slate-900/50 border border-slate-800">
+                                        <div className="flex items-center gap-2 mb-4 pb-2 border-b border-slate-800">
+                                            <Users className="w-4 h-4 text-purple-400" />
+                                            <p className="text-xs text-slate-500 uppercase tracking-wider font-bold">Team Members</p>
+                                        </div>
+                                        <div className="grid grid-cols-1 gap-2">
+                                            {data.members.map((member, idx) => (
+                                                <div key={idx} className="flex items-center gap-3 p-2 rounded-lg hover:bg-white/5 transition-colors">
+                                                    <div className="w-6 h-6 rounded-full bg-slate-800 flex items-center justify-center text-xs font-mono text-slate-400">
+                                                        {idx + 1}
+                                                    </div>
+                                                    <span className="text-sm text-slate-300 font-medium">{member}</span>
+                                                </div>
+                                            ))}
+                                        </div>
+                                    </div>
+                                )}
 
                             </div>
 
