@@ -4,6 +4,8 @@ import RegistrationSuccess from './pages/RegistrationSuccess';
 import TicketVerification from './pages/TicketVerification';
 import AdminScanner from './pages/admin/AdminScanner';
 import AttendanceSheet from './pages/admin/AttendanceSheet';
+import ParticipantsList from './pages/admin/ParticipantsList';
+import ProjectSubmission from './pages/ProjectSubmission';
 import type { ReactNode } from 'react';
 
 interface RouteConfig {
@@ -46,6 +48,18 @@ const routes: RouteConfig[] = [
     name: 'Print Attendance',
     path: '/admin/print',
     element: <AttendanceSheet />,
+    visible: false
+  },
+  {
+    name: 'Participants List',
+    path: '/admin/participants',
+    element: <ParticipantsList />,
+    visible: false
+  },
+  {
+    name: 'Submit Project',
+    path: '/submit',
+    element: <ProjectSubmission />,
     visible: false
   }
 ];

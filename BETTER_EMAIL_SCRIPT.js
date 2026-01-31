@@ -313,6 +313,87 @@ function doGet(e) {
         var data = sheet.getDataRange().getValues();
         var headers = data[0];
 
+        // --- NEW: OTP HANDLERS (Fallback for GET) ---
+
+        // ACTION: SEND OTP (GET)
+        if (e.parameter.action === 'sendOTP') {
+            var ticketId = e.parameter.ticketId;
+            var ticketNum = parseInt(ticketId.split('-')[1], 10);
+
+            if (isNaN(ticketNum) || ticketNum < 1 || ticketNum >= data.length) {
+                return ContentService.createTextOutput(JSON.stringify({ 'result': 'error', 'message': 'Invalid Ticket ID' })).setMimeType(ContentService.MimeType.JSON);
+            }
+
+            var teamEmail = data[ticketNum][getHeaderIndex(headers, ['Email Address', 'Leader Email'])];
+            var teamName = data[ticketNum][getHeaderIndex(headers, ['Team Name', 'Team'])];
+
+            if (!teamEmail) {
+                return ContentService.createTextOutput(JSON.stringify({ 'result': 'error', 'message': 'No email found for this team.' })).setMimeType(ContentService.MimeType.JSON);
+            }
+
+            var otp = Math.floor(100000 + Math.random() * 900000).toString();
+
+            // Save OTP
+            var otpSheet = SpreadsheetApp.getActiveSpreadsheet().getSheetByName("Active_OTPs");
+            if (!otpSheet) {
+                otpSheet = SpreadsheetApp.getActiveSpreadsheet().insertSheet("Active_OTPs");
+                otpSheet.appendRow(["Timestamp", "Ticket ID", "OTP"]);
+            }
+            otpSheet.appendRow([new Date(), ticketId, otp]);
+
+            // Send Email
+            MailApp.sendEmail({
+                to: teamEmail,
+                subject: "Hackaura Project Submission OTP",
+                htmlBody: `
+                    <h2>Project Submission Verification</h2>
+                    <p>Hello Team <b>${teamName}</b>,</p>
+                    <p>Your OTP for submitting your project is:</p>
+                    <h1 style="color: #4ade80; font-size: 32px; letter-spacing: 5px;">${otp}</h1>
+                    <p>This OTP is valid for 15 minutes.</p>
+                `
+            });
+
+            return ContentService.createTextOutput(JSON.stringify({
+                'result': 'success',
+                'message': 'OTP sent to registered email.'
+            })).setMimeType(ContentService.MimeType.JSON);
+        }
+
+        // ACTION: VERIFY OTP (GET)
+        if (e.parameter.action === 'verifyOTP') {
+            var ticketId = e.parameter.ticketId;
+            var userOtp = e.parameter.otp;
+
+            var otpSheet = SpreadsheetApp.getActiveSpreadsheet().getSheetByName("Active_OTPs");
+            if (!otpSheet) {
+                return ContentService.createTextOutput(JSON.stringify({ 'result': 'error', 'message': 'No OTP requested.' })).setMimeType(ContentService.MimeType.JSON);
+            }
+
+            var otpData = otpSheet.getDataRange().getValues();
+            var isValid = false;
+
+            for (var i = otpData.length - 1; i >= 1; i--) {
+                if (String(otpData[i][1]) === String(ticketId)) {
+                    var timestamp = new Date(otpData[i][0]);
+                    var storedOtp = String(otpData[i][2]).trim();
+                    var now = new Date();
+                    var diffMins = (now - timestamp) / 60000;
+
+                    if (diffMins <= 15 && storedOtp === String(userOtp).trim()) {
+                        isValid = true;
+                    }
+                    break;
+                }
+            }
+
+            if (isValid) {
+                return ContentService.createTextOutput(JSON.stringify({ 'result': 'success', 'message': 'OTP Verified' })).setMimeType(ContentService.MimeType.JSON);
+            } else {
+                return ContentService.createTextOutput(JSON.stringify({ 'result': 'error', 'message': 'Invalid or Expired OTP' })).setMimeType(ContentService.MimeType.JSON);
+            }
+        }
+
         // --- NEW: ADMIN ACTIONS ---
 
         // ACTION: MARK ATTENDANCE (Check-In)
@@ -408,21 +489,59 @@ function doGet(e) {
             })).setMimeType(ContentService.MimeType.JSON);
         }
 
-        // --------------------------
+        // ACTION: GET ALL PARTICIPANTS (For Admin List)
+        if (e.parameter.action === 'getAllParticipants') {
+            var allTeams = [];
+            for (var i = 1; i < data.length; i++) {
+                allTeams.push({
+                    ticketId: 'HA26-' + String(i).padStart(3, '0'),
+                    teamName: data[i][getHeaderIndex(headers, ['Team Name', 'Team'])],
+                    leaderName: data[i][getHeaderIndex(headers, ['Leader Name', 'Full Name'])],
+                    email: data[i][getHeaderIndex(headers, ['Email Address', 'Leader Email'])],
+                    phone: data[i][getHeaderIndex(headers, ['Phone Number', 'Phone', 'Mobile'])],
+                    college: data[i][getHeaderIndex(headers, ['College', 'Institute'])],
+                    membersCount: [
+                        data[i][getHeaderIndex(headers, ['Member 1 Name', 'Member 1'])],
+                        data[i][getHeaderIndex(headers, ['Member 2 Name', 'Member 2'])],
+                        data[i][getHeaderIndex(headers, ['Member 3 Name', 'Member 3'])]
+                    ].filter(Boolean).length + 1, // +1 for leader
+                    status: data[i][getHeaderIndex(headers, ['Attendance', 'Status'])] || 'Pending'
+                });
+            }
 
-        var teamIdx = getHeaderIndex(headers, ['Team', 'Team Name']);
-        var emailIdx = getHeaderIndex(headers, ['Email', 'Leader Email', 'Email Address']);
-        var phoneIdx = getHeaderIndex(headers, ['Phone', 'Leader Phone', 'Mobile']);
+            return ContentService.createTextOutput(JSON.stringify({
+                'result': 'success',
+                'teams': allTeams
+            })).setMimeType(ContentService.MimeType.JSON);
+        }
 
-        if (e.parameter.teamName || e.parameter.email || e.parameter.phone) {
+
+        // ACTION: CHECK UNIQUE (Duplicate Check)
+        if (e.parameter.action === 'checkUnique') {
+            var teamIdx = getHeaderIndex(headers, ['Team', 'Team Name']);
+            var emailIdx = getHeaderIndex(headers, ['Email', 'Leader Email', 'Email Address']);
+            var phoneIdx = getHeaderIndex(headers, ['Phone', 'Leader Phone', 'Mobile']);
+
             var exists = false;
+            var type = e.parameter.type;
+            var value = String(e.parameter.value).trim().toLowerCase();
+
             for (var i = 1; i < data.length; i++) {
                 var row = data[i];
-                if (e.parameter.teamName && teamIdx > -1 && String(row[teamIdx]).trim().toLowerCase() === String(e.parameter.teamName).trim().toLowerCase()) exists = true;
-                if (e.parameter.email && emailIdx > -1 && String(row[emailIdx]).trim().toLowerCase() === String(e.parameter.email).trim().toLowerCase()) exists = true;
-                if (e.parameter.phone && phoneIdx > -1 && String(row[phoneIdx]).trim() === String(e.parameter.phone).trim()) exists = true;
+                if (type === 'teamName' && teamIdx > -1 && String(row[teamIdx]).trim().toLowerCase() === value) exists = true;
+                if (type === 'email' && emailIdx > -1 && String(row[emailIdx]).trim().toLowerCase() === value) exists = true;
+                if (type === 'phone' && phoneIdx > -1 && String(row[phoneIdx]).trim() === value) exists = true;
+                if (exists) break;
             }
             return ContentService.createTextOutput(JSON.stringify({ 'result': 'success', 'exists': exists })).setMimeType(ContentService.MimeType.JSON);
+        }
+
+        // --------------------------
+
+        // Legacy implicit check (Optional: remove if not needed, but keeping for safety)
+        if (e.parameter.teamName || e.parameter.email || e.parameter.phone) {
+            // ... legacy logic ...
+            return ContentService.createTextOutput(JSON.stringify({ 'result': 'error', 'message': 'Please use action=checkUnique' })).setMimeType(ContentService.MimeType.JSON);
         }
 
         return ContentService.createTextOutput(JSON.stringify({ 'result': 'error', 'error': 'Invalid params' })).setMimeType(ContentService.MimeType.JSON);
@@ -452,6 +571,12 @@ function doPost(e) {
             if (!ticketId || !imageBase64) {
                 return ContentService.createTextOutput(JSON.stringify({ 'result': 'error', 'message': 'Missing data' })).setMimeType(ContentService.MimeType.JSON);
             }
+
+            // ... (rest of uploadSignature) ...
+            // FOR BREVITY I AM NOT REPLACING THE INSIDE OF uploadSignature, I AM JUST INSERTING AFTER IT...
+            // Wait, multi_replace cannot insert, it replaces. I should append to the end of doPost or find a unique insertion point.
+            // I'll append the new actions BEFORE the end of doPost, after the uploadSignature block.
+
 
             var sheet = SpreadsheetApp.getActiveSpreadsheet().getSheetByName("Form_Responses");
             // Fallback name if user renamed it, try to get first sheet
@@ -512,6 +637,135 @@ function doPost(e) {
                 'timestamp': timestamp,
                 'signatureUrl': signatureDataUrl
             })).setMimeType(ContentService.MimeType.JSON);
+        }
+
+        // ACTION: SUBMIT PROJECT
+        if (action === 'submitProject') {
+            var ticketId = request.ticketId;
+            var ticketNum = parseInt(ticketId.split('-')[1], 10);
+
+            var sheet = SpreadsheetApp.getActiveSpreadsheet().getSheetByName("Form_Responses");
+            if (!sheet) sheet = SpreadsheetApp.getActiveSpreadsheet().getSheets()[0];
+            var data = sheet.getDataRange().getValues();
+            var headers = data[0];
+
+            // Validate Ticket ID
+            if (isNaN(ticketNum) || ticketNum < 1 || ticketNum >= data.length) {
+                return ContentService.createTextOutput(JSON.stringify({ 'result': 'error', 'message': 'Invalid Ticket ID' })).setMimeType(ContentService.MimeType.JSON);
+            }
+
+            var teamName = data[ticketNum][getHeaderIndex(headers, ['Team Name', 'Team'])];
+
+            // Get or Create "Submissions" Sheet
+            var submissionSheet = SpreadsheetApp.getActiveSpreadsheet().getSheetByName("Submissions");
+            if (!submissionSheet) {
+                submissionSheet = SpreadsheetApp.getActiveSpreadsheet().insertSheet("Submissions");
+                submissionSheet.appendRow(["Timestamp", "Ticket ID", "Team Name", "Project Title", "Description", "PPT Link", "Repo Link", "Video Link", "Other Links"]);
+            }
+
+            // Append Submission Data
+            submissionSheet.appendRow([
+                new Date(),
+                ticketId,
+                teamName,
+                request.title,
+                request.description,
+                request.pptLink || '',
+                request.repoLink || '',
+                request.videoLink || '',
+                request.otherLinks || ''
+            ]);
+
+            return ContentService.createTextOutput(JSON.stringify({
+                'result': 'success',
+                'message': 'Project submitted successfully!'
+            })).setMimeType(ContentService.MimeType.JSON);
+        }
+
+        // ACTION: SEND OTP
+        if (action === 'sendOTP') {
+            var ticketId = request.ticketId;
+            var ticketNum = parseInt(ticketId.split('-')[1], 10);
+
+            var sheet = SpreadsheetApp.getActiveSpreadsheet().getSheetByName("Form_Responses");
+            if (!sheet) sheet = SpreadsheetApp.getActiveSpreadsheet().getSheets()[0];
+            var data = sheet.getDataRange().getValues();
+            var headers = data[0];
+
+            if (isNaN(ticketNum) || ticketNum < 1 || ticketNum >= data.length) {
+                return ContentService.createTextOutput(JSON.stringify({ 'result': 'error', 'message': 'Invalid Ticket ID' })).setMimeType(ContentService.MimeType.JSON);
+            }
+
+            var teamEmail = data[ticketNum][getHeaderIndex(headers, ['Email Address', 'Leader Email'])];
+            var teamName = data[ticketNum][getHeaderIndex(headers, ['Team Name', 'Team'])];
+
+            if (!teamEmail) {
+                return ContentService.createTextOutput(JSON.stringify({ 'result': 'error', 'message': 'No email found for this team.' })).setMimeType(ContentService.MimeType.JSON);
+            }
+
+            var otp = Math.floor(100000 + Math.random() * 900000).toString();
+
+            // Save OTP
+            var otpSheet = SpreadsheetApp.getActiveSpreadsheet().getSheetByName("Active_OTPs");
+            if (!otpSheet) {
+                otpSheet = SpreadsheetApp.getActiveSpreadsheet().insertSheet("Active_OTPs");
+                otpSheet.appendRow(["Timestamp", "Ticket ID", "OTP"]);
+            }
+            otpSheet.appendRow([new Date(), ticketId, otp]);
+
+            // Send Email
+            MailApp.sendEmail({
+                to: teamEmail,
+                subject: "Hackaura Project Submission OTP",
+                htmlBody: `
+                    <h2>Project Submission Verification</h2>
+                    <p>Hello Team <b>${teamName}</b>,</p>
+                    <p>Your OTP for submitting your project is:</p>
+                    <h1 style="color: #4ade80; font-size: 32px; letter-spacing: 5px;">${otp}</h1>
+                    <p>This OTP is valid for 15 minutes.</p>
+                    <p>If you did not request this, please ignore this email.</p>
+                `
+            });
+
+            return ContentService.createTextOutput(JSON.stringify({
+                'result': 'success',
+                'message': 'OTP sent to registered email.'
+            })).setMimeType(ContentService.MimeType.JSON);
+        }
+
+        // ACTION: VERIFY OTP
+        if (action === 'verifyOTP') {
+            var ticketId = request.ticketId;
+            var userOtp = request.otp;
+
+            var otpSheet = SpreadsheetApp.getActiveSpreadsheet().getSheetByName("Active_OTPs");
+            if (!otpSheet) {
+                return ContentService.createTextOutput(JSON.stringify({ 'result': 'error', 'message': 'No OTP requested.' })).setMimeType(ContentService.MimeType.JSON);
+            }
+
+            var otpData = otpSheet.getDataRange().getValues();
+            var isValid = false;
+
+            // Check from bottom up for latest OTP
+            for (var i = otpData.length - 1; i >= 1; i--) {
+                if (String(otpData[i][1]) === String(ticketId)) {
+                    var timestamp = new Date(otpData[i][0]);
+                    var storedOtp = String(otpData[i][2]).trim();
+                    var now = new Date();
+                    var diffMins = (now - timestamp) / 60000;
+
+                    if (diffMins <= 15 && storedOtp === String(userOtp).trim()) {
+                        isValid = true;
+                    }
+                    break; // Only check the latest one
+                }
+            }
+
+            if (isValid) {
+                return ContentService.createTextOutput(JSON.stringify({ 'result': 'success', 'message': 'OTP Verified' })).setMimeType(ContentService.MimeType.JSON);
+            } else {
+                return ContentService.createTextOutput(JSON.stringify({ 'result': 'error', 'message': 'Invalid or Expired OTP' })).setMimeType(ContentService.MimeType.JSON);
+            }
         }
 
         return ContentService.createTextOutput(JSON.stringify({ 'result': 'error', 'message': 'Unknown Action' })).setMimeType(ContentService.MimeType.JSON);

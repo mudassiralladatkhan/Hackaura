@@ -1,5 +1,5 @@
-import { useState } from 'react';
-import { Calendar, Sparkles, Trophy, Clock, Users, Zap, Award, MapPin, Phone, Menu, X, ChevronDown, Coffee, Utensils, Mail, Flame, School, Cpu } from 'lucide-react';
+import { useState, useEffect } from 'react';
+import { Zap, Calendar, Sparkles, Users, Trophy, Clock, Award, MapPin, Phone, Menu, X, Coffee, Utensils, Mail, Flame, School, Cpu } from 'lucide-react';
 import { ParticleBackground } from '@/components/ui/particle-background';
 import { CountdownTimer } from '@/components/ui/countdown-timer';
 import { NeonButton } from '@/components/ui/neon-button';
@@ -7,7 +7,6 @@ import { GlassCard } from '@/components/ui/glass-card';
 import { ScrollAnimation } from '@/components/ui/scroll-animation';
 import { Link } from 'react-router-dom';
 import { fetchRegistrationStats } from '@/lib/stats';
-import { useEffect } from 'react';
 
 export default function Home() {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
@@ -161,15 +160,17 @@ export default function Home() {
           </ScrollAnimation>
 
           <ScrollAnimation direction="up" delay={0.6}>
-            <div className="flex flex-col xl:flex-row items-center justify-center gap-4 mb-12">
+            <div className="flex flex-col sm:flex-row items-center justify-center gap-4">
               <Link to="/register">
-                <NeonButton variant="primary" icon={<Zap className="text-xl" />}>
+                <NeonButton variant="primary" className="w-full sm:w-auto min-w-[200px] text-lg py-6">
                   Register Now
                 </NeonButton>
               </Link>
-              <NeonButton onClick={() => scrollToSection('about')} variant="outline" icon={<ChevronDown />}>
-                Learn More
-              </NeonButton>
+              <Link to="/submit">
+                <NeonButton variant="secondary" className="w-full sm:w-auto min-w-[200px] text-lg py-6 border-purple-500/50 hover:bg-purple-500/10 hover:border-purple-400 text-purple-300">
+                  Submit Project
+                </NeonButton>
+              </Link>
             </div>
           </ScrollAnimation>
 

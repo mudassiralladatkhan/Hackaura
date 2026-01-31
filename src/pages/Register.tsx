@@ -34,17 +34,17 @@ const GOOGLE_FORM_ENTRY_IDS = {
 
 
 // --- DUPLICATE CHECK CONFIG ---
-const GOOGLE_SCRIPT_API_URL = "https://script.google.com/macros/s/AKfycbysAGugBZQJYH9bgb14_x3MXwN91KXsgGads4NQCAjGuBOunoOtbtYr02czk7LwKwCS/exec";
+const GOOGLE_SCRIPT_API_URL = "https://script.google.com/macros/s/AKfycbzxnQ42GCK01NcH2egkcko9GTv8p0DYG_OWnou70esO0DUzkgnBsQcgd9OLNjO8YBk3/exec";
 
-// --- EMAIL SERVICE CONFIG ---
-const EMAIL_SERVICE_URL = "https://script.google.com/macros/s/AKfycbysAGugBZQJYH9bgb14_x3MXwN91KXsgGads4NQCAjGuBOunoOtbtYr02czk7LwKwCS/exec";
+
 
 // Generic Duplicate Checker Helper
 const checkUnique = async (value: string, type: 'teamName' | 'email' | 'phone') => {
     if (!value || value.length < 3 || !GOOGLE_SCRIPT_API_URL) return true;
     try {
+        // Updated to use explicit action=checkUnique to avoid "Invalid params" error
         const param = type === 'teamName' ? 'teamName' : type;
-        const response = await fetch(`${GOOGLE_SCRIPT_API_URL}?${param}=${encodeURIComponent(value)}`);
+        const response = await fetch(`${GOOGLE_SCRIPT_API_URL}?action=checkUnique&type=${param}&value=${encodeURIComponent(value)}`);
         const data = await response.json();
         return !data.exists;
     } catch (error) {
@@ -217,33 +217,8 @@ export default function Register() {
                 body: formData
             });
 
-            // Send confirmation email
-            try {
-                await fetch(EMAIL_SERVICE_URL, {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json',
-                    },
-                    body: JSON.stringify({
-                        teamName: data.teamName,
-                        domain: data.domain,
-                        problemStatement: data.domain === 'IOT' ? data.problemStatement : undefined,
-                        leaderName: data.leaderName,
-                        leaderEmail: data.leaderEmail,
-                        collegeName: data.collegeName,
-                        memberCount: data.members.length + 1,
-                        paymentVerified: true,
-                        verificationDetails: {
-                            amount: ocrResults?.details.amountValue || '₹500',
-                            status: ocrResults?.details.statusValue || 'Success'
-                        }
-                    })
-                });
-                console.log('Confirmation email sent successfully');
-            } catch (emailError) {
-                console.error('Email sending failed:', emailError);
-                // Don't fail registration if email fails
-            }
+            // Email is sent automatically by Google Apps Script Trigger (onFormSubmit)
+            // Removed redundant fetch call to avoid "Invalid params" / "Unknown Action" error
 
             toast.success("Registration Successful!", {
                 description: "Your team has been registered. Check your email for confirmation."

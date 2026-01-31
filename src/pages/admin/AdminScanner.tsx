@@ -5,7 +5,7 @@ import { GlassCard } from '@/components/ui/glass-card';
 import { Loader2, CheckCircle2, XCircle, Search, Printer, History, Camera, StopCircle, PenTool, RotateCcw } from 'lucide-react';
 import { Link } from 'react-router-dom';
 
-const GOOGLE_SCRIPT_API_URL = "https://script.google.com/macros/s/AKfycbysAGugBZQJYH9bgb14_x3MXwN91KXsgGads4NQCAjGuBOunoOtbtYr02czk7LwKwCS/exec";
+const GOOGLE_SCRIPT_API_URL = "https://script.google.com/macros/s/AKfycbzxnQ42GCK01NcH2egkcko9GTv8p0DYG_OWnou70esO0DUzkgnBsQcgd9OLNjO8YBk3/exec";
 
 export default function AdminScanner() {
     const [scanResult, setScanResult] = useState<any>(null);
@@ -312,6 +312,11 @@ export default function AdminScanner() {
                                 <RotateCcw className="w-5 h-5 text-red-400" />
                             )}
                         </button>
+                        <Link to="/admin/participants">
+                            <NeonButton variant="secondary" className="!p-2">
+                                <span className="font-bold text-xs">LIST</span>
+                            </NeonButton>
+                        </Link>
                         <Link to="/admin/print">
                             <NeonButton variant="secondary" className="!p-2">
                                 <Printer className="w-5 h-5" />
