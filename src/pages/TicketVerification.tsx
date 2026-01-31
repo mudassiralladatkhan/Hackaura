@@ -131,7 +131,15 @@ export default function TicketVerification() {
                                         <p className="text-xs text-cyan-400 uppercase tracking-widest font-bold">Team Leader</p>
                                     </div>
                                     <p className="text-xl font-bold text-white tracking-wide">{data?.leaderName}</p>
-                                    <p className="text-xs text-cyan-200/50 mt-1">Authorized Representative</p>
+
+                                    <div className="mt-3 space-y-1">
+                                        <p className="text-sm text-cyan-200/70 flex items-center gap-2">
+                                            <span className="opacity-50">📧</span> {data?.leaderEmail || 'N/A'}
+                                        </p>
+                                        <p className="text-sm text-cyan-200/70 flex items-center gap-2">
+                                            <span className="opacity-50">📱</span> {data?.leaderPhone || 'N/A'}
+                                        </p>
+                                    </div>
                                 </div>
 
                                 {/* MEMBERS GRID */}
