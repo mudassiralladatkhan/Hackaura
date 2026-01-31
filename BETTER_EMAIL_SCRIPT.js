@@ -656,6 +656,59 @@ function doPost(e) {
 
             var teamName = data[ticketNum][getHeaderIndex(headers, ['Team Name', 'Team'])];
 
+            // --- TEAM FOLDER MANAGEMENT ---
+            // Create/find a folder named "TicketID - TeamName" for organized storage
+            var parentFolderId = "1PTclMTstaA_iwmoS4i5TADV88_haWU1B";
+            var teamFolderName = ticketId + " - " + teamName;
+            var teamFolder;
+
+            try {
+                var parentFolder = DriveApp.getFolderById(parentFolderId);
+                var folders = parentFolder.getFoldersByName(teamFolderName);
+                if (folders.hasNext()) {
+                    // Folder already exists, use it
+                    teamFolder = folders.next();
+                } else {
+                    // Create new team folder
+                    teamFolder = parentFolder.createFolder(teamFolderName);
+                    teamFolder.setSharing(DriveApp.Access.ANYONE_WITH_LINK, DriveApp.Permission.VIEW);
+                }
+            } catch (e) {
+                return ContentService.createTextOutput(JSON.stringify({ 'result': 'error', 'message': 'Folder Creation Failed: ' + e.toString() })).setMimeType(ContentService.MimeType.JSON);
+            }
+
+            // --- FILE UPLOADS ---
+            var finalPptLink = request.pptLink || '';
+            var finalVideoLink = request.videoLink || '';
+
+            // Handle PPT File - Save to team folder
+            if (request.pptSubmissionType === 'file' && request.pptFile) {
+                try {
+                    var decoded = Utilities.base64Decode(request.pptFile.split(',')[1] || request.pptFile);
+                    var blob = Utilities.newBlob(decoded, MimeType.PDF, request.pptFileName || "Presentation.pdf");
+
+                    var file = teamFolder.createFile(blob);
+                    file.setSharing(DriveApp.Access.ANYONE_WITH_LINK, DriveApp.Permission.VIEW);
+                    finalPptLink = file.getUrl();
+                } catch (e) {
+                    return ContentService.createTextOutput(JSON.stringify({ 'result': 'error', 'message': 'PPT Upload Failed: ' + e.toString() })).setMimeType(ContentService.MimeType.JSON);
+                }
+            }
+
+            // Handle Video File - Save to team folder
+            if (request.videoSubmissionType === 'file' && request.videoFile) {
+                try {
+                    var decodedVideo = Utilities.base64Decode(request.videoFile.split(',')[1] || request.videoFile);
+                    var videoBlob = Utilities.newBlob(decodedVideo, 'video/mp4', request.videoFileName || "Demo.mp4");
+
+                    var vFile = teamFolder.createFile(videoBlob);
+                    vFile.setSharing(DriveApp.Access.ANYONE_WITH_LINK, DriveApp.Permission.VIEW);
+                    finalVideoLink = vFile.getUrl();
+                } catch (e) {
+                    return ContentService.createTextOutput(JSON.stringify({ 'result': 'error', 'message': 'Video Upload Failed: ' + e.toString() })).setMimeType(ContentService.MimeType.JSON);
+                }
+            }
+
             // Get or Create "Submissions" Sheet
             var submissionSheet = SpreadsheetApp.getActiveSpreadsheet().getSheetByName("Submissions");
             if (!submissionSheet) {
@@ -670,9 +723,9 @@ function doPost(e) {
                 teamName,
                 request.title,
                 request.description,
-                request.pptLink || '',
+                finalPptLink,
                 request.repoLink || '',
-                request.videoLink || '',
+                finalVideoLink,
                 request.otherLinks || ''
             ]);
 
@@ -787,4 +840,22 @@ function getHeaderIndex(headers, possibleNames) {
         }
     }
     return -1;
+}
+
+// --- HELPER FOR AUTHORIZATION ---
+// Run this function ONCE in the editor to authorize Drive permissions.
+function testDrivePermissions() {
+    var folderId = "1PTclMTstaA_iwmoS4i5TADV88_haWU1B";
+    var folder = DriveApp.getFolderById(folderId);
+    console.log("Access successful! Folder name: " + folder.getName());
+}
+
+// Test if you can actually CREATE files in the folder
+function testFolderAccess() {
+    var folder = DriveApp.getFolderById("1PTclMTstaA_iwmoS4i5TADV88_haWU1B");
+    var testFile = folder.createFile("test.txt", "hello");
+    console.log("SUCCESS! File created: " + testFile.getUrl());
+    console.log("You are the OWNER and have full write access!");
+    // Clean up test file
+    testFile.setTrashed(true);
 }

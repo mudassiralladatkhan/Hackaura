@@ -6,14 +6,18 @@ import { Link } from 'react-router-dom';
 import { useForm } from 'react-hook-form';
 import ky from 'ky';
 
-const GOOGLE_SCRIPT_API_URL = "https://script.google.com/macros/s/AKfycbzxnQ42GCK01NcH2egkcko9GTv8p0DYG_OWnou70esO0DUzkgnBsQcgd9OLNjO8YBk3/exec";
+const GOOGLE_SCRIPT_API_URL = 'https://script.google.com/macros/s/AKfycbwX4jJHhyj119eeKEtWZUj5az5J_CRYdVBbEPNYG_7uvN1Sp6EOKlswYqcjsPJRW2wC/exec';
 
 interface SubmissionForm {
     title: string;
     description: string;
     pptLink?: string;
+    pptFile?: string; // Base64
+    pptFileName?: string;
     repoLink?: string;
     videoLink?: string;
+    videoFile?: string; // Base64
+    videoFileName?: string;
     otherLinks?: string;
 }
 
@@ -26,7 +30,12 @@ export default function ProjectSubmission() {
 
     const [showRepo, setShowRepo] = useState(false);
     const [showPPT, setShowPPT] = useState(false);
+    const [pptSubmissionType, setPptSubmissionType] = useState<'link' | 'file'>('link');
+    const [pptFile, setPptFile] = useState<File | null>(null);
+
     const [showVideo, setShowVideo] = useState(false);
+    const [videoSubmissionType, setVideoSubmissionType] = useState<'link' | 'file'>('link');
+    const [videoFile, setVideoFile] = useState<File | null>(null);
     const [showOther, setShowOther] = useState(false);
 
     // OTP State
@@ -88,16 +97,68 @@ export default function ProjectSubmission() {
         }
     };
 
+    const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+        if (e.target.files && e.target.files[0]) {
+            const file = e.target.files[0];
+            if (file.size > 1024 * 1024 * 1024) { // 1GB limit
+                alert("File size exceeds 1GB limit.");
+                return;
+            }
+            setPptFile(file);
+        }
+    };
+
+    const handleVideoFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+        if (e.target.files && e.target.files[0]) {
+            const file = e.target.files[0];
+            if (file.size > 1024 * 1024 * 1024) { // 1GB limit
+                alert("File size exceeds 1GB limit.");
+                return;
+            }
+            setVideoFile(file);
+        }
+    };
+
     const onSubmit = async (data: SubmissionForm) => {
         setSubmitting(true);
         try {
+            let pptBase64 = '';
+            let videoBase64 = '';
+
+            if (pptSubmissionType === 'file' && pptFile) {
+                pptBase64 = await new Promise((resolve, reject) => {
+                    const reader = new FileReader();
+                    reader.readAsDataURL(pptFile);
+                    reader.onload = () => resolve(reader.result as string);
+                    reader.onerror = error => reject(error);
+                });
+            }
+
+            if (videoSubmissionType === 'file' && videoFile) {
+                videoBase64 = await new Promise((resolve, reject) => {
+                    const reader = new FileReader();
+                    reader.readAsDataURL(videoFile);
+                    reader.onload = () => resolve(reader.result as string);
+                    reader.onerror = error => reject(error);
+                });
+            }
+
             const payload = {
                 action: 'submitProject',
                 ticketId,
-                ...data
+                ...data,
+                pptSubmissionType,
+                pptFile: pptBase64,
+                pptFileName: pptFile?.name || '',
+                videoSubmissionType,
+                videoFile: videoBase64,
+                videoFileName: videoFile?.name || ''
             };
 
-            const response = await ky.post(GOOGLE_SCRIPT_API_URL, { body: JSON.stringify(payload) }).json<any>();
+            const response = await ky.post(GOOGLE_SCRIPT_API_URL, {
+                body: JSON.stringify(payload),
+                timeout: 180000 // 3 minute timeout for large uploads
+            }).json<any>();
 
             if (response.result === 'success') {
                 setStep('success');
@@ -251,16 +312,88 @@ export default function ProjectSubmission() {
                                     </div>
                                 )}
                                 {showPPT && (
-                                    <div className="animate-in slide-in-from-top-2">
-                                        <label className="block text-sm font-medium text-orange-300 mb-1">Presentation Link (Google Slides / Drive / Canva)</label>
-                                        <input {...register('pptLink')} placeholder="https://docs.google.com/presentation/..." className="w-full bg-slate-900 border border-slate-700 rounded-lg p-3 text-white focus:border-orange-500 focus:outline-none" />
-                                        <p className="text-xs text-slate-500 mt-1">Please ensure link sharing is turned ON.</p>
+                                    <div className="animate-in slide-in-from-top-2 border border-orange-500/30 bg-orange-500/5 rounded-lg p-4">
+                                        <label className="block text-sm font-medium text-orange-300 mb-3">Presentation (PPT / PDF)</label>
+
+                                        <div className="flex gap-4 mb-4">
+                                            <button
+                                                type="button"
+                                                onClick={() => setPptSubmissionType('link')}
+                                                className={`px-4 py-2 rounded-md text-sm transition-colors ${pptSubmissionType === 'link' ? 'bg-orange-500 text-black font-bold' : 'bg-slate-800 text-slate-400 hover:bg-slate-700'}`}
+                                            >
+                                                Submit Link
+                                            </button>
+                                            <button
+                                                type="button"
+                                                onClick={() => setPptSubmissionType('file')}
+                                                className={`px-4 py-2 rounded-md text-sm transition-colors ${pptSubmissionType === 'file' ? 'bg-orange-500 text-black font-bold' : 'bg-slate-800 text-slate-400 hover:bg-slate-700'}`}
+                                            >
+                                                Upload File
+                                            </button>
+                                        </div>
+
+                                        {pptSubmissionType === 'link' ? (
+                                            <div>
+                                                <input
+                                                    {...register('pptLink')}
+                                                    placeholder="https://docs.google.com/presentation/..."
+                                                    className="w-full bg-slate-900 border border-slate-700 rounded-lg p-3 text-white focus:border-orange-500 focus:outline-none"
+                                                />
+                                                <p className="text-xs text-slate-500 mt-1">Please ensure link sharing is turned ON.</p>
+                                            </div>
+                                        ) : (
+                                            <div>
+                                                <input
+                                                    type="file"
+                                                    accept=".pdf, .ppt, .pptx"
+                                                    onChange={handleFileChange}
+                                                    className="w-full bg-slate-900 border border-slate-700 rounded-lg p-3 text-white focus:border-orange-500 focus:outline-none file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-sm file:font-semibold file:bg-orange-500 file:text-black hover:file:bg-orange-400"
+                                                />
+                                                <p className="text-xs text-slate-500 mt-1">Max file size: 1GB.</p>
+                                            </div>
+                                        )}
                                     </div>
                                 )}
                                 {showVideo && (
-                                    <div className="animate-in slide-in-from-top-2">
-                                        <label className="block text-sm font-medium text-red-300 mb-1">Video Demo Link (YouTube / Drive)</label>
-                                        <input {...register('videoLink')} placeholder="https://youtube.com/..." className="w-full bg-slate-900 border border-slate-700 rounded-lg p-3 text-white focus:border-red-500 focus:outline-none" />
+                                    <div className="animate-in slide-in-from-top-2 border border-red-500/30 bg-red-500/5 rounded-lg p-4">
+                                        <label className="block text-sm font-medium text-red-300 mb-3">Video Demo</label>
+
+                                        <div className="flex gap-4 mb-4">
+                                            <button
+                                                type="button"
+                                                onClick={() => setVideoSubmissionType('link')}
+                                                className={`px-4 py-2 rounded-md text-sm transition-colors ${videoSubmissionType === 'link' ? 'bg-red-500 text-black font-bold' : 'bg-slate-800 text-slate-400 hover:bg-slate-700'}`}
+                                            >
+                                                Submit Link
+                                            </button>
+                                            <button
+                                                type="button"
+                                                onClick={() => setVideoSubmissionType('file')}
+                                                className={`px-4 py-2 rounded-md text-sm transition-colors ${videoSubmissionType === 'file' ? 'bg-red-500 text-black font-bold' : 'bg-slate-800 text-slate-400 hover:bg-slate-700'}`}
+                                            >
+                                                Upload File
+                                            </button>
+                                        </div>
+
+                                        {videoSubmissionType === 'link' ? (
+                                            <div>
+                                                <input
+                                                    {...register('videoLink')}
+                                                    placeholder="https://youtube.com/..."
+                                                    className="w-full bg-slate-900 border border-slate-700 rounded-lg p-3 text-white focus:border-red-500 focus:outline-none"
+                                                />
+                                            </div>
+                                        ) : (
+                                            <div>
+                                                <input
+                                                    type="file"
+                                                    accept="video/*, .mp4, .mov"
+                                                    onChange={handleVideoFileChange}
+                                                    className="w-full bg-slate-900 border border-slate-700 rounded-lg p-3 text-white focus:border-red-500 focus:outline-none file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-sm file:font-semibold file:bg-red-500 file:text-black hover:file:bg-red-400"
+                                                />
+                                                <p className="text-xs text-slate-500 mt-1">Max file size: 1GB.</p>
+                                            </div>
+                                        )}
                                     </div>
                                 )}
                                 {showOther && (

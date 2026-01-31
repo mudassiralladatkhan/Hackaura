@@ -4,7 +4,7 @@ import { Loader2, Search, ArrowLeft, Users, Building, Mail, Phone, RefreshCw } f
 import { Link } from 'react-router-dom';
 import { GlassCard } from '@/components/ui/glass-card';
 
-const GOOGLE_SCRIPT_API_URL = "https://script.google.com/macros/s/AKfycbysAGugBZQJYH9bgb14_x3MXwN91KXsgGads4NQCAjGuBOunoOtbtYr02czk7LwKwCS/exec";
+const GOOGLE_SCRIPT_API_URL = "https://script.google.com/macros/s/AKfycbwX4jJHhyj119eeKEtWZUj5az5J_CRYdVBbEPNYG_7uvN1Sp6EOKlswYqcjsPJRW2wC/exec";
 
 interface Participant {
     ticketId: string;
@@ -111,8 +111,8 @@ export default function ParticipantsList() {
                                             {team.ticketId}
                                         </span>
                                         <span className={`text-xs px-2 py-1 rounded-full border ${team.status === 'Checked In'
-                                                ? 'bg-green-500/10 text-green-400 border-green-500/30'
-                                                : 'bg-yellow-500/10 text-yellow-500 border-yellow-500/30'
+                                            ? 'bg-green-500/10 text-green-400 border-green-500/30'
+                                            : 'bg-yellow-500/10 text-yellow-500 border-yellow-500/30'
                                             }`}>
                                             {team.status}
                                         </span>

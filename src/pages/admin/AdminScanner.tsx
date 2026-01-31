@@ -5,7 +5,7 @@ import { GlassCard } from '@/components/ui/glass-card';
 import { Loader2, CheckCircle2, XCircle, Search, Printer, History, Camera, StopCircle, PenTool, RotateCcw } from 'lucide-react';
 import { Link } from 'react-router-dom';
 
-const GOOGLE_SCRIPT_API_URL = "https://script.google.com/macros/s/AKfycbzxnQ42GCK01NcH2egkcko9GTv8p0DYG_OWnou70esO0DUzkgnBsQcgd9OLNjO8YBk3/exec";
+const GOOGLE_SCRIPT_API_URL = "https://script.google.com/macros/s/AKfycbwX4jJHhyj119eeKEtWZUj5az5J_CRYdVBbEPNYG_7uvN1Sp6EOKlswYqcjsPJRW2wC/exec";
 
 export default function AdminScanner() {
     const [scanResult, setScanResult] = useState<any>(null);

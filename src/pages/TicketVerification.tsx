@@ -2,7 +2,7 @@ import { useEffect, useState, useRef } from 'react';
 import { useSearchParams, useNavigate } from 'react-router-dom';
 import { GlassCard } from '@/components/ui/glass-card';
 import { NeonButton } from '@/components/ui/neon-button';
-import { Loader2, CheckCircle2, XCircle, Users, School, Award, ArrowLeft, ShieldCheck, User } from 'lucide-react';
+import { Loader2, XCircle, Users, School, Award, ArrowLeft, ShieldCheck, User } from 'lucide-react';
 import { ParticleBackground } from '@/components/ui/particle-background';
 
 interface TeamDetails {
@@ -16,7 +16,7 @@ interface TeamDetails {
     status: string;
 }
 
-const GOOGLE_SCRIPT_API_URL = "https://script.google.com/macros/s/AKfycbysAGugBZQJYH9bgb14_x3MXwN91KXsgGads4NQCAjGuBOunoOtbtYr02czk7LwKwCS/exec";
+const GOOGLE_SCRIPT_API_URL = "https://script.google.com/macros/s/AKfycbwX4jJHhyj119eeKEtWZUj5az5J_CRYdVBbEPNYG_7uvN1Sp6EOKlswYqcjsPJRW2wC/exec";
 
 export default function TicketVerification() {
     const [searchParams] = useSearchParams();

@@ -4,7 +4,7 @@ export interface HackathonStats {
 }
 
 // Your existing Google Script URL from Register.tsx
-const GOOGLE_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbysAGugBZQJYH9bgb14_x3MXwN91KXsgGads4NQCAjGuBOunoOtbtYr02czk7LwKwCS/exec";
+const GOOGLE_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbwX4jJHhyj119eeKEtWZUj5az5J_CRYdVBbEPNYG_7uvN1Sp6EOKlswYqcjsPJRW2wC/exec";
 
 export async function fetchRegistrationStats(): Promise<HackathonStats> {
     try {
