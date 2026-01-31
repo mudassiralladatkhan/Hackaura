@@ -396,6 +396,81 @@ function doGet(e) {
     }
 }
 
+// --- NEW: POST HANDLER FOR SIGNATURES & IMAGES ---
+function doPost(e) {
+    var lock = LockService.getScriptLock();
+    try {
+        lock.waitLock(30000);
+
+        // Parse the POST body
+        var request = JSON.parse(e.postData.contents);
+        var action = request.action;
+
+        // 1. ACTION: UPLOAD SIGNATURE
+        if (action === 'uploadSignature') {
+            var ticketId = request.ticketId;
+            var imageBase64 = request.image; // "data:image/png;base64,..."
+
+            if (!ticketId || !imageBase64) {
+                return ContentService.createTextOutput(JSON.stringify({ 'result': 'error', 'message': 'Missing data' })).setMimeType(ContentService.MimeType.JSON);
+            }
+
+            var sheet = SpreadsheetApp.getActiveSpreadsheet().getSheetByName("Form_Responses");
+            // Fallback name if user renamed it, try to get first sheet
+            if (!sheet) sheet = SpreadsheetApp.getActiveSpreadsheet().getSheets()[0];
+
+            var data = sheet.getDataRange().getValues();
+            var headers = data[0];
+            var rowNum = parseInt(ticketId.split('-')[1], 10) + 1;
+
+            // Verify Row
+            if (rowNum < 2 || rowNum > sheet.getLastRow()) {
+                return ContentService.createTextOutput(JSON.stringify({ 'result': 'error', 'message': 'Invalid Ticket ID' })).setMimeType(ContentService.MimeType.JSON);
+            }
+
+            // Save Image to Drive
+            var folderName = "Hackaura Signatures";
+            var folders = DriveApp.getFoldersByName(folderName);
+            var folder;
+            if (folders.hasNext()) {
+                folder = folders.next();
+            } else {
+                folder = DriveApp.createFolder(folderName);
+            }
+
+            var decodedImage = Utilities.base64Decode(imageBase64.split(',')[1]);
+            var blob = Utilities.newBlob(decodedImage, MimeType.PNG, ticketId + "_Signature.png");
+            var file = folder.createFile(blob);
+            var fileUrl = file.getUrl();
+
+            // Update Sheet
+            var signatureCol = getHeaderIndex(headers, ['Signature', 'Signed', 'Digital Signature']) + 1;
+
+            if (signatureCol === 0) {
+                // If column doesn't exist, we can't write safely without risking overwriting data.
+                // However, if we are in doPost, we can assume user might have added it.
+                // Let's return error to be safe, urging user to add column.
+                return ContentService.createTextOutput(JSON.stringify({ 'result': 'error', 'message': 'Column "Signature" not found in Sheet' })).setMimeType(ContentService.MimeType.JSON);
+            }
+
+            sheet.getRange(rowNum, signatureCol).setValue(fileUrl);
+
+            return ContentService.createTextOutput(JSON.stringify({
+                'result': 'success',
+                'message': 'Signature Saved',
+                'url': fileUrl
+            })).setMimeType(ContentService.MimeType.JSON);
+        }
+
+        return ContentService.createTextOutput(JSON.stringify({ 'result': 'error', 'message': 'Unknown Action' })).setMimeType(ContentService.MimeType.JSON);
+
+    } catch (err) {
+        return ContentService.createTextOutput(JSON.stringify({ 'result': 'error', 'error': err.toString() })).setMimeType(ContentService.MimeType.JSON);
+    } finally {
+        lock.releaseLock();
+    }
+}
+
 // Helper to find column index
 function getHeaderIndex(headers, possibleNames) {
     for (var i = 0; i < headers.length; i++) {

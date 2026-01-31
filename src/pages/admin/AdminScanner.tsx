@@ -2,7 +2,7 @@ import { useEffect, useState, useRef } from 'react';
 import { Html5Qrcode } from 'html5-qrcode';
 import { NeonButton } from '@/components/ui/neon-button';
 import { GlassCard } from '@/components/ui/glass-card';
-import { Loader2, CheckCircle2, XCircle, Search, Printer, History, Camera, StopCircle } from 'lucide-react';
+import { Loader2, CheckCircle2, XCircle, Search, Printer, History, Camera, StopCircle, PenTool, RotateCcw } from 'lucide-react';
 import { Link } from 'react-router-dom';
 
 const GOOGLE_SCRIPT_API_URL = "https://script.google.com/macros/s/AKfycbysAGugBZQJYH9bgb14_x3MXwN91KXsgGads4NQCAjGuBOunoOtbtYr02czk7LwKwCS/exec";
@@ -15,8 +15,15 @@ export default function AdminScanner() {
     const [recentScans, setRecentScans] = useState<any[]>([]);
     const [cameraError, setCameraError] = useState<string | null>(null);
 
-    // We use a ref to hold the instance
+    // Signature States
+    const [showSignaturePad, setShowSignaturePad] = useState(false);
+    const [currentTicketId, setCurrentTicketId] = useState<string | null>(null);
+    const [isDrawing, setIsDrawing] = useState(false);
+
+    // Refs
     const scannerRef = useRef<Html5Qrcode | null>(null);
+    const canvasRef = useRef<HTMLCanvasElement | null>(null);
+    const contextRef = useRef<CanvasRenderingContext2D | null>(null);
 
     useEffect(() => {
         // Cleanup on unmount
@@ -27,36 +34,51 @@ export default function AdminScanner() {
         };
     }, []);
 
+    // Initialize Canvas
+    useEffect(() => {
+        if (showSignaturePad && canvasRef.current) {
+            const canvas = canvasRef.current;
+            canvas.width = canvas.offsetWidth * 2;
+            canvas.height = canvas.offsetHeight * 2;
+            canvas.style.width = `${canvas.offsetWidth}px`;
+            canvas.style.height = `${canvas.offsetHeight}px`;
+
+            const context = canvas.getContext('2d');
+            if (context) {
+                context.scale(2, 2);
+                context.lineCap = 'round';
+                context.strokeStyle = '#06b6d4'; // Cyan color
+                context.lineWidth = 2;
+                contextRef.current = context;
+            }
+        }
+    }, [showSignaturePad]);
+
     const startCamera = async () => {
         setCameraError(null);
         try {
-            // Check if instance exists, or create new
             if (!scannerRef.current) {
                 scannerRef.current = new Html5Qrcode("reader");
             }
             const scanner = scannerRef.current;
 
-            // 1. Get List of Cameras
             let cameraId = null;
             try {
                 const devices = await Html5Qrcode.getCameras();
                 if (devices && devices.length > 0) {
-                    // Try to find one with 'back' or 'environment' in list if multiple
                     const backCamera = devices.find(d => d.label.toLowerCase().includes('back') || d.label.toLowerCase().includes('environment'));
-                    cameraId = backCamera ? backCamera.id : devices[0].id; // Default to first if no back cam found
+                    cameraId = backCamera ? backCamera.id : devices[0].id;
                 }
             } catch (e) {
                 console.warn("Failed to get camera list, trying generic mode", e);
             }
 
-            // 2. Start Scanning
             const config = {
                 fps: 10,
                 qrbox: { width: 250, height: 250 },
                 aspectRatio: 1.0
             };
 
-            // If we found a specific camera ID, use it. Otherwise use generic facingMode logic.
             if (cameraId) {
                 await scanner.start(cameraId, config, onScanSuccess, undefined);
             } else {
@@ -67,7 +89,6 @@ export default function AdminScanner() {
 
         } catch (err: any) {
             console.error("Camera Start Error:", err);
-            // Display EXACT error for debugging
             setCameraError(err?.message || "Permission Denied: Could not access camera.");
             setScanning(false);
         }
@@ -85,14 +106,12 @@ export default function AdminScanner() {
     };
 
     const onScanSuccess = (decodedText: string) => {
-        // Handle URL or Direct ID
         try {
             let ticketId = decodedText;
             if (decodedText.includes('ticketId=')) {
                 ticketId = decodedText.split('ticketId=')[1];
             }
 
-            // Pause scanning logic temporarily
             if (scannerRef.current) scannerRef.current.pause();
 
             handleCheckIn(ticketId);
@@ -110,37 +129,127 @@ export default function AdminScanner() {
             const result = await response.json();
 
             if (result.result === 'success') {
-                const newScan = {
-                    id: ticketId,
-                    team: result.teamName,
-                    time: result.timestamp,
-                    status: 'success'
-                };
-                setScanResult(newScan);
-                setRecentScans(prev => [newScan, ...prev]);
+                // Show signature pad instead of immediate success
+                setCurrentTicketId(ticketId);
+                setShowSignaturePad(true);
+                setScanResult({ id: ticketId, team: result.teamName, time: result.timestamp, status: 'pending_signature' });
             } else {
                 setScanResult({ id: ticketId, status: 'error', message: result.message });
+                setTimeout(() => {
+                    setScanResult(null);
+                    if (scannerRef.current) {
+                        try { scannerRef.current.resume(); } catch (e) { console.warn(e) }
+                    }
+                }, 3000);
             }
 
         } catch (err) {
             setScanResult({ id: ticketId, status: 'error', message: "Network Error" });
-        } finally {
-            setLoading(false);
-            // Resume scanner after 3 seconds
             setTimeout(() => {
-                setScanResult(null); // Clear overlay
+                setScanResult(null);
                 if (scannerRef.current) {
-                    try {
-                        scannerRef.current.resume();
-                    } catch (e) { console.warn("Scanner resume failed", e) }
+                    try { scannerRef.current.resume(); } catch (e) { console.warn(e) }
                 }
             }, 3000);
+        } finally {
+            setLoading(false);
         }
     };
 
     const handleManualSubmit = (e: React.FormEvent) => {
         e.preventDefault();
         if (manualId) handleCheckIn(manualId);
+    };
+
+    // Signature Drawing Functions
+    const startDrawing = (e: React.MouseEvent<HTMLCanvasElement> | React.TouchEvent<HTMLCanvasElement>) => {
+        if (!contextRef.current || !canvasRef.current) return;
+
+        const rect = canvasRef.current.getBoundingClientRect();
+        const x = 'touches' in e ? e.touches[0].clientX - rect.left : e.nativeEvent.offsetX;
+        const y = 'touches' in e ? e.touches[0].clientY - rect.top : e.nativeEvent.offsetY;
+
+        contextRef.current.beginPath();
+        contextRef.current.moveTo(x, y);
+        setIsDrawing(true);
+    };
+
+    const draw = (e: React.MouseEvent<HTMLCanvasElement> | React.TouchEvent<HTMLCanvasElement>) => {
+        if (!isDrawing || !contextRef.current || !canvasRef.current) return;
+
+        const rect = canvasRef.current.getBoundingClientRect();
+        const x = 'touches' in e ? e.touches[0].clientX - rect.left : e.nativeEvent.offsetX;
+        const y = 'touches' in e ? e.touches[0].clientY - rect.top : e.nativeEvent.offsetY;
+
+        contextRef.current.lineTo(x, y);
+        contextRef.current.stroke();
+    };
+
+    const stopDrawing = () => {
+        if (!contextRef.current) return;
+        contextRef.current.closePath();
+        setIsDrawing(false);
+    };
+
+    const clearSignature = () => {
+        if (!canvasRef.current || !contextRef.current) return;
+        contextRef.current.clearRect(0, 0, canvasRef.current.width, canvasRef.current.height);
+    };
+
+    const submitSignature = async () => {
+        if (!canvasRef.current || !currentTicketId) return;
+
+        setLoading(true);
+        try {
+            const imageData = canvasRef.current.toDataURL('image/png');
+
+            const response = await fetch(GOOGLE_SCRIPT_API_URL, {
+                method: 'POST',
+                body: JSON.stringify({
+                    action: 'uploadSignature',
+                    ticketId: currentTicketId,
+                    image: imageData
+                })
+            });
+
+            const result = await response.json();
+
+            if (result.result === 'success') {
+                // Update scan result to success
+                setScanResult(prev => ({ ...prev, status: 'success' }));
+                setRecentScans(prev => [{
+                    id: currentTicketId,
+                    team: scanResult.team,
+                    time: scanResult.time,
+                    status: 'success'
+                }, ...prev]);
+
+                // Close signature pad and resume scanning
+                setTimeout(() => {
+                    setShowSignaturePad(false);
+                    setScanResult(null);
+                    setCurrentTicketId(null);
+                    if (scannerRef.current) {
+                        try { scannerRef.current.resume(); } catch (e) { console.warn(e) }
+                    }
+                }, 2000);
+            } else {
+                setScanResult({ id: currentTicketId, status: 'error', message: result.message });
+                setTimeout(() => {
+                    setShowSignaturePad(false);
+                    setScanResult(null);
+                    setCurrentTicketId(null);
+                    if (scannerRef.current) {
+                        try { scannerRef.current.resume(); } catch (e) { console.warn(e) }
+                    }
+                }, 3000);
+            }
+        } catch (err) {
+            console.error("Signature upload error:", err);
+            setScanResult({ id: currentTicketId, status: 'error', message: "Failed to upload signature" });
+        } finally {
+            setLoading(false);
+        }
     };
 
     return (
@@ -163,8 +272,49 @@ export default function AdminScanner() {
                 {/* Main Scanner Card */}
                 <GlassCard className="p-4 bg-slate-900/50 border-slate-800 relative overflow-hidden">
 
+                    {/* Signature Pad Overlay */}
+                    {showSignaturePad && (
+                        <div className="absolute inset-0 z-50 flex flex-col items-center justify-center p-6 bg-slate-950/95 backdrop-blur-md">
+                            <PenTool className="w-12 h-12 text-cyan-400 mb-2" />
+                            <h2 className="text-xl font-bold text-white mb-1">Digital Signature</h2>
+                            <p className="text-slate-400 text-sm mb-4">{scanResult?.team}</p>
+
+                            <div className="w-full bg-slate-900 border-2 border-cyan-500/30 rounded-lg p-2 mb-4">
+                                <canvas
+                                    ref={canvasRef}
+                                    onMouseDown={startDrawing}
+                                    onMouseMove={draw}
+                                    onMouseUp={stopDrawing}
+                                    onMouseLeave={stopDrawing}
+                                    onTouchStart={startDrawing}
+                                    onTouchMove={draw}
+                                    onTouchEnd={stopDrawing}
+                                    className="w-full h-40 bg-white rounded cursor-crosshair touch-none"
+                                />
+                            </div>
+
+                            <div className="flex gap-2 w-full">
+                                <NeonButton
+                                    onClick={clearSignature}
+                                    variant="secondary"
+                                    className="flex-1 !py-2"
+                                >
+                                    <RotateCcw className="w-4 h-4 mr-2" />
+                                    Clear
+                                </NeonButton>
+                                <NeonButton
+                                    onClick={submitSignature}
+                                    disabled={loading}
+                                    className="flex-1 !py-2"
+                                >
+                                    {loading ? <Loader2 className="w-4 h-4 animate-spin" /> : 'Submit'}
+                                </NeonButton>
+                            </div>
+                        </div>
+                    )}
+
                     {/* Active Overlay for Result */}
-                    {scanResult && (
+                    {scanResult && scanResult.status !== 'pending_signature' && (
                         <div className={`absolute inset-0 z-50 flex flex-col items-center justify-center p-6 text-center backdrop-blur-md transition-all duration-300 ${scanResult.status === 'success' ? 'bg-green-950/80' : 'bg-red-950/80'}`}>
                             {scanResult.status === 'success' ? (
                                 <>
