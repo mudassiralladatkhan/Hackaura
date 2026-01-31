@@ -73,145 +73,136 @@ function onFormSubmit(e) {
       <!DOCTYPE html>
       <html>
       <head>
+        <meta charset="utf-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
         <style>
-          @import url('https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;800&display=swap');
+          @import url('https://fonts.googleapis.com/css2?family=Outfit:wght@300;500;700;900&display=swap');
+          body { margin: 0; padding: 0; background-color: #000000; -webkit-font-smoothing: antialiased; }
+          img { border: 0; display: block; outline: none; }
+          .btn-hover:hover { transform: translateY(-2px); box-shadow: 0 10px 20px rgba(0,0,0,0.4); }
         </style>
       </head>
-      <body style="margin: 0; padding: 0; background-color: #000000; font-family: 'Outfit', 'Segoe UI', sans-serif; color: #e2e8f0;">
+      <body style="margin: 0; padding: 0; background-color: #000000; font-family: 'Outfit', Helvetica, Arial, sans-serif;">
         
-        <!-- MAIN CONTAINER -->
-        <div style="max-width: 600px; margin: 0 auto; background-color: #0f172a; overflow: hidden; font-size: 16px; line-height: 1.6;">
+        <!-- OUTER WRAPPER -->
+        <div style="background-color: #000000; padding: 40px 10px; background-image: url('https://cdn.pixabay.com/animation/2023/06/26/05/06/05-06-03-999_512.gif'); background-size: cover;">
           
-          <!-- HERO HEADER -->
-          <div style="background: linear-gradient(135deg, #0f172a 0%, #1e1b4b 100%); padding: 40px 20px; text-align: center; border-bottom: 1px solid #334155;">
-             <h1 style="margin: 0; color: #ffffff; font-size: 38px; font-weight: 800; letter-spacing: 2px; text-transform: uppercase;">
-               <span style="color: #22d3ee;">HACK</span>AURA <span style="font-size: 20px; vertical-align: top; color: #a855f7;">2026</span>
-             </h1>
-             <p style="margin: 10px 0 0; color: #94a3b8; font-size: 14px; letter-spacing: 1px; text-transform: uppercase;">National Level 24H Hackathon</p>
-          </div>
-
-          <!-- CONTENT -->
-          <div style="padding: 30px 25px;">
+          <div style="max-width: 600px; margin: 0 auto; background-color: rgba(10, 10, 20, 0.95); border: 1px solid #333; border-radius: 24px; overflow: hidden; box-shadow: 0 0 50px rgba(0, 238, 255, 0.15); backdrop-filter: blur(10px);">
             
-            <p style="font-size: 18px; color: #ffffff;">Hello <strong>${leaderName}</strong>, 👋</p>
-            <p style="color: #cbd5e1;">Correction! Your registration for <strong>HACKAURA 2026</strong> is confirmed. We are thrilled to have your team onboard.</p>
-
-
-            <!-- TICKET CARD -->
-            <div style="margin: 30px 0; background: linear-gradient(180deg, rgba(30, 41, 59, 0.7) 0%, rgba(15, 23, 42, 1) 100%); border: 1px solid #334155; border-radius: 16px; overflow: hidden; position: relative;">
-              <!-- Top Accent -->
-              <div style="height: 4px; background: linear-gradient(90deg, #22d3ee, #a855f7, #f472b6); width: 100%;"></div>
-              
-              <div style="padding: 25px;">
-                <div style="display: table; width: 100%;">
-                  <!-- Row 1 -->
-                  <div style="display: table-row;">
-                    <div style="display: table-cell; padding-bottom: 20px;">
-                      <span style="display: block; font-size: 11px; text-transform: uppercase; color: #64748b; letter-spacing: 1px;">Team Name</span>
-                      <span style="font-size: 20px; font-weight: 700; color: #ffffff;">${teamName}</span>
-                    </div>
-                    <div style="display: table-cell; padding-bottom: 20px; text-align: right;">
-                      <span style="display: block; font-size: 11px; text-transform: uppercase; color: #64748b; letter-spacing: 1px;">Ticket ID</span>
-                      <span style="font-size: 20px; font-weight: 700; color: #22d3ee; font-family: monospace;">${ticketId}</span>
-                    </div>
-                  </div>
-                  <!-- Row 2 -->
-                  <div style="display: table-row;">
-                    <div style="display: table-cell; vertical-align: top;">
-                      <span style="display: block; font-size: 11px; text-transform: uppercase; color: #64748b; letter-spacing: 1px;">Domain</span>
-                      <span style="font-size: 16px; color: #cbd5e1;">${domain || 'Open Innovation'}</span>
-                    </div>
-                    <div style="display: table-cell; text-align: right; vertical-align: top;">
-                      <span style="display: block; font-size: 11px; text-transform: uppercase; color: #64748b; letter-spacing: 1px;">College</span>
-                      <span style="font-size: 16px; color: #cbd5e1;">${college}</span>
-                    </div>
-                  </div>
-
-                  <!-- QR Code Row -->
-                  <div style="display: table-row;">
-                    <div style="display: table-cell; padding-top: 25px; text-align: center;" colspan="2">
-                       <img src="https://api.qrserver.com/v1/create-qr-code/?size=150x150&data=${encodeURIComponent('https://hackaura2026.netlify.app/verify?ticketId=' + ticketId)}" alt="Ticket QR" width="150" height="150" style="border: 4px solid #ffffff; border-radius: 8px; display: inline-block;">
-                       <p style="margin: 10px 0 0; font-size: 12px; color: #64748b;">Scan to Verify Ticket</p>
-                       <a href="https://hackaura2026.netlify.app/verify?ticketId=${ticketId}" style="display: block; margin-top: 5px; color: #22d3ee; font-size: 11px; text-decoration: none;">(or click here to verify)</a>
-                    </div>
-                  </div>
-
-                </div>
-              </div>
-              
-              <!-- Cutout Line -->
-              <div style="border-top: 2px dashed #334155; position: relative;">
-                <div style="position: absolute; left: -10px; top: -10px; width: 20px; height: 20px; background-color: #0f172a; border-radius: 50%;"></div>
-                <div style="position: absolute; right: -10px; top: -10px; width: 20px; height: 20px; background-color: #0f172a; border-radius: 50%;"></div>
-              </div>
-
-              <!-- Event Details footer -->
-              <div style="padding: 20px 25px; background-color: rgba(30, 41, 59, 0.3);">
-                <div style="display: table; width: 100%;">
-                   <div style="display: table-cell; vertical-align: middle;">
-                      <span style="font-size: 14px; font-weight: 600; color: #f8fafc;">📅 ${CONFIG.EVENT_DATE}</span>
-                   </div>
-                   <div style="display: table-cell; text-align: right; vertical-align: middle;">
-                      <span style="font-size: 14px; font-weight: 600; color: #f8fafc;">📍 VSMIT, Nipani</span>
-                   </div>
-                </div>
-              </div>
+            <!-- HEADER -->
+            <div style="background: linear-gradient(135deg, #09090b 0%, #1e1b4b 100%); padding: 40px 30px; text-align: center; border-bottom: 1px solid #333;">
+               <img src="https://media3.giphy.com/media/v1.Y2lkPTc5MGI3NjExazF5ZHM4ZHM4ZHM4ZHM4ZHM4ZHM4ZHM4ZHM4ZHM4ZHM4ZHModmVyaWZpZWQ/w3l5y7y7/giphy.gif" width="50" style="margin: 0 auto 15px; border-radius: 50%; box-shadow: 0 0 20px rgba(0, 255, 136, 0.4);" alt="Verified">
+               <h1 style="margin: 0; color: #ffffff; font-size: 36px; font-weight: 900; letter-spacing: -1px; text-transform: uppercase;">
+                 Registration <span style="color: #22d3ee; text-shadow: 0 0 15px rgba(34, 211, 238, 0.6);">Confirmed</span>
+               </h1>
             </div>
 
-            <!-- ACTIONS -->
-            <div style="text-align: center; margin-bottom: 40px;">
-              <p style="margin-bottom: 15px; font-size: 14px; color: #94a3b8;">👇 Join the group for important updates 👇</p>
-              <a href="${CONFIG.WHATSAPP_LINK}" style="display: inline-block; background: #22c55e; color: #ffffff; padding: 14px 30px; border-radius: 50px; text-decoration: none; font-weight: 700; font-size: 16px; box-shadow: 0 4px 15px rgba(34, 197, 94, 0.3);">
-                Join WhatsApp Group
-              </a>
-              <div style="margin-top: 15px;">
-                <a href="${CONFIG.VENUE_MAP}" style="color: #22d3ee; text-decoration: none; font-size: 13px;">View Venue on Maps ↗</a>
-              </div>
-            </div>
+            <div style="padding: 40px 30px;">
+              <p style="font-size: 18px; color: #94a3b8; text-align: center; margin-bottom: 30px;">
+                Get ready to disrupt the future, <strong style="color: #ffffff;">${leaderName}</strong>. ⚡
+              </p>
 
-            <!-- REMINDERS -->
-            <div style="background-color: #1e293b; border-radius: 12px; padding: 20px; margin-bottom: 30px;">
-              <h3 style="margin-top: 0; color: #f8fafc; font-size: 16px;">🚀 Next Steps</h3>
-              <ul style="padding-left: 20px; margin-bottom: 0; color: #cbd5e1; font-size: 14px;">
-                <li style="margin-bottom: 8px;">Keep this ticket safe (Save screenshot).</li>
-                <li style="margin-bottom: 8px;">Bring your valid College ID Card.</li>
-                <li>Report at venue by <strong>${CONFIG.REPORTING_TIME}</strong>.</li>
-              </ul>
-            </div>
+              <!-- TICKET -->
+              <div style="background: #0f1115; border: 1px solid #2d3748; border-radius: 20px; position: relative; overflow: hidden; box-shadow: 0 20px 50px -10px rgba(0,0,0,0.7);">
+                
+                <!-- Ticket Top -->
+                <div style="padding: 30px; border-bottom: 2px dashed #374151; position: relative; background: radial-gradient(circle at top right, rgba(34, 211, 238, 0.1), transparent 40%);">
+                    <div style="position: absolute; bottom: -12px; left: -12px; width: 24px; height: 24px; background: #0b0c10; border-radius: 50%; border-right: 1px solid #333;"></div>
+                    <div style="position: absolute; bottom: -12px; right: -12px; width: 24px; height: 24px; background: #0b0c10; border-radius: 50%; border-left: 1px solid #333;"></div>
 
-            <!-- COORDINATORS -->
-            <div style="border-top: 1px solid #334155; padding-top: 30px; text-align: center;">
-              <p style="text-transform: uppercase; letter-spacing: 1px; font-size: 12px; color: #64748b; font-weight: 700; margin-bottom: 20px;">Event Coordinators</p>
-              
-              <div style="display: inline-block; text-align: left;">
-                <div style="margin-bottom: 10px;">
-                  <span style="color: #e2e8f0; font-size: 14px; font-weight: 600;">Abdulwahab Mulla</span>
-                  <span style="color: #94a3b8; font-size: 13px; display: block;">+91 73497 58871</span>
+                    <h2 style="margin: 0; font-size: 26px; color: #ffffff; text-align: center; margin-bottom: 5px;">${teamName}</h2>
+                    <p style="margin: 0; color: #64748b; text-align: center; font-size: 14px; text-transform: uppercase; letter-spacing: 1px;">${college}</p>
                 </div>
-                <div style="margin-bottom: 10px;">
-                  <span style="color: #e2e8f0; font-size: 14px; font-weight: 600;">Sandesh Birannavar</span>
-                  <span style="color: #94a3b8; font-size: 13px; display: block;">+91 77950 31246</span>
+
+                <!-- Ticket Bottom (QR & Actions) -->
+                <div style="padding: 30px; text-align: center;">
+                    
+                    <img src="https://api.qrserver.com/v1/create-qr-code/?size=160x160&data=${encodeURIComponent('https://hackaura2026.netlify.app/verify?ticketId=' + ticketId)}" alt="QR" width="150" height="150" style="margin: 0 auto; border: 8px solid #ffffff; border-radius: 8px;">
+                    
+                    <p style="font-family: monospace; font-size: 28px; color: #22d3ee; margin: 15px 0 5px; font-weight: 700; letter-spacing: 2px;">${ticketId}</p>
+                    
+                    <!-- NEW VERIFY BUTTON -->
+                    <a href="https://hackaura2026.netlify.app/verify?ticketId=${ticketId}" style="display: inline-block; margin-top: 15px; padding: 8px 20px; background: rgba(34, 211, 238, 0.15); color: #22d3ee; text-decoration: none; border-radius: 4px; font-size: 13px; border: 1px solid rgba(34, 211, 238, 0.3); font-weight: 600; text-transform: uppercase;">
+                       Verify Ticket Status ↗
+                    </a>
+
+                    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-top: 25px; border-top: 1px solid #1f2937; padding-top: 20px;">
+                       <div>
+                          <span style="color: #64748b; font-size: 11px; text-transform: uppercase; display: block;">Domain</span>
+                          <span style="color: #cbd5e1; font-weight: 600;">${domain || 'Open'}</span>
+                       </div>
+                       <div>
+                          <span style="color: #64748b; font-size: 11px; text-transform: uppercase; display: block;">Date</span>
+                          <span style="color: #cbd5e1; font-weight: 600;">${CONFIG.EVENT_DATE}</span>
+                       </div>
+                    </div>
                 </div>
               </div>
-              <div style="display: inline-block; text-align: left; margin-left: 30px; vertical-align: top;">
-                <div style="margin-bottom: 10px;">
-                  <span style="color: #e2e8f0; font-size: 14px; font-weight: 600;">Rakshita Halluri</span>
-                  <span style="color: #94a3b8; font-size: 13px; display: block;">+91 72040 33630</span>
-                </div>
-                <div style="margin-bottom: 10px;">
-                  <span style="color: #e2e8f0; font-size: 14px; font-weight: 600;">Sana Ravat</span>
-                  <span style="color: #94a3b8; font-size: 13px; display: block;">+91 80959 81415</span>
-                </div>
+
+              <!-- VENUE MAP -->
+              <div style="margin: 30px 0; border: 1px solid #333; border-radius: 12px; overflow: hidden; position: relative;">
+                  <a href="${CONFIG.VENUE_MAP}" style="display: block; text-decoration: none;">
+                    <!-- Simulated Map View Image -->
+                    <img src="https://media.wired.com/photos/59269cd37034dc5f91bec0f1/master/pass/GoogleMapTA.jpg" alt="Venue Map" width="100%" style="display: block; opacity: 0.8; filter: grayscale(40%) contrast(120%);">
+                    
+                    <div style="position: absolute; bottom: 0; left: 0; right: 0; background: linear-gradient(0deg, #000 0%, transparent 100%); padding: 40px 20px 15px;">
+                       <span style="background: #22d3ee; color: #000; padding: 4px 10px; border-radius: 4px; font-weight: 700; font-size: 12px; text-transform: uppercase;">Navigate</span>
+                       <p style="margin: 5px 0 0; color: #fff; font-weight: 700;">VSM Institute of Technology, Nipani</p>
+                    </div>
+                  </a>
               </div>
+
+              <!-- ACTIONS -->
+              <div style="text-align: center; margin: 35px 0;">
+                <a href="${CONFIG.WHATSAPP_LINK}" style="display: block; width: 100%; background: #22c55e; color: #ffffff; padding: 18px 0; border-radius: 12px; text-decoration: none; font-weight: 700; font-size: 16px; text-transform: uppercase; letter-spacing: 0.5px; box-shadow: 0 4px 15px rgba(34, 197, 94, 0.4);">
+                  Join WhatsApp Group
+                </a>
+                <p style="margin-top: 12px; font-size: 13px; color: #64748b;">Required for competition updates</p>
+              </div>
+
+              <!-- STYLED COORDINATORS (New Design) -->
+              <div style="background: rgba(255,255,255,0.03); border-radius: 16px; padding: 25px; border: 1px solid #333;">
+                  <h3 style="margin: 0 0 20px; color: #94a3b8; font-size: 12px; text-transform: uppercase; letter-spacing: 1px; text-align: center;">Event Coordinators</h3>
+                  
+                  <table width="100%" cellpadding="0" cellspacing="0">
+                    <tr>
+                      <td width="50%" style="padding-bottom: 20px; vertical-align: top;">
+                         <div style="border-left: 2px solid #a855f7; padding-left: 10px;">
+                            <span style="display: block; color: #e2e8f0; font-weight: 600; font-size: 14px;">Abdulwahab M.</span>
+                            <a href="tel:+917349758871" style="color: #94a3b8; font-size: 13px; text-decoration: none;">+91 73497 58871</a>
+                         </div>
+                      </td>
+                      <td width="50%" style="padding-bottom: 20px; vertical-align: top;">
+                         <div style="border-left: 2px solid #ec4899; padding-left: 10px;">
+                            <span style="display: block; color: #e2e8f0; font-weight: 600; font-size: 14px;">Rakshita Halluri</span>
+                            <a href="tel:+917204033630" style="color: #94a3b8; font-size: 13px; text-decoration: none;">+91 72040 33630</a>
+                         </div>
+                      </td>
+                    </tr>
+                    <tr>
+                      <td width="50%" style="vertical-align: top;">
+                         <div style="border-left: 2px solid #22d3ee; padding-left: 10px;">
+                            <span style="display: block; color: #e2e8f0; font-weight: 600; font-size: 14px;">Sandesh B.</span>
+                            <a href="tel:+917795031246" style="color: #94a3b8; font-size: 13px; text-decoration: none;">+91 77950 31246</a>
+                         </div>
+                      </td>
+                      <td width="50%" style="vertical-align: top;">
+                         <div style="border-left: 2px solid #f59e0b; padding-left: 10px;">
+                            <span style="display: block; color: #e2e8f0; font-weight: 600; font-size: 14px;">Sana Ravat</span>
+                            <a href="tel:+918095981415" style="color: #94a3b8; font-size: 13px; text-decoration: none;">+91 80959 81415</a>
+                         </div>
+                      </td>
+                    </tr>
+                  </table>
+              </div>
+
+            </div>
+            
+            <div style="text-align: center; padding: 25px; border-top: 1px solid #222;">
+               <p style="margin: 0; color: #4b5563; font-size: 12px;">VSM's Institute of Technology, Nipani</p>
             </div>
 
           </div>
-
-          <!-- FOOTER -->
-          <div style="background-color: #000000; padding: 20px; text-align: center; border-top: 1px solid #334155;">
-            <p style="color: #475569; font-size: 12px; margin: 0;">Hosted by VSM's Institute of Technology, Nipani</p>
-          </div>
-
         </div>
       </body>
       </html>
@@ -301,9 +292,9 @@ function doGet(e) {
                     'college': getVal(['College', 'Institute']),
                     'domain': getVal(['Domain', 'Track']) || 'Open Innovation',
                     'members': [
-                        getVal(['Member 1']),
-                        getVal(['Member 2']),
-                        getVal(['Member 3'])
+                        getVal(['Member 1 Name', 'Member 1', 'Teammate 1']),
+                        getVal(['Member 2 Name', 'Member 2', 'Teammate 2']),
+                        getVal(['Member 3 Name', 'Member 3', 'Teammate 3'])
                     ].filter(function (m) { return m && String(m).trim() !== "" }),
                     'status': 'Confirmed'
                 })).setMimeType(ContentService.MimeType.JSON);
@@ -314,6 +305,73 @@ function doGet(e) {
         // ACTION: CHECK DUPLICATES
         var data = sheet.getDataRange().getValues();
         var headers = data[0];
+
+        // --- NEW: ADMIN ACTIONS ---
+
+        // ACTION: MARK ATTENDANCE (Check-In)
+        if (e.parameter.action === 'markAttendance' && e.parameter.ticketId) {
+            var ticketId = e.parameter.ticketId; // HA26-XXX
+            var rowNum = parseInt(ticketId.split('-')[1], 10) + 1;
+
+            if (rowNum > 1 && rowNum <= sheet.getLastRow()) {
+                var attendanceCol = getHeaderIndex(headers, ['Attendance', 'Status']) + 1;
+                var timeCol = getHeaderIndex(headers, ['Check-In Time', 'Arrival Time']) + 1;
+
+                // If columns don't exist, we assume they are at the end (User must create them ideally)
+                // For safety, let's hardcode likely columns if not found or append? 
+                // Better strategy: Use specific columns if found, else just log to a specific column index if user followed instructions.
+                // Let's try to find headers dynamically, if not found, use last columns? No, dangerous.
+                // We will ask user to create "Attendance" and "Check-In Time" headers.
+
+                if (attendanceCol === 0) {
+                    return ContentService.createTextOutput(JSON.stringify({ 'result': 'error', 'message': 'Column "Attendance" not found in Sheet' })).setMimeType(ContentService.MimeType.JSON);
+                }
+
+                var timestamp = new Date().toLocaleString('en-IN', { timeZone: 'Asia/Kolkata' });
+
+                sheet.getRange(rowNum, attendanceCol).setValue("Checked In");
+                if (timeCol > 0) sheet.getRange(rowNum, timeCol).setValue(timestamp);
+
+                return ContentService.createTextOutput(JSON.stringify({
+                    'result': 'success',
+                    'message': 'Checked In Successfully!',
+                    'teamName': sheet.getRange(rowNum, getHeaderIndex(headers, ['Team Name', 'Team']) + 1).getValue(),
+                    'timestamp': timestamp
+                })).setMimeType(ContentService.MimeType.JSON);
+            }
+        }
+
+        // ACTION: GET ATTENDANCE LIST (For Printing)
+        if (e.parameter.action === 'getAttendanceList') {
+            var attendanceIdx = getHeaderIndex(headers, ['Attendance', 'Status']);
+            if (attendanceIdx === -1) return ContentService.createTextOutput(JSON.stringify([])).setMimeType(ContentService.MimeType.JSON);
+
+            var approvedTeams = [];
+            for (var i = 1; i < data.length; i++) {
+                if (data[i][attendanceIdx] === 'Checked In') {
+                    approvedTeams.push({
+                        ticketId: 'HA26-' + String(i).padStart(3, '0'),
+                        teamName: data[i][getHeaderIndex(headers, ['Team Name', 'Team'])],
+                        leaderName: data[i][getHeaderIndex(headers, ['Leader Name', 'Full Name'])],
+                        college: data[i][getHeaderIndex(headers, ['College', 'Institute'])],
+                        members: [
+                            data[i][getHeaderIndex(headers, ['Member 1 Name', 'Member 1'])],
+                            data[i][getHeaderIndex(headers, ['Member 2 Name', 'Member 2'])],
+                            data[i][getHeaderIndex(headers, ['Member 3 Name', 'Member 3'])]
+                        ].filter(Boolean).join(", "),
+                        checkInTime: data[i][getHeaderIndex(headers, ['Check-In Time', 'Arrival Time'])] || 'N/A'
+                    });
+                }
+            }
+
+            return ContentService.createTextOutput(JSON.stringify({
+                'result': 'success',
+                'teams': approvedTeams
+            })).setMimeType(ContentService.MimeType.JSON);
+        }
+
+        // --------------------------
+
         var teamIdx = getHeaderIndex(headers, ['Team', 'Team Name']);
         var emailIdx = getHeaderIndex(headers, ['Email', 'Leader Email', 'Email Address']);
         var phoneIdx = getHeaderIndex(headers, ['Phone', 'Leader Phone', 'Mobile']);
