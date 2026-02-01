@@ -73,6 +73,14 @@ const formSchema = z.object({
         .regex(/^\d{10}$/, "Phone number must be 10 digits")
         .refine(async (val) => await checkUnique(val, 'phone'), "This phone number is already registered"),
     members: z.array(memberSchema).max(3, "Max 3 additional members"),
+}).superRefine((data, ctx) => {
+    if (data.domain === 'Internet of Things' && !data.problemStatement) {
+        ctx.addIssue({
+            code: z.ZodIssueCode.custom,
+            message: "Please select a problem statement for IoT",
+            path: ["problemStatement"]
+        });
+    }
 });
 
 type FormData = z.infer<typeof formSchema>;
