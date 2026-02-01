@@ -191,7 +191,7 @@ export default function Register() {
             formData.append(GOOGLE_FORM_ENTRY_IDS.LEADER_PHONE, data.leaderPhone);
             // Append Domain
             formData.append(GOOGLE_FORM_ENTRY_IDS.DOMAIN, data.domain);
-            if (data.domain === 'IOT' && data.problemStatement) {
+            if (data.domain === 'Internet of Things' && data.problemStatement) {
                 formData.append(GOOGLE_FORM_ENTRY_IDS.PROBLEM_STATEMENT, data.problemStatement);
             }
 
@@ -300,7 +300,7 @@ export default function Register() {
                                             <option value="Full Stack" className="bg-gray-900">Full Stack</option>
                                             <option value="Cybersecurity" className="bg-gray-900">Cybersecurity</option>
                                             <option value="Generative AI" className="bg-gray-900">Generative AI</option>
-                                            <option value="IOT" className="bg-gray-900">IOT</option>
+                                            <option value="Internet of Things" className="bg-gray-900">Internet of Things</option>
                                         </select>
                                         <div className="absolute right-3 top-3.5 pointer-events-none">
                                             <ChevronLeft className="w-4 h-4 -rotate-90 text-gray-500" />
@@ -310,19 +310,19 @@ export default function Register() {
 
                                     {/* Problem Statement Info */}
                                     {watch('domain') && (
-                                        <div className={`text-xs mt-2 p-2 rounded border ${watch('domain') === 'IOT'
+                                        <div className={`text-xs mt-2 p-2 rounded border ${watch('domain') === 'Internet of Things'
                                             ? 'bg-blue-500/10 border-blue-500/30 text-blue-400'
                                             : 'bg-white/5 border-white/10 text-gray-400'
                                             }`}>
                                             <span className="font-semibold">Note: </span>
-                                            {watch('domain') === 'IOT'
+                                            {watch('domain') === 'Internet of Things'
                                                 ? 'Please select your IOT Problem Statement below'
                                                 : 'Problem Statement will be provided On Venue'}
                                         </div>
                                     )}
 
                                     {/* Conditional Problem Statement Dropdown for IOT */}
-                                    {watch('domain') === 'IOT' && (
+                                    {watch('domain') === 'Internet of Things' && (
                                         <div className="space-y-2 mt-4 animate-in fade-in slide-in-from-top-2">
                                             <label className="text-sm font-medium text-blue-400">Select Problem Statement</label>
                                             <div className="relative">
