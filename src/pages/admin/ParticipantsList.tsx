@@ -1,10 +1,10 @@
 import { useEffect, useState } from 'react';
 import { NeonButton } from '@/components/ui/neon-button';
-import { Loader2, Search, ArrowLeft, Users, Building, Mail, Phone, RefreshCw } from 'lucide-react';
+import { Loader2, Search, ArrowLeft, Users, Building, Mail, Phone, RefreshCw, RotateCcw } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import { GlassCard } from '@/components/ui/glass-card';
 
-const GOOGLE_SCRIPT_API_URL = "https://script.google.com/macros/s/AKfycbwX4jJHhyj119eeKEtWZUj5az5J_CRYdVBbEPNYG_7uvN1Sp6EOKlswYqcjsPJRW2wC/exec";
+const GOOGLE_SCRIPT_API_URL = "https://script.google.com/macros/s/AKfycbyWneTmeB9sq1WVoklnkCKJsQyMOX0LSKedsOG1oNqyCu7GZWj_94dt-FMwV3PSBerG/exec";
 
 interface Participant {
     ticketId: string;
@@ -15,6 +15,7 @@ interface Participant {
     phone: string;
     membersCount: number;
     status: string;
+    assignedProblem?: string | null;
 }
 
 export default function ParticipantsList() {
@@ -37,6 +38,23 @@ export default function ParticipantsList() {
             console.error("Failed to fetch participants:", err);
         } finally {
             setLoading(false);
+        }
+    };
+
+    const handleResetProblem = async (ticketId: string, teamName: string) => {
+        if (!window.confirm(`Are you sure you want to RESET the problem specific for team ${teamName}?`)) return;
+
+        try {
+            const response = await fetch(`${GOOGLE_SCRIPT_API_URL}?action=resetProblem&ticketId=${ticketId}`);
+            const result = await response.json();
+            if (result.result === 'success') {
+                alert('Problem reset successfully!');
+                fetchParticipants();
+            } else {
+                alert('Failed: ' + result.message);
+            }
+        } catch (e) {
+            alert('Network Error');
         }
     };
 
@@ -123,6 +141,13 @@ export default function ParticipantsList() {
                                         <Building className="w-3 h-3" /> {team.college}
                                     </p>
 
+                                    <div className="mb-4 bg-slate-900/50 p-2 rounded border border-slate-700/50">
+                                        <span className="text-xs text-slate-500 uppercase tracking-wider block mb-1">Problem Statement</span>
+                                        <div className="text-sm text-cyan-400 font-medium">
+                                            {team.assignedProblem || <span className="text-slate-600 italic">Not Assigned</span>}
+                                        </div>
+                                    </div>
+
                                     <div className="space-y-2 text-sm border-t border-slate-800 pt-3">
                                         <div className="flex items-center gap-2 text-slate-300">
                                             <Users className="w-4 h-4 text-purple-400" />
@@ -135,6 +160,15 @@ export default function ParticipantsList() {
                                         <div className="flex items-center gap-2 text-slate-400 text-xs">
                                             <Phone className="w-3 h-3" /> {team.phone}
                                         </div>
+                                    </div>
+                                    <div className="mt-3 pt-3 border-t border-slate-800 flex justify-end">
+                                        <button
+                                            onClick={() => handleResetProblem(team.ticketId, team.teamName)}
+                                            className="text-xs text-red-400 hover:text-red-300 flex items-center gap-1 transition-colors px-2 py-1 rounded hover:bg-red-900/20"
+                                            title="Reset Assigned Problem"
+                                        >
+                                            <RotateCcw className="w-3 h-3" /> Reset Problem
+                                        </button>
                                     </div>
                                 </GlassCard>
                             ))

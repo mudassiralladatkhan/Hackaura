@@ -34,7 +34,7 @@ const GOOGLE_FORM_ENTRY_IDS = {
 
 
 // --- DUPLICATE CHECK CONFIG ---
-const GOOGLE_SCRIPT_API_URL = "https://script.google.com/macros/s/AKfycbwX4jJHhyj119eeKEtWZUj5az5J_CRYdVBbEPNYG_7uvN1Sp6EOKlswYqcjsPJRW2wC/exec";
+const GOOGLE_SCRIPT_API_URL = "https://script.google.com/macros/s/AKfycbyWneTmeB9sq1WVoklnkCKJsQyMOX0LSKedsOG1oNqyCu7GZWj_94dt-FMwV3PSBerG/exec";
 
 
 

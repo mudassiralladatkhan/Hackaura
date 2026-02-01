@@ -6,6 +6,10 @@ import AdminScanner from './pages/admin/AdminScanner';
 import AttendanceSheet from './pages/admin/AttendanceSheet';
 import ParticipantsList from './pages/admin/ParticipantsList';
 import ProjectSubmission from './pages/ProjectSubmission';
+import GenAI from './pages/domains/GenAI';
+import Cybersecurity from './pages/domains/Cybersecurity';
+import FullStack from './pages/domains/FullStack';
+import IoT from './pages/domains/IoT';
 import type { ReactNode } from 'react';
 
 interface RouteConfig {
@@ -60,6 +64,30 @@ const routes: RouteConfig[] = [
     name: 'Submit Project',
     path: '/submit',
     element: <ProjectSubmission />,
+    visible: false
+  },
+  {
+    name: 'GenAI Problems',
+    path: '/genai',
+    element: <GenAI />,
+    visible: false
+  },
+  {
+    name: 'Cybersecurity Problems',
+    path: '/cybersecurity',
+    element: <Cybersecurity />,
+    visible: false
+  },
+  {
+    name: 'Full Stack Problems',
+    path: '/fullstack',
+    element: <FullStack />,
+    visible: false
+  },
+  {
+    name: 'IoT Problems',
+    path: '/iot',
+    element: <IoT />,
     visible: false
   }
 ];

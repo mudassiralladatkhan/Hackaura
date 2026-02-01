@@ -3,7 +3,7 @@ import { NeonButton } from '@/components/ui/neon-button';
 import { Printer, ArrowLeft, RefreshCw } from 'lucide-react';
 import { Link } from 'react-router-dom';
 
-const GOOGLE_SCRIPT_API_URL = "https://script.google.com/macros/s/AKfycbwX4jJHhyj119eeKEtWZUj5az5J_CRYdVBbEPNYG_7uvN1Sp6EOKlswYqcjsPJRW2wC/exec";
+const GOOGLE_SCRIPT_API_URL = "https://script.google.com/macros/s/AKfycbyWneTmeB9sq1WVoklnkCKJsQyMOX0LSKedsOG1oNqyCu7GZWj_94dt-FMwV3PSBerG/exec";
 
 export default function AttendanceSheet() {
     const [data, setData] = useState<any[]>([]);

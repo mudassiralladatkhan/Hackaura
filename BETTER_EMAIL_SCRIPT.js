@@ -235,7 +235,7 @@ function onFormSubmit(e) {
    --------------------------------------------------------------
    This matches your existing requirement for real-time website stats.
 */
-function doGet(e) {
+function doGet_legacy(e) {
     var lock = LockService.getScriptLock();
     lock.tryLock(10000);
 
@@ -548,13 +548,412 @@ function doGet(e) {
 
     } catch (err) {
         return ContentService.createTextOutput(JSON.stringify({ 'result': 'error', 'error': err.toString() })).setMimeType(ContentService.MimeType.JSON);
+        return ContentService.createTextOutput(JSON.stringify({ 'result': 'error', 'error': err.toString() })).setMimeType(ContentService.MimeType.JSON);
     } finally {
         lock.releaseLock();
     }
 }
 
+// --- GET HANDLER FOR DOMAIN-SPECIFIC API CALLS (AVOIDS CORS PREFLIGHT) ---
+function doGet(e) {
+    var lock = LockService.getScriptLock();
+    // Shorter lock for GET to avoid timeout pileups
+    lock.tryLock(5000);
+
+    try {
+        // Safety check for manual run in editor
+        if (!e || !e.parameter) {
+            return createCORSResponse({ 'result': 'error', 'message': 'You cannot run doGet directly. Use the deployed URL.' });
+        }
+
+        var action = e.parameter.action;
+        var sheet = SpreadsheetApp.getActiveSpreadsheet().getSheetByName("Form Responses 1");
+        if (!sheet) sheet = SpreadsheetApp.getActiveSpreadsheet().getSheets()[0];
+
+        var data = sheet.getDataRange().getValues();
+        var headers = data[0];
+
+        // --- NEW: STATS ACTION (Restored) ---
+        if (action === 'getStats') {
+            var count = Math.max(0, sheet.getLastRow() - 1); // Total teams
+
+            // Calculate Unique Colleges
+            var collegeIdx = getHeaderIndex(headers, ['College', 'College Name', 'Institute']);
+            var uniqueColleges = {};
+            var uniqueCount = 0;
+
+            if (collegeIdx > -1) {
+                for (var k = 1; k < data.length; k++) {
+                    var collegeName = data[k][collegeIdx];
+                    if (collegeName && String(collegeName).trim() !== "") {
+                        var normalized = String(collegeName).trim().toLowerCase();
+                        if (!uniqueColleges[normalized]) {
+                            uniqueColleges[normalized] = true;
+                            uniqueCount++;
+                        }
+                    }
+                }
+            }
+
+            return createCORSResponse({
+                'result': 'success',
+                'count': count,
+                'collegeCount': uniqueCount
+            });
+        }
+
+        // --- ADMIN ACTIONS ---
+
+        // ACTION: GET ALL PARTICIPANTS
+        if (action === 'getAllParticipants') {
+            var allTeams = [];
+            for (var i = 1; i < data.length; i++) {
+                allTeams.push({
+                    ticketId: 'HA26-' + String(i).padStart(3, '0'),
+                    teamName: data[i][getHeaderIndex(headers, ['Team Name', 'Team'])] || '',
+                    leaderName: data[i][getHeaderIndex(headers, ['Leader Name', 'Full Name'])] || '',
+                    email: data[i][getHeaderIndex(headers, ['Email Address', 'Leader Email'])] || '',
+                    phone: data[i][getHeaderIndex(headers, ['Phone Number', 'Phone', 'Mobile'])] || '',
+                    college: data[i][getHeaderIndex(headers, ['College', 'Institute'])] || '',
+                    membersCount: [
+                        data[i][getHeaderIndex(headers, ['Member 1 Name', 'Member 1'])],
+                        data[i][getHeaderIndex(headers, ['Member 2 Name', 'Member 2'])],
+                        data[i][getHeaderIndex(headers, ['Member 3 Name', 'Member 3'])]
+                    ].filter(function (m) { return m }).length + 1,
+                    status: data[i][getHeaderIndex(headers, ['Attendance', 'Status'])] || 'Pending',
+                    assignedProblem: data[i][getHeaderIndex(headers, ['Problem Statment', 'Problem Statement'])] || null
+                });
+            }
+            return createCORSResponse({ 'result': 'success', 'teams': allTeams });
+        }
+
+        // ACTION: GET ATTENDANCE LIST
+        if (action === 'getAttendanceList') {
+            var attendanceIdx = getHeaderIndex(headers, ['Attendance', 'Status']);
+            var approvedTeams = [];
+
+            for (var i = 1; i < data.length; i++) {
+                if (data[i][attendanceIdx] === 'Checked In') {
+                    approvedTeams.push({
+                        ticketId: 'HA26-' + String(i).padStart(3, '0'),
+                        teamName: data[i][getHeaderIndex(headers, ['Team Name', 'Team'])],
+                        leaderName: data[i][getHeaderIndex(headers, ['Leader Name', 'Full Name'])],
+                        members: [
+                            data[i][getHeaderIndex(headers, ['Member 1 Name', 'Member 1'])],
+                            data[i][getHeaderIndex(headers, ['Member 2 Name', 'Member 2'])],
+                            data[i][getHeaderIndex(headers, ['Member 3 Name', 'Member 3'])]
+                        ].filter(function (m) { return m }).join(", "),
+                        checkInTime: data[i][getHeaderIndex(headers, ['Check-In Time', 'Arrival Time'])] || 'N/A',
+                        signature: data[i][getHeaderIndex(headers, ['Signature', 'Signed', 'Digital Signature'])] || null
+                    });
+                }
+            }
+            return createCORSResponse({ 'result': 'success', 'teams': approvedTeams });
+        }
+
+        // ACTION: MARK ATTENDANCE (If used via GET)
+        if (action === 'markAttendance') {
+            var ticketId = e.parameter.ticketId;
+            var ticketIndex = getHeaderIndex(headers, ['Ticket ID', 'TicketId']);
+            var rowNum = findRowIndexByTicketId(data, ticketId, ticketIndex) + 1;
+
+            if (rowNum > 1) {
+                var attendanceCol = getHeaderIndex(headers, ['Attendance', 'Status']) + 1;
+                var timeCol = getHeaderIndex(headers, ['Check-In Time', 'Arrival Time']) + 1;
+                var timestamp = new Date().toLocaleString('en-IN', { timeZone: 'Asia/Kolkata' });
+
+                if (attendanceCol > 0) sheet.getRange(rowNum, attendanceCol).setValue("Checked In");
+                if (timeCol > 0) sheet.getRange(rowNum, timeCol).setValue(timestamp);
+
+                return createCORSResponse({ 'result': 'success', 'message': 'Checked In' });
+            }
+            return createCORSResponse({ 'result': 'error', 'message': 'Ticket not found' });
+        }
+
+        // ACTION: RESET ATTENDANCE
+        if (action === 'resetAttendance') {
+            var attendanceIdx = getHeaderIndex(headers, ['Attendance', 'Status']);
+            var timeIdx = getHeaderIndex(headers, ['Check-In Time', 'Arrival Time']);
+            var signatureIdx = getHeaderIndex(headers, ['Signature', 'Signed', 'Digital Signature']);
+
+            var clearedCount = 0;
+            for (var i = 1; i < data.length; i++) {
+                if (attendanceIdx > -1) sheet.getRange(i + 1, attendanceIdx + 1).clearContent();
+                if (timeIdx > -1) sheet.getRange(i + 1, timeIdx + 1).clearContent();
+                if (signatureIdx > -1) sheet.getRange(i + 1, signatureIdx + 1).clearContent();
+                clearedCount++;
+            }
+            return createCORSResponse({ 'result': 'success', 'rowsCleared': clearedCount });
+        }
+
+        // ACTION: RESET PROBLEM
+        if (action === 'resetProblem') {
+            var ticketId = e.parameter.ticketId;
+            var ticketIndex = getHeaderIndex(headers, ['Ticket ID', 'TicketId', 'Ticket', 'Ref No', 'ID']);
+            var assignedNumIndex = getHeaderIndex(headers, ['Assigned Problem Number', 'Assigned Problem']);
+            var problemNameIndex = getHeaderIndex(headers, ['Problem Statment', 'Problem Statement']);
+
+            var rowIndex = findRowIndexByTicketId(data, ticketId, ticketIndex);
+
+            if (rowIndex > -1) {
+                if (assignedNumIndex > -1) sheet.getRange(rowIndex + 1, assignedNumIndex + 1).clearContent();
+                if (problemNameIndex > -1) sheet.getRange(rowIndex + 1, problemNameIndex + 1).clearContent();
+
+                return createCORSResponse({ 'result': 'success', 'message': 'Problem reset successfully' });
+            }
+            return createCORSResponse({ 'result': 'error', 'message': 'Ticket not found' });
+        }
+
+        // ACTION: GET TEAM DETAILS
+        if (action === 'getTeamDetails') {
+            var ticketId = e.parameter.ticketId;
+            var idx = findRowIndexByTicketId(data, ticketId, getHeaderIndex(headers, ['Ticket ID', 'TicketId']));
+            if (idx > -1) {
+                var row = data[idx];
+                return createCORSResponse({
+                    'result': 'success',
+                    'teamName': row[getHeaderIndex(headers, ['Team Name', 'Team'])],
+                    'leaderName': row[getHeaderIndex(headers, ['Leader Name', 'Full Name'])]
+                });
+            }
+            return createCORSResponse({ 'result': 'error', 'message': 'Ticket not found' });
+        }
+
+        // ACTION: VERIFY DOMAIN TICKET
+        if (action === 'verifyDomainTicket') {
+            var ticketId = e.parameter.ticketId;
+            var domain = e.parameter.domain;
+
+            var ticketIndex = getHeaderIndex(headers, ['Ticket ID', 'TicketId', 'Ticket', 'Ref No', 'ID']);
+            var domainIndex = getHeaderIndex(headers, ['Hackathon Domain', 'Domain']);
+            var teamNameIndex = getHeaderIndex(headers, ['Team Name']);
+            var leaderEmailIndex = getHeaderIndex(headers, ['Email Address', 'Leader Email']);
+            var assignedProblemIndex = getHeaderIndex(headers, ['Assigned Problem Number', 'Assigned Problem']);
+            var attendanceIndex = getHeaderIndex(headers, ['Attendance', 'Status']);
+
+            var rowIndex = findRowIndexByTicketId(data, ticketId, ticketIndex);
+
+            if (rowIndex > -1) {
+                var row = data[rowIndex];
+
+                // CHECK ATTENDANCE
+                var status = String(row[attendanceIndex]).trim().toLowerCase();
+                if (status !== 'checked in') {
+                    return createCORSResponse({
+                        'result': 'error',
+                        'message': 'Access Denied: Team not Checked-In. Please visit the registration desk.'
+                    });
+                }
+
+                var teamDomain = String(row[domainIndex]).trim();
+                if (teamDomain.toLowerCase() !== domain.toLowerCase()) {
+                    return createCORSResponse({
+                        'result': 'error',
+                        'message': 'This ticket is registered for ' + teamDomain + ', not ' + domain
+                    });
+                }
+
+                return createCORSResponse({
+                    'result': 'success',
+                    'teamName': row[teamNameIndex],
+                    'leaderEmail': row[leaderEmailIndex],
+                    'assignedProblem': row[assignedProblemIndex] || null
+                });
+            }
+
+            return createCORSResponse({
+                'result': 'error',
+                'message': 'Ticket ID not found'
+            });
+        }
+
+        // ACTION: GET PROBLEM STATEMENTS
+        if (action === 'getProblemStatements') {
+            var domain = e.parameter.domain;
+            var problems = [];
+            var problemSheet = SpreadsheetApp.getActiveSpreadsheet().getSheetByName("Problem Statements");
+
+            if (problemSheet) {
+                var problemData = problemSheet.getDataRange().getValues();
+                for (var i = 1; i < problemData.length; i++) {
+                    if (String(problemData[i][0]).toLowerCase() === domain.toLowerCase()) {
+                        problems.push({
+                            'number': problemData[i][1],
+                            'title': problemData[i][2],
+                            'description': problemData[i][3]
+                        });
+                    }
+                }
+            }
+
+            if (problems.length === 0) problems = getPlaceholderProblems(domain);
+
+            return createCORSResponse({ 'result': 'success', 'problems': problems });
+        }
+
+        // ACTION: ASSIGN PROBLEM
+        if (action === 'assignProblem') {
+            var ticketId = e.parameter.ticketId;
+            var problemNumber = e.parameter.problemNumber;
+            var ticketIndex = getHeaderIndex(headers, ['Ticket ID', 'TicketId', 'ID']);
+            var assignedNumIndex = getHeaderIndex(headers, ['Assigned Problem Number', 'Assigned Problem']);
+            var problemNameIndex = getHeaderIndex(headers, ['Problem Statment', 'Problem Statement']);
+            var domainIndex = getHeaderIndex(headers, ['Hackathon Domain', 'Domain']);
+
+            var rowIndex = findRowIndexByTicketId(data, ticketId, ticketIndex);
+
+            if (rowIndex > -1) {
+                var domain = data[rowIndex][domainIndex];
+                var problemTitle = "Problem " + problemNumber;
+
+                // Lookup Title
+                var problemSheet = SpreadsheetApp.getActiveSpreadsheet().getSheetByName("Problem Statements");
+                if (problemSheet) {
+                    var pData = problemSheet.getDataRange().getValues();
+                    for (var k = 1; k < pData.length; k++) {
+                        if (String(pData[k][0]).toLowerCase() === String(domain).toLowerCase() && pData[k][1] == problemNumber) {
+                            problemTitle = pData[k][2];
+                            break;
+                        }
+                    }
+                } else {
+                    var placeholders = getPlaceholderProblems(domain);
+                    var ph = placeholders.filter(function (p) { return p.number == problemNumber })[0];
+                    if (ph) problemTitle = ph.title;
+                }
+
+                if (assignedNumIndex > -1) sheet.getRange(rowIndex + 1, assignedNumIndex + 1).setValue(problemNumber);
+                if (problemNameIndex > -1) sheet.getRange(rowIndex + 1, problemNameIndex + 1).setValue(problemTitle);
+
+                return createCORSResponse({
+                    'result': 'success',
+                    'message': 'Problem assigned successfully',
+                    'number': problemNumber,
+                    'title': problemTitle
+                });
+            }
+            return createCORSResponse({ 'result': 'error', 'message': 'Ticket ID not found' });
+        }
+
+        // ACTION: GET ASSIGNED PROBLEM
+        if (action === 'getAssignedProblem') {
+            var ticketId = e.parameter.ticketId;
+            var ticketIndex = getHeaderIndex(headers, ['Ticket ID', 'TicketId']);
+            var assignedProblemIndex = getHeaderIndex(headers, ['Assigned Problem Number', 'Assigned Problem']);
+            var domainIndex = getHeaderIndex(headers, ['Hackathon Domain', 'Domain']);
+
+            var rowIndex = findRowIndexByTicketId(data, ticketId, ticketIndex);
+
+            if (rowIndex > -1) {
+                var problemNumber = data[rowIndex][assignedProblemIndex];
+                var domain = data[rowIndex][domainIndex];
+
+                if (!problemNumber) return createCORSResponse({ 'result': 'error', 'message': 'No problem assigned yet' });
+
+                var problemSheet = SpreadsheetApp.getActiveSpreadsheet().getSheetByName("Problem Statements");
+                if (problemSheet) {
+                    var pData = problemSheet.getDataRange().getValues();
+                    for (var j = 1; j < pData.length; j++) {
+                        if (String(pData[j][0]).toLowerCase() === String(domain).toLowerCase() && pData[j][1] == problemNumber) {
+                            return createCORSResponse({
+                                'result': 'success',
+                                'problem': { 'number': pData[j][1], 'title': pData[j][2], 'description': pData[j][3] }
+                            });
+                        }
+                    }
+                }
+
+                // Fallback
+                var placeholders = getPlaceholderProblems(domain);
+                var phHandler = placeholders.filter(function (p) { return p.number == problemNumber })[0];
+                if (phHandler) return createCORSResponse({ 'result': 'success', 'problem': phHandler });
+
+                return createCORSResponse({ 'result': 'error', 'message': 'Problem details not found' });
+            }
+            return createCORSResponse({ 'result': 'error', 'message': 'Ticket ID not found' });
+        }
+
+        // ACTION: SEND OTP
+        if (action === 'sendOTP') {
+            var ticketId = e.parameter.ticketId;
+            var ticketIndex = getHeaderIndex(headers, ['Ticket ID', 'TicketId']);
+            var rowIndex = findRowIndexByTicketId(data, ticketId, ticketIndex);
+
+            if (rowIndex === -1) return createCORSResponse({ 'result': 'error', 'message': 'Invalid Ticket ID' });
+
+            var teamEmail = data[rowIndex][getHeaderIndex(headers, ['Email Address', 'Leader Email'])];
+            var teamName = data[rowIndex][getHeaderIndex(headers, ['Team Name', 'Team'])];
+
+            if (!teamEmail) return createCORSResponse({ 'result': 'error', 'message': 'No email found.' });
+
+            var otp = Math.floor(100000 + Math.random() * 900000).toString();
+            var otpSheet = SpreadsheetApp.getActiveSpreadsheet().getSheetByName("Active_OTPs");
+            if (!otpSheet) {
+                otpSheet = SpreadsheetApp.getActiveSpreadsheet().insertSheet("Active_OTPs");
+                otpSheet.appendRow(["Timestamp", "Ticket ID", "OTP"]);
+            }
+            otpSheet.appendRow([new Date(), ticketId, otp]);
+
+            MailApp.sendEmail({
+                to: teamEmail,
+                subject: "Hackaura Validation OTP",
+                htmlBody: `<h2>OTP: ${otp}</h2><p>Valid for 15 mins.</p>`
+            });
+
+            return createCORSResponse({ 'result': 'success', 'message': 'OTP sent' });
+        }
+
+        // ACTION: VERIFY OTP
+        if (action === 'verifyOTP') {
+            var ticketId = e.parameter.ticketId;
+            var userOtp = e.parameter.otp;
+            var otpSheet = SpreadsheetApp.getActiveSpreadsheet().getSheetByName("Active_OTPs");
+
+            if (!otpSheet) return createCORSResponse({ 'result': 'error', 'message': 'No OTPs found' });
+
+            var otpData = otpSheet.getDataRange().getValues();
+            var isValid = false;
+            for (var i = otpData.length - 1; i >= 1; i--) {
+                if (String(otpData[i][1]) === String(ticketId)) {
+                    var diff = (new Date() - new Date(otpData[i][0])) / 60000;
+                    if (diff <= 15 && String(otpData[i][2]).trim() === String(userOtp).trim()) {
+                        isValid = true;
+                    }
+                    break;
+                }
+            }
+            return isValid ? createCORSResponse({ 'result': 'success', 'message': 'Verified' }) : createCORSResponse({ 'result': 'error', 'message': 'Invalid OTP' });
+        }
+
+        return createCORSResponse({ 'result': 'error', 'message': 'Unknown Action: ' + action });
+
+    } catch (err) {
+        return createCORSResponse({ 'result': 'error', 'error': 'Server Error: ' + err.toString() });
+    } finally {
+        lock.releaseLock();
+    }
+}
+
+// --- CORS SUPPORT FOR LOCAL DEVELOPMENT ---
+function doOptions(e) {
+    return ContentService.createTextOutput("")
+        .setMimeType(ContentService.MimeType.JSON);
+}
+
+// Helper function to create CORS-enabled responses
+function createCORSResponse(jsonObject) {
+    return ContentService.createTextOutput(JSON.stringify(jsonObject))
+        .setMimeType(ContentService.MimeType.JSON);
+}
+
 // --- NEW: POST HANDLER FOR SIGNATURES & IMAGES ---
 function doPost(e) {
+    // Handle OPTIONS preflight request for CORS (Just return empty JSON, headers not needed/possible)
+    if (e && e.parameter && e.parameter.method === 'OPTIONS') {
+        return ContentService.createTextOutput("")
+            .setMimeType(ContentService.MimeType.JSON);
+    }
+
     var lock = LockService.getScriptLock();
     try {
         lock.waitLock(30000);
@@ -691,7 +1090,7 @@ function doPost(e) {
                     file.setSharing(DriveApp.Access.ANYONE_WITH_LINK, DriveApp.Permission.VIEW);
                     finalPptLink = file.getUrl();
                 } catch (e) {
-                    return ContentService.createTextOutput(JSON.stringify({ 'result': 'error', 'message': 'PPT Upload Failed: ' + e.toString() })).setMimeType(ContentService.MimeType.JSON);
+                    return createCORSResponse({ 'result': 'error', 'message': 'PPT Upload Failed: ' + e.toString() });
                 }
             }
 
@@ -705,7 +1104,7 @@ function doPost(e) {
                     vFile.setSharing(DriveApp.Access.ANYONE_WITH_LINK, DriveApp.Permission.VIEW);
                     finalVideoLink = vFile.getUrl();
                 } catch (e) {
-                    return ContentService.createTextOutput(JSON.stringify({ 'result': 'error', 'message': 'Video Upload Failed: ' + e.toString() })).setMimeType(ContentService.MimeType.JSON);
+                    return createCORSResponse({ 'result': 'error', 'message': 'Video Upload Failed: ' + e.toString() });
                 }
             }
 
@@ -729,10 +1128,10 @@ function doPost(e) {
                 request.otherLinks || ''
             ]);
 
-            return ContentService.createTextOutput(JSON.stringify({
+            return createCORSResponse({
                 'result': 'success',
                 'message': 'Project submitted successfully!'
-            })).setMimeType(ContentService.MimeType.JSON);
+            });
         }
 
         // ACTION: SEND OTP
@@ -746,14 +1145,14 @@ function doPost(e) {
             var headers = data[0];
 
             if (isNaN(ticketNum) || ticketNum < 1 || ticketNum >= data.length) {
-                return ContentService.createTextOutput(JSON.stringify({ 'result': 'error', 'message': 'Invalid Ticket ID' })).setMimeType(ContentService.MimeType.JSON);
+                return createCORSResponse({ 'result': 'error', 'message': 'Invalid Ticket ID' });
             }
 
             var teamEmail = data[ticketNum][getHeaderIndex(headers, ['Email Address', 'Leader Email'])];
             var teamName = data[ticketNum][getHeaderIndex(headers, ['Team Name', 'Team'])];
 
             if (!teamEmail) {
-                return ContentService.createTextOutput(JSON.stringify({ 'result': 'error', 'message': 'No email found for this team.' })).setMimeType(ContentService.MimeType.JSON);
+                return createCORSResponse({ 'result': 'error', 'message': 'No email found for this team.' });
             }
 
             var otp = Math.floor(100000 + Math.random() * 900000).toString();
@@ -780,10 +1179,10 @@ function doPost(e) {
                 `
             });
 
-            return ContentService.createTextOutput(JSON.stringify({
+            return createCORSResponse({
                 'result': 'success',
                 'message': 'OTP sent to registered email.'
-            })).setMimeType(ContentService.MimeType.JSON);
+            });
         }
 
         // ACTION: VERIFY OTP
@@ -815,19 +1214,235 @@ function doPost(e) {
             }
 
             if (isValid) {
-                return ContentService.createTextOutput(JSON.stringify({ 'result': 'success', 'message': 'OTP Verified' })).setMimeType(ContentService.MimeType.JSON);
+                return createCORSResponse({ 'result': 'success', 'message': 'OTP Verified' });
             } else {
-                return ContentService.createTextOutput(JSON.stringify({ 'result': 'error', 'message': 'Invalid or Expired OTP' })).setMimeType(ContentService.MimeType.JSON);
+                return createCORSResponse({ 'result': 'error', 'message': 'Invalid or Expired OTP' });
             }
         }
 
-        return ContentService.createTextOutput(JSON.stringify({ 'result': 'error', 'message': 'Unknown Action' })).setMimeType(ContentService.MimeType.JSON);
+        // 4. ACTION: VERIFY DOMAIN TICKET
+        if (action === 'verifyDomainTicket') {
+            var ticketId = request.ticketId;
+            var domain = request.domain;
+
+            var sheet = SpreadsheetApp.getActiveSpreadsheet().getSheetByName("Form Responses 1");
+            if (!sheet) sheet = SpreadsheetApp.getActiveSpreadsheet().getSheets()[0];
+
+            var data = sheet.getDataRange().getValues();
+            var headers = data[0];
+            var ticketIndex = getHeaderIndex(headers, ['Ticket ID']);
+            var domainIndex = getHeaderIndex(headers, ['Hackathon Domain', 'Domain']);
+            var teamNameIndex = getHeaderIndex(headers, ['Team Name']);
+            var leaderEmailIndex = getHeaderIndex(headers, ['Leader Email', 'Email']);
+            var assignedProblemIndex = getHeaderIndex(headers, ['Assigned Problem Number']);
+
+            // Find ticket
+            for (var i = 1; i < data.length; i++) {
+                if (String(data[i][ticketIndex]) === String(ticketId)) {
+                    var teamDomain = String(data[i][domainIndex]).trim();
+
+                    // Verify domain matches
+                    if (teamDomain.toLowerCase() !== domain.toLowerCase()) {
+                        return createCORSResponse({
+                            'result': 'error',
+                            'message': 'This ticket is registered for ' + teamDomain + ', not ' + domain
+                        });
+                    }
+
+                    return createCORSResponse({
+                        'result': 'success',
+                        'teamName': data[i][teamNameIndex],
+                        'leaderEmail': data[i][leaderEmailIndex],
+                        'assignedProblem': data[i][assignedProblemIndex] || null
+                    });
+                }
+            }
+
+            return createCORSResponse({
+                'result': 'error',
+                'message': 'Ticket ID not found'
+            });
+        }
+
+        // 5. ACTION: GET PROBLEM STATEMENTS
+        if (action === 'getProblemStatements') {
+            var domain = request.domain;
+
+            var problemSheet = SpreadsheetApp.getActiveSpreadsheet().getSheetByName("Problem Statements");
+            if (!problemSheet) {
+                return createCORSResponse({
+                    'result': 'error',
+                    'message': 'Problem Statements sheet not found. Please create it first.'
+                });
+            }
+
+            var problemData = problemSheet.getDataRange().getValues();
+            var problemHeaders = problemData[0];
+            var problems = [];
+
+            // Find problems for this domain
+            for (var i = 1; i < problemData.length; i++) {
+                if (String(problemData[i][0]).toLowerCase() === domain.toLowerCase()) {
+                    problems.push({
+                        'number': problemData[i][1],
+                        'title': problemData[i][2],
+                        'description': problemData[i][3]
+                    });
+                }
+            }
+
+            return createCORSResponse({
+                'result': 'success',
+                'problems': problems
+            });
+        }
+
+        // 6. ACTION: ASSIGN PROBLEM
+        if (action === 'assignProblem') {
+            var ticketId = request.ticketId;
+            var problemNumber = request.problemNumber;
+
+            var sheet = SpreadsheetApp.getActiveSpreadsheet().getSheetByName("Form Responses 1");
+            if (!sheet) sheet = SpreadsheetApp.getActiveSpreadsheet().getSheets()[0];
+
+            var data = sheet.getDataRange().getValues();
+            var headers = data[0];
+            var ticketIndex = getHeaderIndex(headers, ['Ticket ID']);
+            var assignedProblemIndex = getHeaderIndex(headers, ['Assigned Problem Number']);
+
+            // Find and update ticket
+            for (var i = 1; i < data.length; i++) {
+                if (String(data[i][ticketIndex]) === String(ticketId)) {
+                    sheet.getRange(i + 1, assignedProblemIndex + 1).setValue(problemNumber);
+                    return createCORSResponse({
+                        'result': 'success',
+                        'message': 'Problem assigned successfully'
+                    });
+                }
+            }
+
+            return createCORSResponse({
+                'result': 'error',
+                'message': 'Ticket ID not found'
+            });
+        }
+
+        // 7. ACTION: GET ASSIGNED PROBLEM
+        if (action === 'getAssignedProblem') {
+            var ticketId = request.ticketId;
+
+            var sheet = SpreadsheetApp.getActiveSpreadsheet().getSheetByName("Form Responses 1");
+            if (!sheet) sheet = SpreadsheetApp.getActiveSpreadsheet().getSheets()[0];
+
+            var data = sheet.getDataRange().getValues();
+            var headers = data[0];
+            var ticketIndex = getHeaderIndex(headers, ['Ticket ID']);
+            var domainIndex = getHeaderIndex(headers, ['Hackathon Domain', 'Domain']);
+            var assignedProblemIndex = getHeaderIndex(headers, ['Assigned Problem Number']);
+
+            // Find ticket
+            for (var i = 1; i < data.length; i++) {
+                if (String(data[i][ticketIndex]) === String(ticketId)) {
+                    var problemNumber = data[i][assignedProblemIndex];
+                    var domain = data[i][domainIndex];
+
+                    if (!problemNumber) {
+                        return createCORSResponse({
+                            'result': 'error',
+                            'message': 'No problem assigned yet'
+                        });
+                    }
+
+                    // Fetch problem details from Problem Statements sheet
+                    var problemSheet = SpreadsheetApp.getActiveSpreadsheet().getSheetByName("Problem Statements");
+                    var problemFound = null;
+
+                    if (problemSheet) {
+                        var problemData = problemSheet.getDataRange().getValues();
+                        for (var j = 1; j < problemData.length; j++) {
+                            if (String(problemData[j][0]).toLowerCase() === domain.toLowerCase() &&
+                                problemData[j][1] == problemNumber) {
+                                problemFound = {
+                                    'number': problemData[j][1],
+                                    'title': problemData[j][2],
+                                    'description': problemData[j][3]
+                                };
+                                break;
+                            }
+                        }
+                    }
+
+                    // Fallback to placeholder if not found in sheet
+                    if (!problemFound) {
+                        var placeholders = getPlaceholderProblems(domain);
+                        // Adjust index (Problem 1 is index 0)
+                        var index = parseInt(problemNumber, 10) - 1;
+                        if (index >= 0 && index < placeholders.length) {
+                            problemFound = placeholders[index];
+                        } else {
+                            // Generic fallback
+                            problemFound = {
+                                'number': problemNumber,
+                                'title': domain + ' Problem ' + problemNumber,
+                                'description': 'Description placeholder'
+                            };
+                        }
+                    }
+
+                    if (problemFound) {
+                        return createCORSResponse({
+                            'result': 'success',
+                            'problem': problemFound
+                        });
+                    }
+
+                    return createCORSResponse({
+                        'result': 'error',
+                        'message': 'Problem details not found'
+                    });
+                }
+            }
+
+            return createCORSResponse({
+                'result': 'error',
+                'message': 'Ticket ID not found'
+            });
+        }
+
+        return createCORSResponse({ 'result': 'error', 'message': 'Unknown Action' });
 
     } catch (err) {
-        return ContentService.createTextOutput(JSON.stringify({ 'result': 'error', 'error': err.toString() })).setMimeType(ContentService.MimeType.JSON);
+        return createCORSResponse({ 'result': 'error', 'error': err.toString() });
     } finally {
         lock.releaseLock();
     }
+}
+
+// Helper to find row by Ticket ID (Column Search OR Row-Based Fallback)
+function findRowIndexByTicketId(data, ticketId, ticketColIndex) {
+    if (ticketColIndex > -1) {
+        for (var i = 1; i < data.length; i++) {
+            if (String(data[i][ticketColIndex]).trim().toLowerCase() === String(ticketId).trim().toLowerCase()) return i;
+        }
+    }
+    var match = String(ticketId).match(/^HA26-(\d+)$/i);
+    if (match) {
+        var idx = parseInt(match[1], 10);
+        if (idx > 0 && idx < data.length) return idx;
+    }
+    return -1;
+}
+
+function getPlaceholderProblems(domain) {
+    var problems = [];
+    for (var i = 1; i <= 6; i++) {
+        problems.push({
+            'number': i,
+            'title': domain + ' Problem Statement ' + i,
+            'description': 'This is a placeholder description for the ' + domain + ' problem statement #' + i + '. The actual problem details will be updated shortly.'
+        });
+    }
+    return problems;
 }
 
 // Helper to find column index
