@@ -109,10 +109,9 @@ export default function Home() {
 
 
       <section className="relative min-h-screen flex items-center justify-center pt-52 md:pt-44 pb-16 px-4">
-        {/* Logo Corners - Improved responsiveness to prevent overlapping on mobile */}
-        <div className="absolute top-20 md:top-28 left-0 right-0 z-20 flex items-start justify-between px-4 md:px-10 pointer-events-none">
+        <div className="absolute top-20 md:top-28 w-full z-20 pointer-events-none px-0">
           {/* VSTC Logo on the left */}
-          <div className="animate-fade-in pointer-events-auto flex items-center justify-center">
+          <div className="absolute left-0 top-0 animate-fade-in pointer-events-auto">
             <img
               src="/vstc-logo.png.png"
               alt="VSTC Logo"
@@ -124,7 +123,7 @@ export default function Home() {
           </div>
 
           {/* Savikar Logo on the right */}
-          <div className="animate-fade-in pointer-events-auto flex items-center justify-center">
+          <div className="absolute right-0 top-0 animate-fade-in pointer-events-auto">
             <img
               src="/savikar-logo.png.png"
               alt="Savikar Logo"
@@ -1235,6 +1234,6 @@ export default function Home() {
           </div>
         </div>
       </footer>
-    </div>
+    </div >
   );
 }
