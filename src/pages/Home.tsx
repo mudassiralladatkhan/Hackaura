@@ -1039,7 +1039,7 @@ export default function Home() {
                     <Users className="w-8 h-8 text-amber-500" />
                   </div>
                   <h4 className="text-lg font-bold">Prof. Anup Ganji</h4>
-                  <p className="text-xs text-foreground/60 mb-2">Assistant Professor, HOD (AIML)</p>
+                  <p className="text-xs text-foreground/60 mb-2">Assistant Professor & HOD (AIML)</p>
                   <a href="tel:8971016801" className="text-amber-500 hover:text-amber-400 transition-colors text-sm">
                     8971016801
                   </a>
@@ -1054,7 +1054,7 @@ export default function Home() {
                     <Users className="w-8 h-8 text-amber-500" />
                   </div>
                   <h4 className="text-lg font-bold">Prof. Rahul Palakar</h4>
-                  <p className="text-xs text-foreground/60 mb-2">Assistant Professor, HOD (CSE)</p>
+                  <p className="text-xs text-foreground/60 mb-2">Assistant Professor & HOD (CSE)</p>
                   <a href="tel:9739059248" className="text-amber-500 hover:text-amber-400 transition-colors text-sm">
                     9739059248
                   </a>
