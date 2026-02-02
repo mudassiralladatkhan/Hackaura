@@ -12,16 +12,9 @@ const Header: React.FC = () => {
       <nav className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex justify-between h-16">
           <div className="flex items-center">
-            <Link to="/" className="flex-shrink-0 flex items-center">
-              {/* Please replace with your website logo */}
-              <img
-                className="h-8 w-auto"
-                src={`https://miaoda-site-img.cdn.bcebos.com/placeholder/code_logo_default.png`}
-                alt="Website logo"
-              />
-              {/* Please replace with your website name */}
-              <span className="ml-2 text-xl font-bold text-blue-600">
-                Website Name
+            <Link to="/" className="flex-shrink-0 flex items-center gap-2">
+              <span className="text-xl font-bold text-blue-600">
+                Hackaura 2026 Admin
               </span>
             </Link>
           </div>
@@ -32,11 +25,10 @@ const Header: React.FC = () => {
               <Link
                 key={item.path}
                 to={item.path}
-                className={`px-3 py-2 text-base font-medium rounded-md ${
-                  location.pathname === item.path
+                className={`px-3 py-2 text-base font-medium rounded-md ${location.pathname === item.path
                     ? "text-blue-600 bg-blue-50"
                     : "text-gray-700 hover:text-blue-600 hover:bg-gray-50"
-                } transition duration-300`}
+                  } transition duration-300`}
               >
                 {item.name}
               </Link>
