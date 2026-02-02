@@ -193,6 +193,43 @@ export default function Home() {
                 </NeonButton>
               </Link>
             </div>
+
+            {/* Problem Statement Announcements */}
+            <div className="mt-12 animate-fade-in">
+              <GlassCard className="max-w-4xl mx-auto p-6 border-neon-yellow/30 bg-neon-yellow/5">
+                <h3 className="text-xl md:text-2xl font-bold mb-6 text-neon-yellow flex items-center justify-center gap-2">
+                  <Sparkles className="w-6 h-6 animate-pulse" />
+                  PROBLEM STATEMENTS REVEALED
+                  <Sparkles className="w-6 h-6 animate-pulse" />
+                </h3>
+                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+                  <Link to="/genai">
+                    <button className="w-full py-3 px-4 rounded-xl border border-cyan-500/30 bg-cyan-500/10 hover:bg-cyan-500/20 text-cyan-300 font-semibold transition-all hover:scale-105 flex items-center justify-center gap-2 group">
+                      <Sparkles className="w-4 h-4 group-hover:rotate-12 transition-transform" />
+                      Gen AI
+                    </button>
+                  </Link>
+                  <Link to="/cybersecurity">
+                    <button className="w-full py-3 px-4 rounded-xl border border-purple-500/30 bg-purple-500/10 hover:bg-purple-500/20 text-purple-300 font-semibold transition-all hover:scale-105 flex items-center justify-center gap-2 group">
+                      <Zap className="w-4 h-4 group-hover:rotate-12 transition-transform" />
+                      Cybersecurity
+                    </button>
+                  </Link>
+                  <Link to="/fullstack">
+                    <button className="w-full py-3 px-4 rounded-xl border border-pink-500/30 bg-pink-500/10 hover:bg-pink-500/20 text-pink-300 font-semibold transition-all hover:scale-105 flex items-center justify-center gap-2 group">
+                      <Cpu className="w-4 h-4 group-hover:rotate-12 transition-transform" />
+                      Full Stack
+                    </button>
+                  </Link>
+                  <Link to="/iot">
+                    <button className="w-full py-3 px-4 rounded-xl border border-neon-magenta/30 bg-neon-magenta/10 hover:bg-neon-magenta/20 text-neon-magenta font-semibold transition-all hover:scale-105 flex items-center justify-center gap-2 group">
+                      <Users className="w-4 h-4 group-hover:rotate-12 transition-transform" />
+                      IoT
+                    </button>
+                  </Link>
+                </div>
+              </GlassCard>
+            </div>
           </ScrollAnimation>
 
           <ScrollAnimation direction="up" delay={0.8}>
