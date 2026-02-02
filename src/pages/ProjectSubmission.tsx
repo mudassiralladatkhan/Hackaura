@@ -43,7 +43,7 @@ export default function ProjectSubmission() {
     const [showOtpInput, setShowOtpInput] = useState(false);
     const [error, setError] = useState<string | null>(null);
 
-    const { register, handleSubmit, setValue, formState: { errors } } = useForm<SubmissionForm>();
+    const { register, handleSubmit, setValue, formState: { errors, isSubmitting, isValidating } } = useForm<SubmissionForm>();
 
     const handleValidate = async (e: React.FormEvent) => {
         e.preventDefault();
@@ -443,9 +443,13 @@ export default function ProjectSubmission() {
                                 type="submit"
                                 variant="primary"
                                 className="w-full !py-4 text-lg mt-8"
-                                disabled={submitting}
+                                disabled={submitting || isSubmitting || isValidating}
                             >
-                                {submitting ? <Loader2 className="w-6 h-6 animate-spin" /> : 'Submit Project'}
+                                {submitting || isSubmitting || isValidating ? (
+                                    <span className="flex items-center gap-2 justify-center">
+                                        <Loader2 className="w-6 h-6 animate-spin" /> {isValidating ? 'Checking...' : 'Submitting...'}
+                                    </span>
+                                ) : 'Submit Project'}
                             </NeonButton>
                         </form>
                     </GlassCard>

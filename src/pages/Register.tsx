@@ -92,7 +92,7 @@ export default function Register() {
     const [ocrVerificationStatus, setOcrVerificationStatus] = useState<'idle' | 'analyzing' | 'success' | 'failed'>('idle');
     const [ocrResults, setOcrResults] = useState<PaymentVerificationResult | null>(null);
 
-    const { register, control, handleSubmit, watch, formState: { errors } } = useForm<FormData>({
+    const { register, control, handleSubmit, watch, formState: { errors, isSubmitting: formSubmitting, isValidating } } = useForm<FormData>({
         resolver: zodResolver(formSchema),
         mode: 'onBlur',
         defaultValues: {
@@ -173,10 +173,13 @@ export default function Register() {
     });
 
     const onSubmit = async (data: FormData) => {
+        setIsSubmitting(true);
+
         if (!paymentScreenshot) {
             toast.error("Payment Screenshot Required", {
                 description: "Please upload a screenshot of your payment."
             });
+            setIsSubmitting(false);
             return;
         }
 
@@ -185,10 +188,9 @@ export default function Register() {
             toast.error("Payment Verification Required", {
                 description: "Please upload a valid payment screenshot showing ₹500 payment with success status."
             });
+            setIsSubmitting(false);
             return;
         }
-
-        setIsSubmitting(true);
 
         try {
             const formData = new FormData();
@@ -595,12 +597,12 @@ export default function Register() {
                             <NeonButton
                                 variant="primary"
                                 className="w-full relative overflow-hidden"
-                                disabled={isSubmitting}
+                                disabled={isSubmitting || formSubmitting || isValidating}
                                 type="submit"
                             >
-                                {isSubmitting ? (
+                                {isSubmitting || formSubmitting || isValidating ? (
                                     <span className="flex items-center gap-2">
-                                        <Loader2 className="animate-spin" /> Submission in Progress...
+                                        <Loader2 className="animate-spin" /> {isValidating ? 'Checking Details...' : 'Submission in Progress...'}
                                     </span>
                                 ) : (
                                     <span className="flex items-center gap-2">
