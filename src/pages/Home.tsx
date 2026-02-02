@@ -45,16 +45,16 @@ export default function Home() {
       <nav className="fixed top-0 left-0 right-0 z-50 glass-effect border-b border-primary/20">
         <div className="container mx-auto px-4 py-4">
           <div className="flex items-center justify-between">
-            <div className="flex items-center gap-2">
+            <div className="flex items-center gap-2 mr-8">
               <img
-                src="/vstc-logo.png.png"
-                alt="VSTC Logo"
-                className="w-20 h-20 object-contain"
+                src="/vsm-logo.png.png"
+                alt="vsm Logo"
+                className="w-10 h-10 md:w-14 md:h-14 object-contain"
                 onError={(e) => {
                   e.currentTarget.style.display = 'none';
                 }}
               />
-              <span className="text-xl font-bold gradient-text">Vikram Sarabhai Tech Club</span>
+              <span className="text-sm md:text-base font-bold gradient-text whitespace-nowrap overflow-hidden text-ellipsis max-w-[200px] md:max-w-none">VSM's Somashekhar R Kothiwale Institute of Technology</span>
             </div>
 
             <div className="hidden xl:flex items-center gap-8">
@@ -109,42 +109,61 @@ export default function Home() {
 
 
       <section className="relative min-h-screen flex items-center justify-center pt-44 pb-16 px-4">
-        <div className="container mx-auto text-center space-y-8 z-10">
-          <div className="flex flex-col items-center justify-center gap-4 mb-6">
+        {/* Logo Corners - Moved outside container for extreme corners */}
+        <div className="absolute top-20 left-4 right-4 md:left-10 md:right-10 z-20 flex items-center justify-between pointer-events-none">
+          {/* VSTC Logo on the left */}
+          <div className="animate-fade-in pointer-events-auto flex items-center justify-center">
             <img
-              src="/vsm-logo.png.png"
-              alt="VSM Logo"
-              className="w-20 h-20 object-contain"
+              src="/vstc-logo.png.png"
+              alt="VSTC Logo"
+              className="h-18 md:h-24 object-contain drop-shadow-glow"
               onError={(e) => {
                 e.currentTarget.style.display = 'none';
               }}
             />
+          </div>
+
+          {/* Savikar Logo on the right (slightly down) */}
+          <div className="animate-fade-in pointer-events-auto flex items-center justify-center mt-6 mr-4 md:mr-8">
             <img
               src="/savikar-logo.png.png"
               alt="Savikar Logo"
-              className="h-28 object-contain"
+              className="h-20 md:h-32 object-contain drop-shadow-glow"
               onError={(e) => {
                 e.currentTarget.style.display = 'none';
               }}
             />
-            <div className="flex flex-col items-center gap-1 mt-2">
-              <span className="text-xs uppercase tracking-widest text-primary/60 font-semibold">Smart Media Technology Group</span>
-              <p className="text-base text-foreground font-semibold">Hemanth C S</p>
-            </div>
+          </div>
+        </div>
+
+        <div className="container mx-auto text-center space-y-8 z-10 relative">
+          <div className="flex flex-col items-center justify-center -mt-12 mb-2 pt-4 animate-fade-in">
+            <span className="font-extrabold tracking-[0.15em] mb-2 bg-gradient-to-r from-cyan-400 via-purple-500 to-pink-500 bg-clip-text text-transparent drop-shadow-[0_0_15px_rgba(168,85,247,0.3)] text-xl md:text-3xl text-center">
+              Vikram Sarabhai Tech Club
+            </span>
+            <span className="text-sm md:text-base uppercase tracking-[0.3em] text-primary/80 font-semibold mb-4">
+              Presents
+            </span>
+            <div className="w-24 h-1 bg-gradient-to-r from-transparent via-primary to-transparent opacity-50 mb-2"></div>
+          </div>
+
+          <ScrollAnimation direction="down">
+            <h1 className="text-5xl xl:text-8xl font-bold mb-8">
+              <span className="gradient-text">HACKAURA</span>
+              <br />
+              <span className="text-3xl xl:text-5xl text-foreground/80">2026</span>
+            </h1>
+          </ScrollAnimation>
+
+          <div className="flex flex-col items-center justify-center gap-1 mb-8 animate-fade-in">
+            <span className="text-xs uppercase tracking-widest text-primary/60 font-semibold">Smart Media Technology Group</span>
+            <p className="text-base text-foreground font-semibold">Hemanth C S</p>
           </div>
 
           <div className="inline-flex items-center gap-2 glass-effect border border-primary/30 rounded-full px-6 py-3 mb-4">
             <Calendar className="w-5 h-5 text-primary" />
             <span className="text-sm uppercase tracking-wider">March 1-2, 2026</span>
           </div>
-
-          <ScrollAnimation direction="down">
-            <h1 className="text-5xl xl:text-8xl font-bold mb-4">
-              <span className="gradient-text">HACKAURA</span>
-              <br />
-              <span className="text-3xl xl:text-5xl text-foreground/80">2026</span>
-            </h1>
-          </ScrollAnimation>
 
           <ScrollAnimation direction="up" delay={0.2}>
             <p className="text-xl xl:text-3xl font-semibold text-primary mb-4">
@@ -154,7 +173,7 @@ export default function Home() {
 
           <ScrollAnimation direction="up" delay={0.4}>
             <p className="text-base xl:text-lg text-foreground/70 max-w-2xl mx-auto mb-8">
-              Join us for a 24-hour national-level hackathon organized by Vikram Sarabhai Tech Club at VSMIT, Nipani.
+              Join us for a 24-hour national-level hackathon organized by Vikram Sarabhai Tech Club at VSMSRKIT, Nipani.
               Compete in Generative AI, Cybersecurity, and Full Stack domains for a prize pool of ₹45,000.
             </p>
           </ScrollAnimation>
@@ -232,7 +251,7 @@ export default function Home() {
           <ScrollAnimation direction="up" delay={0.2}>
             <p className="text-center text-foreground/70 max-w-3xl mx-auto mb-16">
               HACKAURA 2026 is a premier 24-hour coding marathon where innovation meets excellence.
-              Organized by the Vikram Sarabhai Tech Club at VSMIT, Nipani, this national-level hackathon
+              Organized by the Vikram Sarabhai Tech Club at VSMSRKIT, Nipani, this national-level hackathon
               brings together passionate developers, designers, and problem-solvers to create groundbreaking solutions.
             </p>
           </ScrollAnimation>
@@ -1111,7 +1130,7 @@ export default function Home() {
                   <h3 className="text-xl font-bold">Venue</h3>
                 </div>
                 <p className="text-foreground/70 mb-6">
-                  VSM's Institute of Technology, Nipani
+                  VSM's Somashekhar R Kothiwale Institute of Technology, Nipani
                   <br />
                   <span className="text-sm">Nipani, Karnataka 591237</span>
                 </p>
@@ -1124,7 +1143,7 @@ export default function Home() {
                     allowFullScreen
                     loading="lazy"
                     referrerPolicy="no-referrer-when-downgrade"
-                    title="VSMIT Campus Map"
+                    title="VSMSRKIT Campus Map"
                   ></iframe>
                 </div>
                 <div className="mt-6">

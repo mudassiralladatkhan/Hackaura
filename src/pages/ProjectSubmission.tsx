@@ -41,35 +41,38 @@ export default function ProjectSubmission() {
     // OTP State
     const [otp, setOtp] = useState('');
     const [showOtpInput, setShowOtpInput] = useState(false);
+    const [error, setError] = useState<string | null>(null);
 
-    const { register, handleSubmit, formState: { errors } } = useForm<SubmissionForm>();
+    const { register, handleSubmit, setValue, formState: { errors } } = useForm<SubmissionForm>();
 
     const handleValidate = async (e: React.FormEvent) => {
         e.preventDefault();
         setValidating(true);
+        setError(null);
         try {
             // First check if ticket exists and send OTP
-            const response = await ky.post(`${GOOGLE_SCRIPT_API_URL}?action=sendOTP&ticketId=${ticketId}`, {
+            const response = await ky.post(`${GOOGLE_SCRIPT_API_URL}?action=sendOTP&ticketId=${ticketId}&type=submission`, {
                 body: JSON.stringify({
                     action: 'sendOTP',
-                    ticketId: ticketId
+                    ticketId: ticketId,
+                    type: 'submission'
                 })
             }).json<any>();
 
             if (response.result === 'success') {
                 setShowOtpInput(true);
             } else {
-                alert('Validation failed: ' + response.message);
+                setError(response.message);
             }
         } catch (error) {
-            alert('Network error. Please try again.');
-        } finally {
+            setError('Network error. Please try again.');
             setValidating(false);
         }
     };
 
     const handleVerifyOtp = async () => {
         setValidating(true);
+        setError(null);
         try {
             // Updated to send Params in URL (for doGet fallback) AND Body (for doPost)
             const response = await ky.post(`${GOOGLE_SCRIPT_API_URL}?action=verifyOTP&ticketId=${ticketId}&otp=${otp}`, {
@@ -81,18 +84,23 @@ export default function ProjectSubmission() {
             }).json<any>();
 
             if (response.result === 'success') {
-                // Fetch team name for display
+                // Fetch team name and problem title for display and pre-fill
                 const teamResponse = await ky.get(`${GOOGLE_SCRIPT_API_URL}?action=getTeamDetails&ticketId=${ticketId}`).json<any>();
                 if (teamResponse.result === 'success') {
                     setTeamName(teamResponse.teamName);
+
+                    // Pre-fill the project title if a problem statement exists
+                    if (teamResponse.problemTitle) {
+                        setValue('title', teamResponse.problemTitle);
+                    }
+
                     setStep('form');
                 }
             } else {
-                alert('Invalid OTP. Please try again.');
+                setError('Invalid OTP. Please try again.');
             }
         } catch (error) {
-            alert('Verification failed. Please check your connection.');
-        } finally {
+            setError('Verification failed. Please check your connection.');
             setValidating(false);
         }
     };
@@ -167,7 +175,6 @@ export default function ProjectSubmission() {
             }
         } catch (error) {
             alert('Network error. Please try again.');
-        } finally {
             setSubmitting(false);
         }
     };
@@ -188,7 +195,17 @@ export default function ProjectSubmission() {
                         <div className="text-center mb-8">
                             <UploadCloud className="w-16 h-16 text-cyan-400 mx-auto mb-4" />
                             <h1 className="text-3xl font-bold text-white mb-2">Project Submission</h1>
-                            <p className="text-slate-400">Enter your Team ID to start your submission.</p>
+                            <p className="text-slate-400 mb-6">Enter your Team ID to start your submission.</p>
+
+                            <div className="bg-cyan-500/10 border border-cyan-500/30 rounded-lg p-4 mb-2 text-left">
+                                <h3 className="text-cyan-400 text-sm font-bold uppercase tracking-wider mb-2 flex items-center gap-2">
+                                    <CheckCircle2 className="w-4 h-4" /> Submission Prerequisites
+                                </h3>
+                                <ul className="text-xs text-slate-400 space-y-1 list-disc pl-4">
+                                    <li>Your team must be <span className="text-cyan-300 font-semibold">Checked In</span> at the registration desk.</li>
+                                    <li>You must have a <span className="text-cyan-300 font-semibold">Problem Statement</span> assigned via your domain page.</li>
+                                </ul>
+                            </div>
                         </div>
 
                         {!showOtpInput ? (
@@ -204,6 +221,13 @@ export default function ProjectSubmission() {
                                         required
                                     />
                                 </div>
+
+                                {error && (
+                                    <div className="bg-red-500/10 border border-red-500/30 rounded-lg p-3 animate-in fade-in slide-in-from-top-2">
+                                        <p className="text-red-400 text-sm text-center font-medium">{error}</p>
+                                    </div>
+                                )}
+
                                 <NeonButton
                                     type="submit"
                                     variant="primary"
@@ -230,6 +254,13 @@ export default function ProjectSubmission() {
                                         required
                                     />
                                 </div>
+
+                                {error && (
+                                    <div className="bg-red-500/10 border border-red-500/30 rounded-lg p-3 animate-in fade-in slide-in-from-top-2">
+                                        <p className="text-red-400 text-sm text-center font-medium">{error}</p>
+                                    </div>
+                                )}
+
                                 <NeonButton
                                     onClick={handleVerifyOtp}
                                     variant="primary"
@@ -238,8 +269,12 @@ export default function ProjectSubmission() {
                                 >
                                     {validating ? <Loader2 className="w-6 h-6 animate-spin" /> : 'Verify Code'}
                                 </NeonButton>
+
                                 <button
-                                    onClick={() => setShowOtpInput(false)}
+                                    onClick={() => {
+                                        setShowOtpInput(false);
+                                        setError(null);
+                                    }}
                                     className="w-full text-center text-sm text-slate-500 hover:text-white transition-colors"
                                 >
                                     Change Ticket ID

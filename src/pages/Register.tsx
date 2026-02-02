@@ -236,12 +236,15 @@ export default function Register() {
                 navigate('/registration-success');
             }, 2000);
 
+            // If successful, we don't set isSubmitting to false 
+            // because we are navigating away in 2 seconds.
+            // This prevents the button from becoming clickable again.
+
         } catch (error) {
             console.error("Submission Error:", error);
             toast.error("Registration Failed", {
                 description: "Something went wrong. Please try again or contact support."
             });
-        } finally {
             setIsSubmitting(false);
         }
     };
@@ -593,7 +596,7 @@ export default function Register() {
                                 variant="primary"
                                 className="w-full relative overflow-hidden"
                                 disabled={isSubmitting}
-                                onClick={handleSubmit(onSubmit)}
+                                type="submit"
                             >
                                 {isSubmitting ? (
                                     <span className="flex items-center gap-2">

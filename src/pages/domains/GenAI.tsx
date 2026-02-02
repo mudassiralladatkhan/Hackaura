@@ -40,16 +40,10 @@ export default function GenAI() {
             if (response.result === 'success') {
                 setTeamName(response.teamName);
                 setLeaderEmail(response.leaderEmail);
+                setAssignedProblem(response.assignedProblem);
 
-                // Check if problem already assigned
-                if (response.assignedProblem) {
-                    setAssignedProblem(response.assignedProblem);
-                    // Fetch problem details
-                    await fetchAssignedProblem();
-                } else {
-                    // Send OTP
-                    await sendOTP();
-                }
+                // Send OTP regardless of whether problem is assigned
+                await sendOTP();
             } else {
                 setError(response.message || 'Verification failed');
             }
@@ -101,7 +95,11 @@ export default function GenAI() {
             }).json<any>();
 
             if (response.result === 'success') {
-                setStep('dice');
+                if (_assignedProblem) {
+                    await fetchAssignedProblem();
+                } else {
+                    setStep('dice');
+                }
             } else {
                 setError(response.message || 'Invalid OTP');
             }

@@ -39,13 +39,9 @@ export default function Cybersecurity() {
             if (response.result === 'success') {
                 setTeamName(response.teamName);
                 setLeaderEmail(response.leaderEmail);
+                setAssignedProblem(response.assignedProblem);
 
-                if (response.assignedProblem) {
-                    setAssignedProblem(response.assignedProblem);
-                    await fetchAssignedProblem();
-                } else {
-                    await sendOTP();
-                }
+                await sendOTP();
             } else {
                 setError(response.message || 'Verification failed');
             }
@@ -95,7 +91,11 @@ export default function Cybersecurity() {
             }).json<any>();
 
             if (response.result === 'success') {
-                setStep('dice');
+                if (_assignedProblem) {
+                    await fetchAssignedProblem();
+                } else {
+                    setStep('dice');
+                }
             } else {
                 setError(response.message || 'Invalid OTP');
             }

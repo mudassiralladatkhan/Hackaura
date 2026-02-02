@@ -94,7 +94,11 @@ export default function AttendanceSheet() {
                                             <div className="text-xs text-slate-600">M: {team.members}</div>
                                         </td>
                                         <td className="border border-black p-2 text-center font-mono text-xs">
-                                            {team.checkInTime ? team.checkInTime.split(',')[1] : '-'}
+                                            {team.checkInTime && team.checkInTime !== 'N/A' ? (
+                                                team.checkInTime.includes(',')
+                                                    ? team.checkInTime.split(',')[1].trim()
+                                                    : team.checkInTime
+                                            ) : '-'}
                                         </td>
                                         <td className="border border-black p-2 text-center">
                                             {team.signature ? (

@@ -9,11 +9,13 @@ interface DiceRollProps {
 export function DiceRoll({ onRollComplete, isLocked }: DiceRollProps) {
     const [isRolling, setIsRolling] = useState(false);
     const [result, setResult] = useState<number | null>(null);
+    const [hasRolled, setHasRolled] = useState(false);
 
     const rollDice = () => {
-        if (isLocked || isRolling) return;
+        if (isLocked || isRolling || hasRolled) return;
 
         setIsRolling(true);
+        setHasRolled(true);
 
         // Simulate dice roll animation
         let count = 0;
@@ -45,18 +47,20 @@ export function DiceRoll({ onRollComplete, isLocked }: DiceRollProps) {
 
             <button
                 onClick={rollDice}
-                disabled={isLocked || isRolling}
-                className={`px-8 py-3 rounded-lg font-bold text-lg transition-all ${isLocked
-                        ? 'bg-gray-600 cursor-not-allowed opacity-50'
-                        : 'bg-gradient-to-r from-purple-500 to-pink-500 hover:from-purple-600 hover:to-pink-600 text-white shadow-lg hover:shadow-xl'
+                disabled={isLocked || isRolling || hasRolled}
+                className={`px-8 py-3 rounded-lg font-bold text-lg transition-all ${isLocked || hasRolled
+                    ? 'bg-gray-600 cursor-not-allowed opacity-50'
+                    : 'bg-gradient-to-r from-purple-500 to-pink-500 hover:from-purple-600 hover:to-pink-600 text-white shadow-lg hover:shadow-xl'
                     }`}
             >
-                {isLocked ? '🔒 Locked' : isRolling ? '🎲 Rolling...' : '🎲 Roll the Dice!'}
+                {isLocked ? '🔒 Locked' : isRolling ? '🎲 Rolling...' : hasRolled ? '⏳ Processing...' : '🎲 Roll the Dice!'}
             </button>
 
-            {isLocked && (
+            {(isLocked || hasRolled) && (
                 <p className="text-sm text-slate-400 text-center">
-                    You've already rolled the dice. Your problem statement is locked.
+                    {isLocked
+                        ? "You've already rolled the dice. Your problem statement is locked."
+                        : "Processing your roll... Please wait."}
                 </p>
             )}
         </div>

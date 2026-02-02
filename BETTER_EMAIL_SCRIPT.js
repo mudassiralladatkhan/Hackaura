@@ -568,6 +568,7 @@ function doGet(e) {
 
         var action = e.parameter.action;
         var sheet = SpreadsheetApp.getActiveSpreadsheet().getSheetByName("Form Responses 1");
+        if (!sheet) sheet = SpreadsheetApp.getActiveSpreadsheet().getSheetByName("Form_Responses");
         if (!sheet) sheet = SpreadsheetApp.getActiveSpreadsheet().getSheets()[0];
 
         var data = sheet.getDataRange().getValues();
@@ -630,21 +631,42 @@ function doGet(e) {
         // ACTION: GET ATTENDANCE LIST
         if (action === 'getAttendanceList') {
             var attendanceIdx = getHeaderIndex(headers, ['Attendance', 'Status']);
+            var timeIdx = getHeaderIndex(headers, ['Check-In Time', 'Arrival Time']);
+            var teamNameIdx = getHeaderIndex(headers, ['Team Name', 'Team']);
+            var leaderNameIdx = getHeaderIndex(headers, ['Leader Name', 'Full Name']);
+            var signatureIdx = getHeaderIndex(headers, ['Signature', 'Signed', 'Digital Signature']);
+
             var approvedTeams = [];
 
             for (var i = 1; i < data.length; i++) {
                 if (data[i][attendanceIdx] === 'Checked In') {
+                    var timeVal = data[i][timeIdx];
+                    var timeStr = 'N/A';
+
+                    if (timeVal) {
+                        try {
+                            // If it's a Date object, format it. Otherwise use as string.
+                            if (timeVal instanceof Date) {
+                                timeStr = timeVal.toLocaleString('en-IN', { timeZone: 'Asia/Kolkata' });
+                            } else {
+                                timeStr = String(timeVal);
+                            }
+                        } catch (e) {
+                            timeStr = String(timeVal);
+                        }
+                    }
+
                     approvedTeams.push({
                         ticketId: 'HA26-' + String(i).padStart(3, '0'),
-                        teamName: data[i][getHeaderIndex(headers, ['Team Name', 'Team'])],
-                        leaderName: data[i][getHeaderIndex(headers, ['Leader Name', 'Full Name'])],
+                        teamName: data[i][teamNameIdx] || 'Team ' + i,
+                        leaderName: data[i][leaderNameIdx] || 'Leader',
                         members: [
                             data[i][getHeaderIndex(headers, ['Member 1 Name', 'Member 1'])],
                             data[i][getHeaderIndex(headers, ['Member 2 Name', 'Member 2'])],
                             data[i][getHeaderIndex(headers, ['Member 3 Name', 'Member 3'])]
                         ].filter(function (m) { return m }).join(", "),
-                        checkInTime: data[i][getHeaderIndex(headers, ['Check-In Time', 'Arrival Time'])] || 'N/A',
-                        signature: data[i][getHeaderIndex(headers, ['Signature', 'Signed', 'Digital Signature'])] || null
+                        checkInTime: timeStr,
+                        signature: data[i][signatureIdx] || null
                     });
                 }
             }
@@ -710,10 +732,14 @@ function doGet(e) {
             var idx = findRowIndexByTicketId(data, ticketId, getHeaderIndex(headers, ['Ticket ID', 'TicketId']));
             if (idx > -1) {
                 var row = data[idx];
+                var teamName = row[getHeaderIndex(headers, ['Team Name', 'Team'])];
+                var problemTitle = row[getHeaderIndex(headers, ['Problem Statment', 'Problem Statement'])];
+
                 return createCORSResponse({
                     'result': 'success',
-                    'teamName': row[getHeaderIndex(headers, ['Team Name', 'Team'])],
-                    'leaderName': row[getHeaderIndex(headers, ['Leader Name', 'Full Name'])]
+                    'teamName': teamName,
+                    'leaderName': row[getHeaderIndex(headers, ['Leader Name', 'Full Name'])],
+                    'problemTitle': problemTitle || ''
                 });
             }
             return createCORSResponse({ 'result': 'error', 'message': 'Ticket not found' });
@@ -881,6 +907,31 @@ function doGet(e) {
 
             if (rowIndex === -1) return createCORSResponse({ 'result': 'error', 'message': 'Invalid Ticket ID' });
 
+            var attendanceIndex = getHeaderIndex(headers, ['Attendance', 'Status']);
+            var assignedProblemIndex = getHeaderIndex(headers, ['Assigned Problem Number', 'Assigned Problem']);
+
+            // CHECK ATTENDANCE
+            if (attendanceIndex > -1) {
+                var statusValue = String(data[rowIndex][attendanceIndex]).trim().toLowerCase();
+                if (statusValue !== 'checked in') {
+                    return createCORSResponse({
+                        'result': 'error',
+                        'message': 'Access Denied: Team not Checked-In. Please visit the registration desk.'
+                    });
+                }
+            }
+
+            // CHECK PROBLEM ASSIGNMENT (Only for Project Submission)
+            if (assignedProblemIndex > -1 && e.parameter.type === 'submission') {
+                var assignedVal = String(data[rowIndex][assignedProblemIndex]).trim();
+                if (!assignedVal) {
+                    return createCORSResponse({
+                        'result': 'error',
+                        'message': 'Access Denied: No problem assigned. Please visit a domain page (e.g., /genai) to get your problem statement first.'
+                    });
+                }
+            }
+
             var teamEmail = data[rowIndex][getHeaderIndex(headers, ['Email Address', 'Leader Email'])];
             var teamName = data[rowIndex][getHeaderIndex(headers, ['Team Name', 'Team'])];
 
@@ -977,8 +1028,8 @@ function doPost(e) {
             // I'll append the new actions BEFORE the end of doPost, after the uploadSignature block.
 
 
-            var sheet = SpreadsheetApp.getActiveSpreadsheet().getSheetByName("Form_Responses");
-            // Fallback name if user renamed it, try to get first sheet
+            var sheet = SpreadsheetApp.getActiveSpreadsheet().getSheetByName("Form Responses 1");
+            if (!sheet) sheet = SpreadsheetApp.getActiveSpreadsheet().getSheetByName("Form_Responses");
             if (!sheet) sheet = SpreadsheetApp.getActiveSpreadsheet().getSheets()[0];
 
             var data = sheet.getDataRange().getValues();
@@ -1136,20 +1187,44 @@ function doPost(e) {
 
         // ACTION: SEND OTP
         if (action === 'sendOTP') {
-            var ticketId = request.ticketId;
-            var ticketNum = parseInt(ticketId.split('-')[1], 10);
-
-            var sheet = SpreadsheetApp.getActiveSpreadsheet().getSheetByName("Form_Responses");
+            var sheet = SpreadsheetApp.getActiveSpreadsheet().getSheetByName("Form Responses 1");
             if (!sheet) sheet = SpreadsheetApp.getActiveSpreadsheet().getSheets()[0];
             var data = sheet.getDataRange().getValues();
             var headers = data[0];
 
-            if (isNaN(ticketNum) || ticketNum < 1 || ticketNum >= data.length) {
-                return createCORSResponse({ 'result': 'error', 'message': 'Invalid Ticket ID' });
+            var ticketId = request.ticketId;
+            var ticketIndex = getHeaderIndex(headers, ['Ticket ID', 'TicketId']);
+            var rowIndex = findRowIndexByTicketId(data, ticketId, ticketIndex);
+
+            if (rowIndex === -1) return createCORSResponse({ 'result': 'error', 'message': 'Invalid Ticket ID' });
+
+            var attendanceIndex = getHeaderIndex(headers, ['Attendance', 'Status']);
+            var assignedProblemIndex = getHeaderIndex(headers, ['Assigned Problem Number', 'Assigned Problem']);
+
+            // CHECK ATTENDANCE
+            if (attendanceIndex > -1) {
+                var statusValue = String(data[rowIndex][attendanceIndex]).trim().toLowerCase();
+                if (statusValue !== 'checked in') {
+                    return createCORSResponse({
+                        'result': 'error',
+                        'message': 'Access Denied: Team not Checked-In. Please visit the registration desk.'
+                    });
+                }
             }
 
-            var teamEmail = data[ticketNum][getHeaderIndex(headers, ['Email Address', 'Leader Email'])];
-            var teamName = data[ticketNum][getHeaderIndex(headers, ['Team Name', 'Team'])];
+            // CHECK PROBLEM ASSIGNMENT (Only for Project Submission)
+            if (assignedProblemIndex > -1 && request.type === 'submission') {
+                var assignedVal = String(data[rowIndex][assignedProblemIndex]).trim();
+                if (!assignedVal) {
+                    return createCORSResponse({
+                        'result': 'error',
+                        'message': 'Access Denied: No problem assigned. Please visit a domain page (e.g., /genai) to get your problem statement first.'
+                    });
+                }
+            }
+
+            var teamEmail = data[rowIndex][getHeaderIndex(headers, ['Email Address', 'Leader Email'])];
+            var teamName = data[rowIndex][getHeaderIndex(headers, ['Team Name', 'Team'])];
 
             if (!teamEmail) {
                 return createCORSResponse({ 'result': 'error', 'message': 'No email found for this team.' });

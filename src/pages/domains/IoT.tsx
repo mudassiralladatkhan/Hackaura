@@ -15,6 +15,7 @@ export default function IoT() {
     const [otp, setOtp] = useState('');
     const [_teamName, setTeamName] = useState('');
     const [leaderEmail, setLeaderEmail] = useState('');
+    const [_assignedProblem, setAssignedProblem] = useState<any>(null);
     const [problem, setProblem] = useState<any>(null);
     const [loading, setLoading] = useState(false);
     const [error, setError] = useState('');
@@ -37,13 +38,10 @@ export default function IoT() {
             if (response.result === 'success') {
                 setTeamName(response.teamName);
                 setLeaderEmail(response.leaderEmail);
+                setAssignedProblem(response.assignedProblem);
 
-                // Check if problem already assigned
-                if (response.assignedProblem) {
-                    await fetchAssignedProblem();
-                } else {
-                    await sendOTP();
-                }
+                // Always send OTP for security
+                await sendOTP();
             } else {
                 setError(response.message || 'Verification failed');
             }
@@ -93,46 +91,33 @@ export default function IoT() {
             }).json<any>();
 
             if (response.result === 'success') {
-                // Check if problem is already assigned (we might need to check verifyDomainTicket response again or just try fetching)
-                // But since we are here, we likely need to ensure assignment.
-                // For IoT, we default to Problem 1 if not assigned.
+                // If problem already assigned, fetch it and show
+                if (_assignedProblem) {
+                    await fetchAssignedProblem();
+                    return;
+                }
 
+                // Otherwise, auto-assign Problem 1 for IoT
                 try {
-                    // Try to assign "1" (or ensure it's set)
-                    // Note: If already assigned, this might overwrite? 
-                    // Ideally we check verifyDomainTicket's assignedProblem state.
-                    // But verifyDomainTicket is step 1.
-
-                    // Let's just try to fetch first.
-                    const checkResponse = await ky.get(GOOGLE_SCRIPT_API_URL, {
-                        searchParams: { action: 'getAssignedProblem', ticketId: ticketId.trim() }
+                    // Not assigned yet, so assign Problem 1
+                    const assignResponse = await ky.get(GOOGLE_SCRIPT_API_URL, {
+                        searchParams: {
+                            action: 'assignProblem',
+                            ticketId: ticketId.trim(),
+                            problemNumber: '1'
+                        },
+                        timeout: 30000
                     }).json<any>();
 
-                    if (checkResponse.result === 'success') {
-                        setProblem(checkResponse.problem);
-                        setStep('problem');
+                    if (assignResponse.result === 'success') {
+                        await fetchAssignedProblem();
                     } else {
-                        // Not assigned yet, so assign Problem 1
-                        const assignResponse = await ky.get(GOOGLE_SCRIPT_API_URL, {
-                            searchParams: {
-                                action: 'assignProblem',
-                                ticketId: ticketId.trim(),
-                                problemNumber: '1'
-                            },
-                            timeout: 30000
-                        }).json<any>();
-
-                        if (assignResponse.result === 'success') {
-                            await fetchAssignedProblem();
-                        } else {
-                            setError(assignResponse.message || 'Failed to assign default problem');
-                        }
+                        setError(assignResponse.message || 'Failed to assign default problem');
                     }
                 } catch (assignErr) {
                     // Fallback flow
                     await fetchAssignedProblem();
                 }
-
             } else {
                 setError(response.message || 'Invalid OTP');
             }
