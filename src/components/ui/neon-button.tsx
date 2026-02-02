@@ -41,10 +41,19 @@ export function NeonButton({
     );
   }
 
+  const handleInternalClick = (e: React.MouseEvent<HTMLButtonElement>) => {
+    if (disabled) {
+      e.preventDefault();
+      e.stopPropagation();
+      return;
+    }
+    onClick?.(e);
+  };
+
   return (
     <button
-      type="button"
-      onClick={onClick}
+      type={props.type || "button"}
+      onClick={handleInternalClick}
       className={combinedClassName}
       disabled={disabled}
       {...props}

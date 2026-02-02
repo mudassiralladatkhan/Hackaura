@@ -600,7 +600,7 @@ export default function Register() {
                             >
                                 {isSubmitting ? (
                                     <span className="flex items-center gap-2">
-                                        <Loader2 className="animate-spin" /> Registering...
+                                        <Loader2 className="animate-spin" /> Submission in Progress...
                                     </span>
                                 ) : (
                                     <span className="flex items-center gap-2">
