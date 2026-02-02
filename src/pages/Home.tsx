@@ -117,7 +117,7 @@ export default function Home() {
             <img
               src="/vstc-logo.png.png"
               alt="VSTC Logo"
-              className="h-24 md:h-32 w-auto object-contain drop-shadow-glow"
+              className="h-20 md:h-28 w-auto object-contain drop-shadow-glow"
               onError={(e) => {
                 e.currentTarget.style.display = 'none';
               }}
@@ -150,7 +150,7 @@ export default function Home() {
             <img
               src="/savikar-logo.png.png"
               alt="Savikar Logo"
-              className="h-16 md:h-24 w-auto object-contain drop-shadow-glow"
+              className="h-28 md:h-40 w-auto object-contain drop-shadow-glow"
               onError={(e) => {
                 e.currentTarget.style.display = 'none';
               }}
