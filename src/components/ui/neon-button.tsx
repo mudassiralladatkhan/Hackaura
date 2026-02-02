@@ -52,11 +52,11 @@ export function NeonButton({
 
   return (
     <button
+      {...props}
       type={props.type || "button"}
       onClick={handleInternalClick}
       className={combinedClassName}
       disabled={disabled}
-      {...props}
     >
       {icon && <span className="text-xl">{icon}</span>}
       {children}
