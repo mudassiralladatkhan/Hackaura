@@ -1122,10 +1122,9 @@ export default function Home() {
 
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 max-w-6xl mx-auto mb-12">
             {[
-              { name: 'Abdulwahab Mulla', phone: '7349758871', email: 'abdulwahabmulla6746@gmail.com' },
               { name: 'Sandesh Birannavar', phone: '7795031246', email: 'sandeshbirannavar@gmail.com' },
               { name: 'Rakshita Halluri', phone: '7204033630', email: 'rakshitahalluri@gmail.com' },
-              { name: 'Sana Ravat', phone: '8095981415', email: 'sanaravat786@gmail.com' }
+              { name: 'Sana Ravat', phone: '9353127433', email: 'sanaravat786@gmail.com' }
             ].map((coordinator, index) => (
               <ScrollAnimation key={index} direction="up" delay={index * 0.1}>
                 <GlassCard glowColor={['cyan', 'purple', 'pink', 'magenta', 'cyan', 'purple'][index] as any} hover3d>
