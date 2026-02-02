@@ -108,7 +108,7 @@ export default function Home() {
 
 
 
-      <section className="relative min-h-screen flex items-center justify-center pt-44 pb-16 px-4">
+      <section className="relative min-h-screen flex items-center justify-center pt-32 md:pt-44 pb-16 px-4">
         {/* Logo Corners - Improved responsiveness to prevent overlapping on mobile */}
         <div className="absolute top-24 md:top-28 left-0 right-0 z-20 flex items-start justify-between px-4 md:px-10 pointer-events-none">
           {/* VSTC Logo on the left */}
@@ -116,7 +116,7 @@ export default function Home() {
             <img
               src="/vstc-logo.png.png"
               alt="VSTC Logo"
-              className="h-12 md:h-24 w-auto object-contain drop-shadow-glow"
+              className="h-16 md:h-24 w-auto object-contain drop-shadow-glow"
               onError={(e) => {
                 e.currentTarget.style.display = 'none';
               }}
@@ -124,11 +124,11 @@ export default function Home() {
           </div>
 
           {/* Savikar Logo on the right */}
-          <div className="animate-fade-in pointer-events-auto flex items-center justify-center mr-2 md:mr-0">
+          <div className="animate-fade-in pointer-events-auto flex items-center justify-center">
             <img
               src="/savikar-logo.png.png"
               alt="Savikar Logo"
-              className="h-14 md:h-32 w-auto object-contain drop-shadow-glow"
+              className="h-20 md:h-32 w-auto object-contain drop-shadow-glow"
               onError={(e) => {
                 e.currentTarget.style.display = 'none';
               }}
@@ -137,8 +137,8 @@ export default function Home() {
         </div>
 
         <div className="container mx-auto text-center space-y-8 z-10 relative">
-          <div className="flex flex-col items-center justify-center md:-mt-12 mb-2 pt-16 md:pt-4 animate-fade-in">
-            <span className="font-extrabold tracking-[0.1em] md:tracking-[0.15em] mb-2 bg-gradient-to-r from-cyan-400 via-purple-500 to-pink-500 bg-clip-text text-transparent drop-shadow-[0_0_15px_rgba(168,85,247,0.3)] text-xl md:text-3xl text-center px-4">
+          <div className="flex flex-col items-center justify-center md:-mt-12 mb-2 pt-6 md:pt-4 animate-fade-in">
+            <span className="font-extrabold tracking-[0.05em] md:tracking-[0.15em] mb-2 bg-gradient-to-r from-cyan-400 via-purple-500 to-pink-500 bg-clip-text text-transparent drop-shadow-[0_0_15px_rgba(168,85,247,0.3)] text-2xl md:text-3xl text-center px-4 leading-tight">
               Vikram Sarabhai Tech Club
             </span>
             <span className="text-sm md:text-base uppercase tracking-[0.3em] text-primary/80 font-semibold mb-4">
