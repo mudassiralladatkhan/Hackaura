@@ -108,35 +108,23 @@ export default function Home() {
 
 
 
-      <section className="relative min-h-screen flex items-center justify-center pt-52 md:pt-44 pb-16 px-4">
-        <div className="absolute top-20 md:top-28 w-full z-20 pointer-events-none px-0">
-          {/* VSTC Logo on the left */}
-          <div className="absolute left-0 top-0 animate-fade-in pointer-events-auto">
+      <section className="relative min-h-screen flex items-center justify-center pt-32 pb-16 px-4">
+        {/* Absolute logos removed - now inline */}
+        <div className="container mx-auto text-center space-y-6 z-10 relative">
+
+          {/* Centered VSTC Logo */}
+          <div className="flex justify-center mb-6 animate-fade-in">
             <img
               src="/vstc-logo.png.png"
               alt="VSTC Logo"
-              className="h-12 md:h-24 w-auto object-contain drop-shadow-glow"
+              className="h-24 md:h-32 w-auto object-contain drop-shadow-glow"
               onError={(e) => {
                 e.currentTarget.style.display = 'none';
               }}
             />
           </div>
 
-          {/* Savikar Logo on the right */}
-          <div className="absolute right-0 top-0 animate-fade-in pointer-events-auto">
-            <img
-              src="/savikar-logo.png.png"
-              alt="Savikar Logo"
-              className="h-14 md:h-32 w-auto object-contain drop-shadow-glow"
-              onError={(e) => {
-                e.currentTarget.style.display = 'none';
-              }}
-            />
-          </div>
-        </div>
-
-        <div className="container mx-auto text-center space-y-8 z-10 relative">
-          <div className="flex flex-col items-center justify-center md:-mt-12 mb-2 pt-4 animate-fade-in">
+          <div className="flex flex-col items-center justify-center animate-fade-in">
             <span className="font-extrabold tracking-[0.1em] md:tracking-[0.15em] mb-2 bg-gradient-to-r from-cyan-400 via-purple-500 to-pink-500 bg-clip-text text-transparent drop-shadow-[0_0_15px_rgba(168,85,247,0.3)] text-xl md:text-3xl text-center px-4 leading-tight">
               Vikram Sarabhai Tech Club
             </span>
@@ -147,12 +135,27 @@ export default function Home() {
           </div>
 
           <ScrollAnimation direction="down">
-            <h1 className="text-5xl xl:text-8xl font-bold mb-8">
+            <h1 className="text-5xl xl:text-8xl font-bold mb-4">
               <span className="gradient-text">HACKAURA</span>
               <br />
               <span className="text-3xl xl:text-5xl text-foreground/80">2026</span>
             </h1>
           </ScrollAnimation>
+
+          {/* Collaboration Section */}
+          <div className="flex flex-col items-center justify-center gap-4 animate-fade-in py-2">
+            <span className="text-sm md:text-base uppercase tracking-widest text-foreground/60 italic">
+              in collaboration with
+            </span>
+            <img
+              src="/savikar-logo.png.png"
+              alt="Savikar Logo"
+              className="h-16 md:h-24 w-auto object-contain drop-shadow-glow"
+              onError={(e) => {
+                e.currentTarget.style.display = 'none';
+              }}
+            />
+          </div>
 
           <div className="flex flex-col items-center justify-center gap-1 mb-8 animate-fade-in">
             <span className="text-xs uppercase tracking-widest text-primary/60 font-semibold">Smart Media Technology Group</span>
