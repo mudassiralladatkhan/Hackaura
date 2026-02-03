@@ -603,6 +603,26 @@ function doGet(e) {
             });
         }
 
+        // --- DUPLICATE CHECK ACTION ---
+        if (action === 'checkUnique') {
+            var teamIdx = getHeaderIndex(headers, ['Team', 'Team Name']);
+            var emailIdx = getHeaderIndex(headers, ['Email', 'Leader Email', 'Email Address']);
+            var phoneIdx = getHeaderIndex(headers, ['Phone', 'Leader Phone', 'Mobile']);
+
+            var exists = false;
+            var type = e.parameter.type;
+            var value = String(e.parameter.value).trim().toLowerCase();
+
+            for (var i = 1; i < data.length; i++) {
+                var row = data[i];
+                if (type === 'teamName' && teamIdx > -1 && String(row[teamIdx]).trim().toLowerCase() === value) exists = true;
+                if (type === 'email' && emailIdx > -1 && String(row[emailIdx]).trim().toLowerCase() === value) exists = true;
+                if (type === 'phone' && phoneIdx > -1 && String(row[phoneIdx]).trim() === value) exists = true;
+                if (exists) break;
+            }
+            return createCORSResponse({ 'result': 'success', 'exists': exists });
+        }
+
         // --- ADMIN ACTIONS ---
 
         // ACTION: GET ALL PARTICIPANTS
