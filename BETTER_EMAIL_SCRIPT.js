@@ -1569,7 +1569,17 @@ function doPost(e) {
             var data = sheet.getDataRange().getValues();
             var headers = data[0];
 
-            var paymentIdx = getHeaderIndex(headers, ['Payment', 'Payment Proof', 'Screenshot', 'Upload', 'Transaction', 'Payment Screenshot', 'Payment Screen Shot']);
+            var paymentIdx = getHeaderIndex(headers, ['Payment Screenshot URL', 'Payment', 'Payment Proof', 'Screenshot', 'Upload', 'Transaction', 'Payment Screenshot', 'Payment Screen Shot']);
+
+            // Fallback: search for any column with "screenshot" in the name if not found
+            if (paymentIdx === -1) {
+                for (var h = 0; h < headers.length; h++) {
+                    if (headers[h].toString().toLowerCase().indexOf('screenshot') > -1) {
+                        paymentIdx = h;
+                        break;
+                    }
+                }
+            }
             var ticketIdx = getHeaderIndex(headers, ['Ticket ID', 'TicketId']);
             var teamIdx = getHeaderIndex(headers, ['Team Name', 'Team']);
 
