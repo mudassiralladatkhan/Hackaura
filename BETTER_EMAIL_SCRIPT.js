@@ -755,15 +755,22 @@ function doGet(e) {
                 var teamName = row[getHeaderIndex(headers, ['Team Name', 'Team'])];
                 var problemTitle = row[getHeaderIndex(headers, ['Problem Statment', 'Problem Statement'])];
 
-                // Gather Members (Check for Member 2, 3, 4)
+                // Gather Members (Check for Member 2, 3, 4, 5)
                 var members = [];
-                var m2Idx = getHeaderIndex(headers, ['Member 2 Name', 'Member 2']);
-                var m3Idx = getHeaderIndex(headers, ['Member 3 Name', 'Member 3']);
-                var m4Idx = getHeaderIndex(headers, ['Member 4 Name', 'Member 4']);
+                var memberHeaders = [
+                    ['Member 2', 'Member 2 Name', 'Team Member 2', 'Participant 2', 'Member2', 'Participant2'],
+                    ['Member 3', 'Member 3 Name', 'Team Member 3', 'Participant 3', 'Member3', 'Participant3'],
+                    ['Member 4', 'Member 4 Name', 'Team Member 4', 'Participant 4', 'Member4', 'Participant4'],
+                    ['Member 5', 'Member 5 Name', 'Team Member 5', 'Participant 5', 'Member5', 'Participant5']
+                ];
 
-                if (m2Idx > -1 && row[m2Idx]) members.push(row[m2Idx]);
-                if (m3Idx > -1 && row[m3Idx]) members.push(row[m3Idx]);
-                if (m4Idx > -1 && row[m4Idx]) members.push(row[m4Idx]);
+                for (var i = 0; i < memberHeaders.length; i++) {
+                    var idx = getHeaderIndex(headers, memberHeaders[i]);
+                    if (idx > -1) {
+                        var val = String(row[idx]).trim();
+                        if (val) members.push(val);
+                    }
+                }
 
                 return createCORSResponse({
                     'result': 'success',
