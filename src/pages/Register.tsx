@@ -216,8 +216,46 @@ export default function Register() {
                 formData.append(GOOGLE_FORM_ENTRY_IDS.MEMBER_3, `${data.members[2].name} (${data.members[2].email})`);
             }
 
-            // Payment Proof - Include OCR Verification Status
-            const verificationStatus = `Screenshot Uploaded - OCR Verified: Amount ₹${ocrResults?.details.amountValue || '500'}, Status: ${ocrResults?.details.statusValue || 'Success'}`;
+            // Payment Proof - Include OCR Verification Status AND Upload URL
+            let paymentUrl = "Upload Failed";
+            try {
+                if (paymentScreenshot) {
+                    toast.info("Uploading Screenshot...", { description: "Saving your payment proof." });
+
+                    // Convert to Base64
+                    const reader = new FileReader();
+                    const base64Promise = new Promise<string>((resolve, reject) => {
+                        reader.onload = () => resolve(reader.result as string);
+                        reader.onerror = reject;
+                        reader.readAsDataURL(paymentScreenshot);
+                    });
+                    const base64Image = await base64Promise;
+
+                    // Upload to Script
+                    const uploadResponse = await fetch(`${GOOGLE_SCRIPT_API_URL}`, {
+                        method: 'POST',
+                        body: JSON.stringify({
+                            action: 'uploadPaymentProof',
+                            teamName: data.teamName,
+                            image: base64Image
+                        })
+                    });
+                    const uploadResult = await uploadResponse.json();
+
+                    if (uploadResult.result === 'success') {
+                        paymentUrl = uploadResult.url;
+                        toast.success("Screenshot Uploaded");
+                    } else {
+                        console.error("Upload failed:", uploadResult);
+                        toast.error("Screenshot Upload Failed", { description: "Continuing with registration..." });
+                    }
+                }
+            } catch (e) {
+                console.error("Upload Error:", e);
+                toast.error("Upload Error", { description: "Could not save screenshot. Continuing..." });
+            }
+
+            const verificationStatus = `Screenshot URL: ${paymentUrl} | OCR Status: Amount ₹${ocrResults?.details.amountValue || '500'}, Status: ${ocrResults?.details.statusValue || 'Success'}`;
             formData.append(GOOGLE_FORM_ENTRY_IDS.PAYMENT_PROOF, verificationStatus);
 
 

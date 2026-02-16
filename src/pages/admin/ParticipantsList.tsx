@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react';
 import { NeonButton } from '@/components/ui/neon-button';
-import { Loader2, Search, ArrowLeft, Users, Building, Mail, Phone, RefreshCw, RotateCcw } from 'lucide-react';
+import { Loader2, Search, ArrowLeft, Users, Building, Mail, Phone, RefreshCw, RotateCcw, ExternalLink } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import { GlassCard } from '@/components/ui/glass-card';
 
@@ -82,6 +82,12 @@ export default function ParticipantsList() {
                         <Link to="/admin">
                             <NeonButton variant="secondary" className="!p-2">
                                 <ArrowLeft className="w-5 h-5" />
+                            </NeonButton>
+                        </Link>
+                        <Link to="/admin/payments">
+                            <NeonButton variant="outline" className="!p-2 text-xs" title="View Payment Screenshots">
+                                <span className="mr-2">Payment Proofs</span>
+                                <ExternalLink className="w-4 h-4" />
                             </NeonButton>
                         </Link>
                         <div>

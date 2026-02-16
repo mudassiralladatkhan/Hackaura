@@ -755,19 +755,22 @@ function doGet(e) {
                 var teamName = row[getHeaderIndex(headers, ['Team Name', 'Team'])];
                 var problemTitle = row[getHeaderIndex(headers, ['Problem Statment', 'Problem Statement'])];
 
-                // Gather Members (Check for Member 2, 3, 4, 5)
+                // Gather Members (Check for Member 1, 2, 3, 4)
                 var members = [];
                 var memberHeaders = [
-                    ['Member 2', 'Member 2 Name', 'Team Member 2', 'Participant 2', 'Member2', 'Participant2'],
-                    ['Member 3', 'Member 3 Name', 'Team Member 3', 'Participant 3', 'Member3', 'Participant3'],
-                    ['Member 4', 'Member 4 Name', 'Team Member 4', 'Participant 4', 'Member4', 'Participant4'],
-                    ['Member 5', 'Member 5 Name', 'Team Member 5', 'Participant 5', 'Member5', 'Participant5']
+                    ['Member 1', 'Member 1 Name', 'Team Member 1', 'Participant 1', 'Member 1 (Optional)', 'Member1'],
+                    ['Member 2', 'Member 2 Name', 'Team Member 2', 'Participant 2', 'Member 2 (Optional)', 'Member2'],
+                    ['Member 3', 'Member 3 Name', 'Team Member 3', 'Participant 3', 'Member 3 (Optional)', 'Member3'],
+                    ['Member 4', 'Member 4 Name', 'Team Member 4', 'Participant 4', 'Member 4 (Optional)', 'Member4']
                 ];
 
                 for (var i = 0; i < memberHeaders.length; i++) {
                     var idx = getHeaderIndex(headers, memberHeaders[i]);
                     if (idx > -1) {
                         var val = String(row[idx]).trim();
+                        // Ignore email addresses in parens like "Name (email@example.com)" if present, or just take the whole string.
+                        // The user's screenshot shows "Name (email)". Let's keep it simple and just take the value for now, 
+                        // as cleaning it might be risky without knowing exact format.
                         if (val) members.push(val);
                     }
                 }
@@ -1132,6 +1135,37 @@ function doPost(e) {
             })).setMimeType(ContentService.MimeType.JSON);
         }
 
+        // 2. ACTION: UPLOAD PAYMENT PROOF
+        if (action === 'uploadPaymentProof') {
+            var teamName = request.teamName || "Unknown Team";
+            var imageBase64 = request.image; // "data:image/png;base64,..."
+
+            if (!imageBase64) {
+                return ContentService.createTextOutput(JSON.stringify({ 'result': 'error', 'message': 'Missing image data' })).setMimeType(ContentService.MimeType.JSON);
+            }
+
+            // Create/Find "Payment Screenshots" Folder
+            var folderName = "Hackaura Payment Screenshots";
+            var folders = DriveApp.getFoldersByName(folderName);
+            var folder;
+            if (folders.hasNext()) {
+                folder = folders.next();
+            } else {
+                folder = DriveApp.createFolder(folderName);
+                folder.setSharing(DriveApp.Access.ANYONE_WITH_LINK, DriveApp.Permission.VIEW);
+            }
+
+            // Save Image
+            var blob = Utilities.newBlob(Utilities.base64Decode(imageBase64.split(',')[1]), MimeType.PNG, teamName + "_Payment.png");
+            var file = folder.createFile(blob);
+            file.setSharing(DriveApp.Access.ANYONE_WITH_LINK, DriveApp.Permission.VIEW);
+
+            return ContentService.createTextOutput(JSON.stringify({
+                'result': 'success',
+                'url': file.getUrl()
+            })).setMimeType(ContentService.MimeType.JSON);
+        }
+
         // ACTION: SUBMIT PROJECT
         if (action === 'submitProject') {
             var ticketId = request.ticketId;
@@ -1166,6 +1200,7 @@ function doPost(e) {
                     teamFolder = parentFolder.createFolder(teamFolderName);
                     teamFolder.setSharing(DriveApp.Access.ANYONE_WITH_LINK, DriveApp.Permission.VIEW);
                 }
+                teamFolder.setSharing(DriveApp.Access.ANYONE_WITH_LINK, DriveApp.Permission.VIEW);
             } catch (e) {
                 return ContentService.createTextOutput(JSON.stringify({ 'result': 'error', 'message': 'Folder Creation Failed: ' + e.toString() })).setMimeType(ContentService.MimeType.JSON);
             }
@@ -1524,6 +1559,41 @@ function doPost(e) {
             return createCORSResponse({
                 'result': 'error',
                 'message': 'Ticket ID not found'
+            });
+        }
+
+        // 8. ACTION: GET PAYMENT SCREENSHOTS (ADMIN)
+        if (action === 'getPaymentScreenshots') {
+            var sheet = SpreadsheetApp.getActiveSpreadsheet().getSheetByName("Form Responses 1");
+            if (!sheet) sheet = SpreadsheetApp.getActiveSpreadsheet().getSheets()[0];
+            var data = sheet.getDataRange().getValues();
+            var headers = data[0];
+
+            var paymentIdx = getHeaderIndex(headers, ['Payment', 'Payment Proof', 'Screenshot', 'Upload', 'Transaction']);
+            var ticketIdx = getHeaderIndex(headers, ['Ticket ID', 'TicketId']);
+            var teamIdx = getHeaderIndex(headers, ['Team Name', 'Team']);
+
+            var screenshots = [];
+
+            if (paymentIdx > -1) {
+                for (var i = 1; i < data.length; i++) {
+                    var val = String(data[i][paymentIdx]);
+                    // Extract URL if present
+                    var urlMatch = val.match(/https?:\/\/[^\s|]+/);
+                    if (urlMatch) {
+                        screenshots.push({
+                            'ticketId': ticketIdx > -1 ? data[i][ticketIdx] : 'Unknown',
+                            'teamName': teamIdx > -1 ? data[i][teamIdx] : 'Unknown',
+                            'url': urlMatch[0],
+                            'raw': val // For debugging or full status
+                        });
+                    }
+                }
+            }
+
+            return createCORSResponse({
+                'result': 'success',
+                'screenshots': screenshots
             });
         }
 

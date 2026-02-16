@@ -2,6 +2,7 @@ import Home from './pages/Home';
 import Register from './pages/Register';
 import RegistrationSuccess from './pages/RegistrationSuccess';
 import TicketVerification from './pages/TicketVerification';
+import PaymentScreenshots from './pages/admin/PaymentScreenshots';
 import AdminScanner from './pages/admin/AdminScanner';
 import AttendanceSheet from './pages/admin/AttendanceSheet';
 import ParticipantsList from './pages/admin/ParticipantsList';
@@ -40,6 +41,12 @@ const routes: RouteConfig[] = [
     name: 'Verify Ticket',
     path: '/verify',
     element: <TicketVerification />,
+    visible: false
+  },
+  {
+    name: 'Payment Screenshots',
+    path: '/admin/payments',
+    element: <PaymentScreenshots />,
     visible: false
   },
   {
