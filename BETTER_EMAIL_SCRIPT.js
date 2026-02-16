@@ -1569,7 +1569,7 @@ function doPost(e) {
             var data = sheet.getDataRange().getValues();
             var headers = data[0];
 
-            var paymentIdx = getHeaderIndex(headers, ['Payment', 'Payment Proof', 'Screenshot', 'Upload', 'Transaction']);
+            var paymentIdx = getHeaderIndex(headers, ['Payment', 'Payment Proof', 'Screenshot', 'Upload', 'Transaction', 'Payment Screenshot', 'Payment Screen Shot']);
             var ticketIdx = getHeaderIndex(headers, ['Ticket ID', 'TicketId']);
             var teamIdx = getHeaderIndex(headers, ['Team Name', 'Team']);
 
@@ -1578,14 +1578,21 @@ function doPost(e) {
             if (paymentIdx > -1) {
                 for (var i = 1; i < data.length; i++) {
                     var val = String(data[i][paymentIdx]);
+                    var url = "";
+
                     // Extract URL if present
                     var urlMatch = val.match(/https?:\/\/[^\s|]+/);
                     if (urlMatch) {
+                        url = urlMatch[0];
+                    }
+
+                    // Return entry even if no URL (so we see old data too)
+                    if (val && val.length > 2) { // Filter out empty cells
                         screenshots.push({
                             'ticketId': ticketIdx > -1 ? data[i][ticketIdx] : 'Unknown',
                             'teamName': teamIdx > -1 ? data[i][teamIdx] : 'Unknown',
-                            'url': urlMatch[0],
-                            'raw': val // For debugging or full status
+                            'url': url,
+                            'raw': val
                         });
                     }
                 }

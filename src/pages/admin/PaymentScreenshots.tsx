@@ -95,16 +95,27 @@ export default function PaymentScreenshots() {
                     <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
                         {filtered.map((item, idx) => (
                             <GlassCard key={idx} className="p-4 group hover:border-cyan-500/50 transition-all duration-300">
-                                <div className="aspect-[3/5] rounded-lg overflow-hidden bg-slate-950 mb-4 relative border border-slate-800">
-                                    <img
-                                        src={item.url}
-                                        alt={item.teamName}
-                                        className="w-full h-full object-cover opacity-80 group-hover:opacity-100 transition-opacity cursor-pointer"
-                                        onClick={() => window.open(item.url, '_blank')}
-                                    />
-                                    <div className="absolute inset-0 bg-black/60 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center pointer-events-none">
-                                        <ExternalLink className="w-8 h-8 text-white" />
-                                    </div>
+                                <div className="aspect-[3/5] rounded-lg overflow-hidden bg-slate-950 mb-4 relative border border-slate-800 flex items-center justify-center">
+                                    {item.url ? (
+                                        <>
+                                            <img
+                                                src={item.url}
+                                                alt={item.teamName}
+                                                className="w-full h-full object-cover opacity-80 group-hover:opacity-100 transition-opacity cursor-pointer"
+                                                onClick={() => window.open(item.url, '_blank')}
+                                            />
+                                            <div className="absolute inset-0 bg-black/60 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center pointer-events-none">
+                                                <ExternalLink className="w-8 h-8 text-white" />
+                                            </div>
+                                        </>
+                                    ) : (
+                                        <div className="text-center p-4">
+                                            <p className="text-slate-600 text-xs mb-2">No Screenshot</p>
+                                            <div className="text-[10px] text-slate-700 font-mono break-all line-clamp-6">
+                                                {item.raw.substring(0, 100)}
+                                            </div>
+                                        </div>
+                                    )}
                                 </div>
 
                                 <div className="space-y-1">
@@ -115,7 +126,7 @@ export default function PaymentScreenshots() {
                                         </span>
                                     </div>
                                     <p className="text-xs text-slate-500 truncate" title={item.raw}>
-                                        {item.raw.replace(item.url, '').trim() || 'Verifed'}
+                                        {item.url ? 'Verified Upload' : 'Text Record Only'}
                                     </p>
                                 </div>
                             </GlassCard>
