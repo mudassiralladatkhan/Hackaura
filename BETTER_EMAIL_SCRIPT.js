@@ -755,10 +755,26 @@ function doGet(e) {
                 var teamName = row[getHeaderIndex(headers, ['Team Name', 'Team'])];
                 var problemTitle = row[getHeaderIndex(headers, ['Problem Statment', 'Problem Statement'])];
 
+                // Gather Members (Check for Member 2, 3, 4)
+                var members = [];
+                var m2Idx = getHeaderIndex(headers, ['Member 2 Name', 'Member 2']);
+                var m3Idx = getHeaderIndex(headers, ['Member 3 Name', 'Member 3']);
+                var m4Idx = getHeaderIndex(headers, ['Member 4 Name', 'Member 4']);
+
+                if (m2Idx > -1 && row[m2Idx]) members.push(row[m2Idx]);
+                if (m3Idx > -1 && row[m3Idx]) members.push(row[m3Idx]);
+                if (m4Idx > -1 && row[m4Idx]) members.push(row[m4Idx]);
+
                 return createCORSResponse({
                     'result': 'success',
                     'teamName': teamName,
-                    'leaderName': row[getHeaderIndex(headers, ['Leader Name', 'Full Name'])],
+                    'leaderName': row[getHeaderIndex(headers, ['Leader Name', 'Full Name', 'Representative'])],
+                    'leaderEmail': row[getHeaderIndex(headers, ['Leader Email', 'Email Address', 'Email'])],
+                    'leaderPhone': row[getHeaderIndex(headers, ['Leader Phone', 'Phone', 'Mobile'])],
+                    'college': row[getHeaderIndex(headers, ['College', 'Institute'])],
+                    'domain': row[getHeaderIndex(headers, ['Hackathon Domain', 'Domain', 'Track'])],
+                    'members': members,
+                    'status': row[getHeaderIndex(headers, ['Attendance', 'Status'])] || 'Registered',
                     'problemTitle': problemTitle || ''
                 });
             }
