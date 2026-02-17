@@ -554,7 +554,7 @@ export default function Home() {
           </ScrollAnimation>
           <ScrollAnimation direction="up" delay={0.2}>
             <p className="text-center text-foreground/70 max-w-3xl mx-auto mb-4">
-              Day 1 - March 1, 2026
+              Day 1 - March 12, 2026
             </p>
             <p className="text-center text-sm text-foreground/60 mb-16">
               Follow the timeline to make the most of your hackathon experience
@@ -769,7 +769,7 @@ export default function Home() {
             <div className="mt-12 max-w-4xl mx-auto">
               <GlassCard glowColor="cyan">
                 <h3 className="text-xl font-bold mb-4 text-center">
-                  📅 Day 2 - March 2, 2026
+                  📅 Day 2 - March 13, 2026
                 </h3>
                 <p className="text-foreground/70 text-sm text-center">
                   All Day 2 events listed below starting from 6:00 AM
@@ -1123,7 +1123,8 @@ export default function Home() {
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 max-w-6xl mx-auto mb-12">
             {[
               { name: 'Sandesh Birannavar', phone: '7795031246', email: 'sandeshbirannavar@gmail.com' },
-              { name: 'Rakshita Halluri', phone: '7204033630', email: 'rakshitahalluri@gmail.com' }
+              { name: 'Rakshita Halluri', phone: '7204033630', email: 'rakshitahalluri@gmail.com' },
+              { name: 'Pankaj Babaleshwar', phone: '8217221908', email: 'pankajbabaleshwar@gmail.com' }
             ].map((coordinator, index) => (
               <ScrollAnimation key={index} direction="up" delay={index * 0.1}>
                 <GlassCard glowColor={['cyan', 'purple', 'pink', 'magenta', 'cyan', 'purple'][index] as any} hover3d>
