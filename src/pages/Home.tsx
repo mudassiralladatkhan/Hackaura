@@ -1104,10 +1104,10 @@ export default function Home() {
                   <div className="w-16 h-16 mx-auto mb-4 rounded-full bg-amber-500/20 flex items-center justify-center">
                     <Users className="w-8 h-8 text-amber-500" />
                   </div>
-                  <h4 className="text-lg font-bold">Prof. Prasanna Patil</h4>
+                  <h4 className="text-lg font-bold">Prof. S.C. Gandhi</h4>
                   <p className="text-xs text-foreground/60 mb-2">Assistant Professor</p>
-                  <a href="tel:9743202717" className="text-amber-500 hover:text-amber-400 transition-colors text-sm">
-                    9743202717
+                  <a href="tel:7795838187" className="text-amber-500 hover:text-amber-400 transition-colors text-sm">
+                    7795838187
                   </a>
                 </div>
               </GlassCard>
@@ -1123,8 +1123,7 @@ export default function Home() {
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 max-w-6xl mx-auto mb-12">
             {[
               { name: 'Sandesh Birannavar', phone: '7795031246', email: 'sandeshbirannavar@gmail.com' },
-              { name: 'Rakshita Halluri', phone: '7204033630', email: 'rakshitahalluri@gmail.com' },
-              { name: 'Sana Ravat', phone: '9353127433', email: 'sanaravat786@gmail.com' }
+              { name: 'Rakshita Halluri', phone: '7204033630', email: 'rakshitahalluri@gmail.com' }
             ].map((coordinator, index) => (
               <ScrollAnimation key={index} direction="up" delay={index * 0.1}>
                 <GlassCard glowColor={['cyan', 'purple', 'pink', 'magenta', 'cyan', 'purple'][index] as any} hover3d>
