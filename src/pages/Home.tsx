@@ -164,7 +164,7 @@ export default function Home() {
 
           <div className="inline-flex items-center gap-2 glass-effect border border-primary/30 rounded-full px-6 py-3 mb-4">
             <Calendar className="w-5 h-5 text-primary" />
-            <span className="text-sm uppercase tracking-wider">March 1-2, 2026</span>
+            <span className="text-sm uppercase tracking-wider">March 12-13, 2026</span>
           </div>
 
           <ScrollAnimation direction="up" delay={0.2}>
@@ -176,7 +176,7 @@ export default function Home() {
           <ScrollAnimation direction="up" delay={0.4}>
             <p className="text-base xl:text-lg text-foreground/70 max-w-2xl mx-auto mb-8">
               Join us for a 24-hour national-level hackathon organized by Vikram Sarabhai Tech Club at VSMSRKIT, Nipani.
-              Compete in Generative AI, Cybersecurity, and Full Stack domains for a prize pool of ₹45,000.
+              Compete in Generative AI, Cybersecurity, and Full Stack domains for a prize pool of ₹70,000.
             </p>
           </ScrollAnimation>
 
@@ -203,7 +203,7 @@ export default function Home() {
                   <Lock className="w-6 h-6" />
                 </h3>
                 <p className="text-neon-yellow/60 text-sm mb-6 uppercase tracking-widest">
-                  Revealing at Venue on March 1st
+                  Revealing at Venue on March 12th
                 </p>
                 <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
                   <button disabled className="w-full py-3 px-4 rounded-xl border border-cyan-500/30 bg-cyan-500/5 text-cyan-500/50 font-semibold cursor-not-allowed flex items-center justify-center gap-2">
@@ -230,7 +230,7 @@ export default function Home() {
           <ScrollAnimation direction="up" delay={0.8}>
             <div className="mt-16 text-center">
               <h3 className="text-sm uppercase tracking-widest text-muted-foreground mb-6">
-                Registration Starts In
+                Event Starts In
               </h3>
               <CountdownTimer />
             </div>
@@ -259,7 +259,7 @@ export default function Home() {
                 <div className="flex justify-center mb-2">
                   <Trophy className="w-6 h-6 text-accent animate-pulse" />
                 </div>
-                <h4 className="text-3xl font-bold text-white mb-1">₹45k</h4>
+                <h4 className="text-3xl font-bold text-white mb-1">₹70k</h4>
                 <p className="text-xs uppercase tracking-wider text-accent/80">Prize Pool</p>
               </GlassCard>
 
@@ -467,7 +467,7 @@ export default function Home() {
             <div className="text-center mb-16">
               <div className="inline-flex items-center gap-3 glass-effect border border-neon-yellow/30 rounded-2xl px-8 py-4">
                 <Trophy className="w-8 h-8 text-neon-yellow animate-bounce" />
-                <span className="text-3xl xl:text-4xl font-bold text-neon-yellow">₹45,000</span>
+                <span className="text-3xl xl:text-4xl font-bold text-neon-yellow">₹70,000</span>
                 <span className="text-foreground/70">Total Prize Pool</span>
               </div>
             </div>
@@ -1205,12 +1205,14 @@ export default function Home() {
               <p className="text-foreground/70 mb-8 text-lg">
                 Join us for 24 hours of innovation, collaboration, and impact!
               </p>
-              <button disabled className="inline-flex items-center justify-center gap-2 px-8 py-4 rounded-2xl font-semibold text-lg bg-gray-600 text-gray-400 cursor-not-allowed opacity-60">
-                <Zap className="text-xl" />
-                Registration Closed
-              </button>
-              <p className="text-sm text-red-400 mt-6 font-semibold">
-                Registration has been closed
+              <Link to="/register">
+                <NeonButton variant="primary" className="text-lg py-6">
+                  <Zap className="text-xl" />
+                  Register Now
+                </NeonButton>
+              </Link>
+              <p className="text-sm text-cyan-400 mt-6 font-semibold">
+                Registration is now open!
               </p>
             </GlassCard>
           </ScrollAnimation>
