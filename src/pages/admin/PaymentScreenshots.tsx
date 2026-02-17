@@ -12,7 +12,7 @@ interface Screenshot {
     raw: string;
 }
 
-const GOOGLE_SCRIPT_API_URL = "https://script.google.com/macros/s/AKfycbyWneTmeB9sq1WVoklnkCKJsQyMOX0LSKedsOG1oNqyCu7GZWj_94dt-FMwV3PSBerG/exec";
+import { GOOGLE_SCRIPT_API_URL } from '@/lib/config';
 
 export default function PaymentScreenshots() {
     const navigate = useNavigate();

@@ -28,5 +28,11 @@ package-lock.json
 history/*.json
 .vite_cache
 
+
 # Local Netlify folder
 .netlify
+
+# Environment Variables
+.env
+.env.production
+.env.local

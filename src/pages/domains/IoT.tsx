@@ -6,7 +6,7 @@ import { ProblemDisplay } from '@/components/ProblemDisplay';
 import { Loader2, Cpu, Mail } from 'lucide-react';
 import ky from 'ky';
 
-const GOOGLE_SCRIPT_API_URL = "https://script.google.com/macros/s/AKfycbyWneTmeB9sq1WVoklnkCKJsQyMOX0LSKedsOG1oNqyCu7GZWj_94dt-FMwV3PSBerG/exec";
+import { GOOGLE_SCRIPT_API_URL } from '@/lib/config';
 const DOMAIN = "Internet of Things";
 
 export default function IoT() {

@@ -4,12 +4,14 @@ export interface HackathonStats {
 }
 
 // Your existing Google Script URL from Register.tsx
-const GOOGLE_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbyWneTmeB9sq1WVoklnkCKJsQyMOX0LSKedsOG1oNqyCu7GZWj_94dt-FMwV3PSBerG/exec";
+import { GOOGLE_SCRIPT_API_URL } from './config';
+
+// Your existing Google Script URL from Register.tsx
 
 export async function fetchRegistrationStats(): Promise<HackathonStats> {
     try {
         // We add action=getStats to tell the script we just want numbers
-        const response = await fetch(`${GOOGLE_SCRIPT_URL}?action=getStats`);
+        const response = await fetch(`${GOOGLE_SCRIPT_API_URL}?action=getStats`);
         const data = await response.json();
 
         return {

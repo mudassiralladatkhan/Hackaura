@@ -582,6 +582,7 @@ function doGet(e) {
             var collegeIdx = getHeaderIndex(headers, ['College', 'College Name', 'Institute']);
             var uniqueColleges = {};
             var uniqueCount = 0;
+            var emailQuota = MailApp.getRemainingDailyQuota(); // NEW: Get Quota
 
             if (collegeIdx > -1) {
                 for (var k = 1; k < data.length; k++) {
@@ -599,7 +600,8 @@ function doGet(e) {
             return createCORSResponse({
                 'result': 'success',
                 'count': count,
-                'collegeCount': uniqueCount
+                'collegeCount': uniqueCount,
+                'emailQuota': emailQuota // NEW: Expose Quota
             });
         }
 

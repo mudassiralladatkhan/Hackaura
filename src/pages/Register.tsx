@@ -12,29 +12,9 @@ import { toast } from 'sonner';
 import { analyzePaymentScreenshot, type PaymentVerificationResult } from '@/lib/paymentOCR';
 import { PaymentVerificationBadge } from '@/components/ui/PaymentVerificationBadge';
 
-// --- CONFIGURATION START ---
-// REPLACE THESE VALUES WITH YOUR GOOGLE FORM DETAILS
-// --- CONFIGURATION START ---
-// --- CONFIGURATION START ---
-// REPLACE THESE VALUES WITH YOUR GOOGLE FORM DETAILS
-const GOOGLE_FORM_ACTION_URL = "https://docs.google.com/forms/u/0/d/e/1FAIpQLSfEiLpFnMAj88c-9gD1bTLvCuAMRJ2ylZ2y0FO9DFZK5jdRcA/formResponse";
-const GOOGLE_FORM_ENTRY_IDS = {
-    TEAM_NAME: "entry.798662715",
-    COLLEGE_NAME: "entry.636447192",
-    LEADER_NAME: "entry.1811380723",
-    LEADER_EMAIL: "entry.1199163587",
-    LEADER_PHONE: "entry.1759462912",
-    MEMBER_1: "entry.1168609319",
-    MEMBER_2: "entry.238999982",
-    MEMBER_3: "entry.321323673",
-    PAYMENT_PROOF: "entry.377523907",
-    DOMAIN: "entry.1382947175",
-    PROBLEM_STATEMENT: "entry.1289687427",
-};
+import { GOOGLE_SCRIPT_API_URL, GOOGLE_FORM_ACTION_URL, GOOGLE_FORM_ENTRY_IDS } from '@/lib/config';
 
-
-// --- DUPLICATE CHECK CONFIG ---
-const GOOGLE_SCRIPT_API_URL = "https://script.google.com/macros/s/AKfycbyWneTmeB9sq1WVoklnkCKJsQyMOX0LSKedsOG1oNqyCu7GZWj_94dt-FMwV3PSBerG/exec";
+// Generic Duplicate Checker Helper
 
 
 
@@ -124,7 +104,7 @@ export default function Register() {
 
             // Perform OCR analysis
             try {
-                const result = await analyzePaymentScreenshot(file, 500);
+                const result = await analyzePaymentScreenshot(file, 600);
                 setOcrResults(result);
 
                 if (result.isValid) {
@@ -186,7 +166,7 @@ export default function Register() {
         // Check OCR verification status
         if (ocrVerificationStatus !== 'success') {
             toast.error("Payment Verification Required", {
-                description: "Please upload a valid payment screenshot showing ₹500 payment with success status."
+                description: "Please upload a valid payment screenshot showing ₹600 payment with success status."
             });
             setIsSubmitting(false);
             return;
@@ -255,7 +235,7 @@ export default function Register() {
                 toast.error("Upload Error", { description: "Could not save screenshot. Continuing..." });
             }
 
-            const verificationStatus = `Screenshot URL: ${paymentUrl} | OCR Status: Amount ₹${ocrResults?.details.amountValue || '500'}, Status: ${ocrResults?.details.statusValue || 'Success'}`;
+            const verificationStatus = `Screenshot URL: ${paymentUrl} | OCR Status: Amount ₹${ocrResults?.details.amountValue || '600'}, Status: ${ocrResults?.details.statusValue || 'Success'}`;
             formData.append(GOOGLE_FORM_ENTRY_IDS.PAYMENT_PROOF, verificationStatus);
 
 
@@ -528,8 +508,8 @@ export default function Register() {
                                     <strong>Important:</strong> Upload a screenshot of your payment.
                                 </p>
                                 <ul className="list-disc list-inside space-y-1 text-gray-400 ml-1">
-                                    <li>Transfer <strong>₹500</strong> to the UPI ID provided below.</li>
-                                    <li>Ensure the screenshot clearly shows the <strong>Amount (₹500)</strong>, <strong>Success</strong> status.</li>
+                                    <li>Transfer <strong>₹600</strong> to the UPI ID provided below.</li>
+                                    <li>Ensure the screenshot clearly shows the <strong>Amount (₹600)</strong>, <strong>Success</strong> status.</li>
                                 </ul>
                             </div>
 

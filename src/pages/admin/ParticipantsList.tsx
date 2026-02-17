@@ -4,7 +4,7 @@ import { Loader2, Search, ArrowLeft, Users, Building, Mail, Phone, RefreshCw, Ro
 import { Link } from 'react-router-dom';
 import { GlassCard } from '@/components/ui/glass-card';
 
-const GOOGLE_SCRIPT_API_URL = "https://script.google.com/macros/s/AKfycbyWneTmeB9sq1WVoklnkCKJsQyMOX0LSKedsOG1oNqyCu7GZWj_94dt-FMwV3PSBerG/exec";
+import { GOOGLE_SCRIPT_API_URL } from '@/lib/config';
 
 interface Participant {
     ticketId: string;

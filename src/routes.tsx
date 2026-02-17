@@ -11,6 +11,8 @@ import GenAI from './pages/domains/GenAI';
 import Cybersecurity from './pages/domains/Cybersecurity';
 import FullStack from './pages/domains/FullStack';
 import IoT from './pages/domains/IoT';
+import Chatbot from './pages/Chatbot';
+import SystemHealth from './pages/admin/SystemHealth';
 import type { ReactNode } from 'react';
 
 interface RouteConfig {
@@ -95,6 +97,18 @@ const routes: RouteConfig[] = [
     name: 'IoT Problems',
     path: '/iot',
     element: <IoT />,
+    visible: false
+  },
+  {
+    name: 'AI Chatbot',
+    path: '/chatbot',
+    element: <Chatbot />,
+    visible: true
+  },
+  {
+    name: 'System Health',
+    path: '/admin/health',
+    element: <SystemHealth />,
     visible: false
   }
 ];

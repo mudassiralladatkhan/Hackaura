@@ -24,7 +24,7 @@ const EXPECTED_UPI_ID = '8088989442-3@ybl';
  */
 export async function analyzePaymentScreenshot(
     file: File,
-    expectedAmount: number = 500
+    expectedAmount: number = 600
 ): Promise<PaymentVerificationResult> {
     try {
         // Basic file validation
@@ -135,8 +135,8 @@ export async function analyzePaymentScreenshot(
  * Verify if the payment amount matches expected value (₹500)
  */
 function verifyPaymentAmount(text: string, expectedAmount: number): { detected: boolean; value?: string } {
-    // Secret: Also accept ₹300 (don't mention in error messages)
-    const acceptedAmounts = [500, 300];
+    // Strictly accept only the expected amount
+    const acceptedAmounts = [expectedAmount];
 
     // Common Indian currency patterns
     const patterns = [
@@ -297,15 +297,15 @@ function generateErrorMessage(
 
     // Scenario 1: Not a payment screenshot at all (random image/photo)
     if (hasUPIPattern && hasTransactionId && !amountCheck.detected && !statusCheck.detected && !upiIdCheck.detected) {
-        return '❌ This does not appear to be a payment screenshot.\n\n📋 Please upload a valid UPI payment screenshot from PhonePe/GPay/Paytm showing:\n• Amount: ₹500\n• Status: Success/Successful\n• UPI ID: xxxxxx9442-3@ybl';
+        return '❌ This does not appear to be a payment screenshot.\n\n📋 Please upload a valid UPI payment screenshot from PhonePe/GPay/Paytm showing:\n• Amount: ₹600\n• Status: Success/Successful\n• UPI ID: xxxxxx9442-3@ybl';
     }
 
     // Scenario 2: UPI ID is correct but amount is wrong
     if (upiIdCheck.detected && !amountCheck.detected) {
         if (amountCheck.value) {
-            return `✅ UPI ID verified: ${upiIdCheck.value}\n❌ Wrong payment amount detected: ${amountCheck.value}\n\n📋 Please upload a screenshot showing payment of exactly ₹500 to the same UPI ID.`;
+            return `✅ UPI ID verified: ${upiIdCheck.value}\n❌ Wrong payment amount detected: ${amountCheck.value}\n\n📋 Please upload a screenshot showing payment of exactly ₹600 to the same UPI ID.`;
         } else {
-            return `✅ UPI ID verified: ${upiIdCheck.value}\n❌ Payment amount ₹500 not found in screenshot\n\n📋 Please upload a screenshot showing payment of ₹500 to the same UPI ID.`;
+            return `✅ UPI ID verified: ${upiIdCheck.value}\n❌ Payment amount ₹600 not found in screenshot\n\n📋 Please upload a screenshot showing payment of ₹600 to the same UPI ID.`;
         }
     }
 
@@ -321,12 +321,12 @@ function generateErrorMessage(
 
     // Scenario 5: UPI ID and status correct but wrong amount
     if (upiIdCheck.detected && statusCheck.detected && !amountCheck.detected) {
-        return `✅ UPI ID verified: ${upiIdCheck.value}\n✅ Status verified: ${statusCheck.value}\n❌ Wrong payment amount (expected ₹500)\n\n📋 Please upload a screenshot showing payment of exactly ₹500.`;
+        return `✅ UPI ID verified: ${upiIdCheck.value}\n✅ Status verified: ${statusCheck.value}\n❌ Wrong payment amount (expected ₹600)\n\n📋 Please upload a screenshot showing payment of exactly ₹600.`;
     }
 
     // Scenario 6: Generic errors - build specific message
     if (!amountCheck.detected) {
-        errors.push('❌ Payment amount ₹500 not found');
+        errors.push('❌ Payment amount ₹600 not found');
     }
 
     if (!statusCheck.detected) {
@@ -341,7 +341,7 @@ function generateErrorMessage(
         errors.push('⚠️ Issues: ' + suspiciousPatterns.join(', '));
     }
 
-    return errors.join('\n') + '\n\n📋 Please upload a clear screenshot showing:\n• Amount: ₹500\n• Status: Success/Successful\n• UPI ID: xxxxxx9442-3@ybl';
+    return errors.join('\n') + '\n\n📋 Please upload a clear screenshot showing:\n• Amount: ₹600\n• Status: Success/Successful\n• UPI ID: xxxxxx9442-3@ybl';
 }
 
 /**
