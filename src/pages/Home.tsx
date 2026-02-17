@@ -1124,7 +1124,7 @@ export default function Home() {
             {[
               { name: 'Sandesh Birannavar', phone: '7795031246', email: 'sandeshbirannavar@gmail.com' },
               { name: 'Rakshita Halluri', phone: '7204033630', email: 'rakshitahalluri@gmail.com' },
-              { name: 'Pankaj Babaleshwar', phone: '8217221908', email: 'pankajbabaleshwar@gmail.com' }
+              { name: 'Pankaj Babaleshwar', phone: '8217221908', email: 'babaleshwarpankaj@gmail.com' }
             ].map((coordinator, index) => (
               <ScrollAnimation key={index} direction="up" delay={index * 0.1}>
                 <GlassCard glowColor={['cyan', 'purple', 'pink', 'magenta', 'cyan', 'purple'][index] as any} hover3d>
