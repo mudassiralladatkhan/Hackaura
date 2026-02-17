@@ -494,7 +494,7 @@ export default function Home() {
                   </div>
                 </div>
                 <p className="text-center text-sm text-foreground/60 mt-4">
-                  Same awards for all three domains: Generative AI, Cybersecurity & Full Stack
+                  Same awards for all four domains: Generative AI, Cybersecurity, Full Stack & IoT
                 </p>
               </GlassCard>
             </ScrollAnimation>
@@ -526,7 +526,7 @@ export default function Home() {
                   </div>
                 </div>
                 <p className="text-center text-sm text-foreground/60 mt-4">
-                  Same awards for all three domains: Generative AI, Cybersecurity & Full Stack
+                  Same awards for all four domains: Generative AI, Cybersecurity, Full Stack & IoT
                 </p>
               </GlassCard>
             </ScrollAnimation>
