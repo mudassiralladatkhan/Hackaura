@@ -1,18 +1,74 @@
-import { useEffect, useState, useRef } from 'react';
+import { useEffect, useState, useRef, useCallback } from 'react';
 import { Html5Qrcode } from 'html5-qrcode';
 import { NeonButton } from '@/components/ui/neon-button';
 import { GlassCard } from '@/components/ui/glass-card';
-import { Loader2, CheckCircle2, XCircle, Search, Printer, History, Camera, StopCircle, PenTool, RotateCcw } from 'lucide-react';
-import { Link } from 'react-router-dom';
+import { Loader2, CheckCircle2, XCircle, Search, Printer, History, Camera, StopCircle, PenTool, RotateCcw, LogOut } from 'lucide-react';
+import { Link, useNavigate } from 'react-router-dom';
+import { useAuth } from '@/contexts/AuthContext';
 
 import { GOOGLE_SCRIPT_API_URL } from '@/lib/config';
 
+// 6-hour expiry in milliseconds
+const CHECKIN_EXPIRY_MS = 6 * 60 * 60 * 1000;
+
+interface StoredScan {
+    id: string;
+    team: string;
+    time: string;
+    status: string;
+    timestamp: number; // epoch ms for expiry
+}
+
+function getStorageKey(username: string) {
+    return `hackaura_checkins_${username}`;
+}
+
+function loadCheckins(username: string): StoredScan[] {
+    try {
+        const raw = localStorage.getItem(getStorageKey(username));
+        if (!raw) return [];
+        const items: StoredScan[] = JSON.parse(raw);
+        const now = Date.now();
+        // Filter out expired entries (older than 6 hours)
+        return items.filter(item => now - item.timestamp < CHECKIN_EXPIRY_MS);
+    } catch {
+        return [];
+    }
+}
+
+function saveCheckins(username: string, scans: StoredScan[]) {
+    localStorage.setItem(getStorageKey(username), JSON.stringify(scans));
+}
+
 export default function AdminScanner() {
+    const { currentUser, logout } = useAuth();
+    const navigate = useNavigate();
     const [scanResult, setScanResult] = useState<any>(null);
     const [loading, setLoading] = useState(false);
     const [scanning, setScanning] = useState(false);
     const [manualId, setManualId] = useState('');
-    const [recentScans, setRecentScans] = useState<any[]>([]);
+    const [recentScans, setRecentScans] = useState<StoredScan[]>([]);
+
+    // Load persisted check-ins for current user
+    useEffect(() => {
+        if (currentUser) {
+            const stored = loadCheckins(currentUser.username);
+            setRecentScans(stored);
+        }
+    }, [currentUser]);
+
+    // Save check-ins whenever they change
+    const persistScans = useCallback((scans: StoredScan[]) => {
+        setRecentScans(scans);
+        if (currentUser) {
+            saveCheckins(currentUser.username, scans);
+        }
+    }, [currentUser]);
+
+    const handleLogout = () => {
+        logout();
+        navigate('/admin/login');
+    };
     const [cameraError, setCameraError] = useState<string | null>(null);
     const [resetting, setResetting] = useState(false);
 
@@ -178,7 +234,7 @@ export default function AdminScanner() {
 
             if (result.result === 'success') {
                 alert(`✅ Success! Cleared attendance data for ${result.rowsCleared} rows.`);
-                setRecentScans([]); // Clear recent scans display
+                persistScans([]); // Clear recent scans display
             } else {
                 alert(`❌ Error: ${result.message || 'Failed to reset attendance'}`);
             }
@@ -251,12 +307,14 @@ export default function AdminScanner() {
                     time: result.timestamp,
                     status: 'success'
                 });
-                setRecentScans(prev => [{
+                const newScan: StoredScan = {
                     id: currentTicketId,
                     team: result.teamName,
                     time: result.timestamp,
-                    status: 'success'
-                }, ...prev]);
+                    status: 'success',
+                    timestamp: Date.now()
+                };
+                persistScans([newScan, ...recentScans]);
 
                 // Close signature pad and resume scanning
                 setTimeout(() => {
@@ -297,7 +355,7 @@ export default function AdminScanner() {
                 <div className="flex items-center justify-between">
                     <div>
                         <h1 className="text-2xl font-bold text-white tracking-tighter">ADMIN <span className="text-cyan-400">SCANNER</span></h1>
-                        <p className="text-xs text-slate-500 uppercase tracking-widest">Hackaura 2026 Admin Portal</p>
+                        <p className="text-xs text-cyan-400/70 font-medium">{currentUser?.displayName}</p>
                     </div>
                     <div className="flex gap-2">
                         <button
@@ -322,6 +380,13 @@ export default function AdminScanner() {
                                 <Printer className="w-5 h-5" />
                             </NeonButton>
                         </Link>
+                        <button
+                            onClick={handleLogout}
+                            className="p-2 bg-slate-800/50 hover:bg-red-900/50 border border-slate-700/50 hover:border-red-700/50 rounded-lg transition-colors"
+                            title="Logout"
+                        >
+                            <LogOut className="w-5 h-5 text-slate-400 hover:text-red-400" />
+                        </button>
                     </div>
                 </div>
 
