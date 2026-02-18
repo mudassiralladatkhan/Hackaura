@@ -23,9 +23,13 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
 
     useEffect(() => {
         // Initialize Netlify Identity
-        netlifyIdentity.init({
-            APIUrl: 'https://hackaura2026.netlify.app/.netlify/identity' // Using base domain for stability
-        });
+        // On strict production (custom domain), let it auto-detect (relative path)
+        // On localhost, point to the specific Netlify site
+        const initOptions = window.location.hostname === 'localhost'
+            ? { APIUrl: 'https://hackaura2026.netlify.app/.netlify/identity' }
+            : { APIUrl: 'https://hackaura.vsmsrkitevents.in/.netlify/identity' }; // Explicitly set for custom domain
+
+        netlifyIdentity.init(initOptions);
 
         // Set initial user
         const currentUser = netlifyIdentity.currentUser();
