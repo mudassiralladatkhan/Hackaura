@@ -22,7 +22,9 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     const [isLoading, setIsLoading] = useState(true);
 
     useEffect(() => {
-        netlifyIdentity.init();
+        netlifyIdentity.init({
+            APIUrl: 'https://hackaura2026.netlify.app/.netlify/identity'
+        });
 
         const user = netlifyIdentity.currentUser();
         setUser(user);
