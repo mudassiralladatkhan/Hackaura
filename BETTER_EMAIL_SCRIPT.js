@@ -748,6 +748,57 @@ function doGet(e) {
             return createCORSResponse({ 'result': 'error', 'message': 'Ticket not found' });
         }
 
+        // ACTION: GET PAYMENT SCREENSHOTS
+        if (action === 'getPaymentScreenshots') {
+            var teamNameIdx = getHeaderIndex(headers, ['Team Name', 'Team']);
+            var paymentIdx = getHeaderIndex(headers, ['Payment Screenshot URL', 'Payment Proof', 'Payment', 'Screenshot URL', 'Payment Screenshot']);
+
+            var screenshots = [];
+            for (var i = 1; i < data.length; i++) {
+                var raw = paymentIdx > -1 ? String(data[i][paymentIdx] || '') : '';
+                var teamName = teamNameIdx > -1 ? String(data[i][teamNameIdx] || 'Team ' + i) : 'Team ' + i;
+                var ticketId = 'HA26-' + String(i).padStart(3, '0');
+
+                // Extract URL from the raw field
+                // The raw field might be: "Screenshot URL: https://... | OCR Status: ..."
+                // Or it could be a direct Google Drive URL
+                var url = '';
+                if (raw) {
+                    // Try to extract URL from "Screenshot URL: <url>" pattern
+                    var urlMatch = raw.match(/Screenshot URL:\s*(https?:\/\/[^\s|]+)/i);
+                    if (urlMatch) {
+                        url = urlMatch[1].trim();
+                    } else if (raw.match(/^https?:\/\//)) {
+                        // Direct URL
+                        url = raw.trim();
+                    } else if (raw.includes('drive.google.com') || raw.includes('googleusercontent.com')) {
+                        // Google Drive link embedded somewhere
+                        var driveMatch = raw.match(/(https?:\/\/[^\s|,]+)/i);
+                        if (driveMatch) url = driveMatch[1].trim();
+                    }
+
+                    // Convert Google Drive file links to direct image URLs
+                    if (url.includes('drive.google.com/file/d/')) {
+                        var fileIdMatch = url.match(/\/file\/d\/([^\/]+)/);
+                        if (fileIdMatch) {
+                            url = 'https://drive.google.com/uc?export=view&id=' + fileIdMatch[1];
+                        }
+                    }
+                }
+
+                // Only include rows that have some payment data
+                if (raw && raw.trim() !== '' && raw !== 'Upload Failed') {
+                    screenshots.push({
+                        ticketId: ticketId,
+                        teamName: teamName,
+                        url: url,
+                        raw: raw
+                    });
+                }
+            }
+            return createCORSResponse({ 'result': 'success', 'screenshots': screenshots });
+        }
+
         // ACTION: GET TEAM DETAILS
         if (action === 'getTeamDetails') {
             var ticketId = e.parameter.ticketId;
