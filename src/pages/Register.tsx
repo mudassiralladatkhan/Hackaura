@@ -123,7 +123,19 @@ export default function Register() {
                             const checkResult = await checkResponse.json();
 
                             if (checkResult.exists) {
+                                const duplicateMsg = `⚠️ Duplicate Payment Detected!\n\nThis transaction (UTR: ${utr}) has already been used${checkResult.teamName ? ` by team "${checkResult.teamName}"` : ''}.\n\nPlease make a new payment and upload a fresh screenshot.`;
                                 setOcrVerificationStatus('failed');
+                                setOcrResults({
+                                    isValid: false,
+                                    confidence: 'high',
+                                    details: {
+                                        amountDetected: false,
+                                        statusDetected: false,
+                                        upiIdDetected: false,
+                                        suspiciousPatterns: ['Duplicate UTR detected'],
+                                    },
+                                    errorMessage: duplicateMsg,
+                                });
                                 setPaymentScreenshot(null);
                                 setExtractedUTR(null);
                                 toast.error("Duplicate Payment Detected!", {
