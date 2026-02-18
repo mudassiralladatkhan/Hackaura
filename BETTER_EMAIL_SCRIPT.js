@@ -781,7 +781,14 @@ function doGet(e) {
                     if (url.includes('drive.google.com/file/d/')) {
                         var fileIdMatch = url.match(/\/file\/d\/([^\/]+)/);
                         if (fileIdMatch) {
-                            url = 'https://drive.google.com/uc?export=view&id=' + fileIdMatch[1];
+                            url = 'https://lh3.googleusercontent.com/d/' + fileIdMatch[1];
+                        }
+                    }
+                    // Also convert uc?export=view format
+                    if (url.includes('drive.google.com/uc')) {
+                        var ucIdMatch = url.match(/[?&]id=([^&]+)/);
+                        if (ucIdMatch) {
+                            url = 'https://lh3.googleusercontent.com/d/' + ucIdMatch[1];
                         }
                     }
                 }

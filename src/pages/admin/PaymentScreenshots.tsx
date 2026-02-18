@@ -103,6 +103,17 @@ export default function PaymentScreenshots() {
                                                 alt={item.teamName}
                                                 className="w-full h-full object-cover opacity-80 group-hover:opacity-100 transition-opacity cursor-pointer"
                                                 onClick={() => window.open(item.url, '_blank')}
+                                                referrerPolicy="no-referrer"
+                                                crossOrigin="anonymous"
+                                                onError={(e) => {
+                                                    const target = e.target as HTMLImageElement;
+                                                    // Try alternative Google Drive thumbnail URL
+                                                    const idMatch = item.url.match(/[?&]id=([^&]+)/);
+                                                    if (idMatch && !target.dataset.retried) {
+                                                        target.dataset.retried = 'true';
+                                                        target.src = `https://lh3.googleusercontent.com/d/${idMatch[1]}`;
+                                                    }
+                                                }}
                                             />
                                             <div className="absolute inset-0 bg-black/60 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center pointer-events-none">
                                                 <ExternalLink className="w-8 h-8 text-white" />
