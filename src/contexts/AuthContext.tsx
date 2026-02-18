@@ -1,68 +1,49 @@
-import React, { createContext, useContext, useEffect, useState } from 'react';
-import netlifyIdentity from 'netlify-identity-widget';
+import React, { createContext, useContext, useState, useEffect } from 'react';
 
 interface AuthContextType {
-    user: netlifyIdentity.User | null;
-    login: () => void;
+    isAuthenticated: boolean;
+    login: (password: string) => boolean;
     logout: () => void;
-    isLoading: boolean;
 }
 
 const AuthContext = createContext<AuthContextType>({
-    user: null,
-    login: () => { },
+    isAuthenticated: false,
+    login: () => false,
     logout: () => { },
-    isLoading: true
 });
 
 export const useAuth = () => useContext(AuthContext);
 
+// Admin password — change this to whatever you want
+const ADMIN_PASSWORD = 'hackaura@admin2026';
+
 export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
-    const [user, setUser] = useState<netlifyIdentity.User | null>(null);
-    const [isLoading, setIsLoading] = useState(true);
+    const [isAuthenticated, setIsAuthenticated] = useState(false);
 
     useEffect(() => {
-        // Initialize Netlify Identity
-        // formatting:off
-        // ALWAYS use the primary Netlify domain for identity checks
-        // The custom domain endpoint (hackaura.vsmsrkitevents.in/.netlify/identity) is returning 404
-        netlifyIdentity.init({
-            APIUrl: 'https://hackaura2026.netlify.app/.netlify/identity'
-        });
-        // formatting:on
-
-        // Set initial user
-        const currentUser = netlifyIdentity.currentUser();
-        setUser(currentUser);
-        setIsLoading(false);
-
-        // Event listeners
-        netlifyIdentity.on('login', (user) => {
-            setUser(user);
-            netlifyIdentity.close();
-        });
-
-        netlifyIdentity.on('logout', () => {
-            setUser(null);
-        });
-
-        // Cleanup
-        return () => {
-            netlifyIdentity.off('login');
-            netlifyIdentity.off('logout');
+        // Check if admin was previously logged in (session persistence)
+        const stored = sessionStorage.getItem('hackaura_admin_auth');
+        if (stored === 'true') {
+            setIsAuthenticated(true);
         }
     }, []);
 
-    const login = () => {
-        netlifyIdentity.open('login');
+    const login = (password: string): boolean => {
+        if (password === ADMIN_PASSWORD) {
+            setIsAuthenticated(true);
+            sessionStorage.setItem('hackaura_admin_auth', 'true');
+            return true;
+        }
+        return false;
     };
 
     const logout = () => {
-        netlifyIdentity.logout();
+        setIsAuthenticated(false);
+        sessionStorage.removeItem('hackaura_admin_auth');
     };
 
     return (
-        <AuthContext.Provider value={{ user, login, logout, isLoading }}>
+        <AuthContext.Provider value={{ isAuthenticated, login, logout }}>
             {children}
         </AuthContext.Provider>
     );
