@@ -56,7 +56,7 @@ const CountdownTimer = () => {
     const [timeLeft, setTimeLeft] = useState({ days: 0, hours: 0, minutes: 0, seconds: 0 });
 
     useEffect(() => {
-        const targetDate = new Date('2026-03-01T11:00:00');
+        const targetDate = new Date('2026-03-12T11:00:00');
 
         const interval = setInterval(() => {
             const now = new Date();
@@ -102,7 +102,7 @@ export default function RegistrationSuccess() {
     }, []);
 
     // Generate Google Calendar Link
-    const googleCalendarUrl = `https://calendar.google.com/calendar/render?action=TEMPLATE&text=HACKAURA+2026&details=Join+us+for+the+ultimate+hackathon+experience!+Don't+forget+your+college+ID+and+tech+gear.&location=VSM's+Institute+of+Technology,+Nipani&dates=20260301T110000/20260302T180000`;
+    const googleCalendarUrl = `https://calendar.google.com/calendar/render?action=TEMPLATE&text=HACKAURA+2026&details=Join+us+for+the+ultimate+hackathon+experience!+Don't+forget+your+college+ID+and+tech+gear.&location=VSM's+Institute+of+Technology,+Nipani&dates=20260312T110000/20260313T180000`;
 
     // Generate Google Maps Link
     const googleMapsUrl = "https://www.google.com/maps/search/?api=1&query=VSM's+Institute+of+Technology,+Nipani";
@@ -170,7 +170,7 @@ export default function RegistrationSuccess() {
                                     <div className="flex gap-8">
                                         <div>
                                             <p className="text-xs text-slate-500 uppercase">Date</p>
-                                            <p className="text-white font-medium">March 1-2, 2026</p>
+                                            <p className="text-white font-medium">March 12-13, 2026</p>
                                         </div>
                                         <div>
                                             <p className="text-xs text-slate-500 uppercase">Time</p>

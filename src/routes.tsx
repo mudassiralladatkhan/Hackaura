@@ -13,6 +13,8 @@ import FullStack from './pages/domains/FullStack';
 import IoT from './pages/domains/IoT';
 import Chatbot from './pages/Chatbot';
 import SystemHealth from './pages/admin/SystemHealth';
+import AdminLogin from './pages/AdminLogin';
+import ProtectedRoute from '@/components/ProtectedRoute';
 import type { ReactNode } from 'react';
 
 interface RouteConfig {
@@ -42,31 +44,52 @@ const routes: RouteConfig[] = [
   {
     name: 'Verify Ticket',
     path: '/verify',
-    element: <TicketVerification />,
+    element: <TicketVerification />
+  },
+  {
+    name: 'Admin Login',
+    path: '/admin/login',
+    element: <AdminLogin />,
     visible: false
   },
   {
     name: 'Payment Screenshots',
     path: '/admin/payments',
-    element: <PaymentScreenshots />,
+    element: (
+      <ProtectedRoute>
+        <PaymentScreenshots />
+      </ProtectedRoute>
+    ),
     visible: false
   },
   {
     name: 'Admin Scanner',
     path: '/admin',
-    element: <AdminScanner />,
+    element: (
+      <ProtectedRoute>
+        <AdminScanner />
+      </ProtectedRoute>
+    ),
     visible: false
   },
   {
     name: 'Print Attendance',
     path: '/admin/print',
-    element: <AttendanceSheet />,
+    element: (
+      <ProtectedRoute>
+        <AttendanceSheet />
+      </ProtectedRoute>
+    ),
     visible: false
   },
   {
     name: 'Participants List',
     path: '/admin/participants',
-    element: <ParticipantsList />,
+    element: (
+      <ProtectedRoute>
+        <ParticipantsList />
+      </ProtectedRoute>
+    ),
     visible: false
   },
   {
@@ -108,7 +131,11 @@ const routes: RouteConfig[] = [
   {
     name: 'System Health',
     path: '/admin/health',
-    element: <SystemHealth />,
+    element: (
+      <ProtectedRoute>
+        <SystemHealth />
+      </ProtectedRoute>
+    ),
     visible: false
   }
 ];

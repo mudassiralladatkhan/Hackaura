@@ -18,7 +18,7 @@ function testDrivePermissions() {
 // --- CONFIGURATION ---
 var CONFIG = {
     SHEET_NAME: 'Form Responses 1', // Check your sheet tab name!
-    EVENT_DATE: 'March 1-2, 2026',
+    EVENT_DATE: 'March 12-13, 2026',
     REPORTING_TIME: '11:00 AM',
     VENUE_NAME: 'VSM Institute of Technology, Nipani',
     VENUE_MAP: 'https://maps.app.goo.gl/to5bjseBAVoWZ3mP7',
@@ -136,7 +136,7 @@ function onFormSubmit(e) {
                     <p style="font-family: monospace; font-size: 28px; color: #22d3ee; margin: 15px 0 5px; font-weight: 700; letter-spacing: 2px;">${ticketId}</p>
                     
                     <!-- NEW VERIFY BUTTON -->
-                    <a href="https://hackaura2026.netlify.app/verify?ticketId=${ticketId}" style="display: inline-block; margin-top: 15px; padding: 8px 20px; background: rgba(34, 211, 238, 0.15); color: #22d3ee; text-decoration: none; border-radius: 4px; font-size: 13px; border: 1px solid rgba(34, 211, 238, 0.3); font-weight: 600; text-transform: uppercase;">
+                    <a href="https://hackaura.vsmsrkitevents.in/verify?ticketId=${ticketId}" style="display: inline-block; margin-top: 15px; padding: 8px 20px; background: rgba(34, 211, 238, 0.15); color: #22d3ee; text-decoration: none; border-radius: 4px; font-size: 13px; border: 1px solid rgba(34, 211, 238, 0.3); font-weight: 600; text-transform: uppercase;">
                        Verify Ticket Status ↗
                     </a>
 
@@ -182,8 +182,8 @@ function onFormSubmit(e) {
                     <tr>
                       <td width="50%" style="padding-bottom: 20px; vertical-align: top;">
                          <div style="border-left: 2px solid #a855f7; padding-left: 10px;">
-                            <span style="display: block; color: #e2e8f0; font-weight: 600; font-size: 14px;">Abdulwahab M.</span>
-                            <a href="tel:+917349758871" style="color: #94a3b8; font-size: 13px; text-decoration: none;">+91 73497 58871</a>
+                            <span style="display: block; color: #e2e8f0; font-weight: 600; font-size: 14px;">Pankaj Babaleshwar</span>
+                            <a href="tel:+918217221908" style="color: #94a3b8; font-size: 13px; text-decoration: none;">+91 82172 21908</a>
                          </div>
                       </td>
                       <td width="50%" style="padding-bottom: 20px; vertical-align: top;">
@@ -202,8 +202,8 @@ function onFormSubmit(e) {
                       </td>
                       <td width="50%" style="vertical-align: top;">
                          <div style="border-left: 2px solid #f59e0b; padding-left: 10px;">
-                            <span style="display: block; color: #e2e8f0; font-weight: 600; font-size: 14px;">Sana Ravat</span>
-                            <a href="tel:+918095981415" style="color: #94a3b8; font-size: 13px; text-decoration: none;">+91 80959 81415</a>
+                            <span style="display: block; color: #e2e8f0; font-weight: 600; font-size: 14px;">Abdulwahab M</span>
+                            <a href="tel:+917349758871" style="color: #94a3b8; font-size: 13px; text-decoration: none;">+91 73497 58871</a>
                          </div>
                       </td>
                     </tr>
