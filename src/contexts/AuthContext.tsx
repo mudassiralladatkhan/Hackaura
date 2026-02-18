@@ -22,14 +22,17 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     const [isLoading, setIsLoading] = useState(true);
 
     useEffect(() => {
+        // Initialize Netlify Identity
         netlifyIdentity.init({
-            APIUrl: 'https://hackaura2026.netlify.app/.netlify/identity'
+            APIUrl: 'https://vsmsrkitevents.in/.netlify/identity'
         });
 
-        const user = netlifyIdentity.currentUser();
-        setUser(user);
+        // Set initial user
+        const currentUser = netlifyIdentity.currentUser();
+        setUser(currentUser);
         setIsLoading(false);
 
+        // Event listeners
         netlifyIdentity.on('login', (user) => {
             setUser(user);
             netlifyIdentity.close();
@@ -39,6 +42,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
             setUser(null);
         });
 
+        // Cleanup
         return () => {
             netlifyIdentity.off('login');
             netlifyIdentity.off('logout');
