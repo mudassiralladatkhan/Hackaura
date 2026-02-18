@@ -24,7 +24,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     useEffect(() => {
         // Initialize Netlify Identity
         netlifyIdentity.init({
-            APIUrl: 'https://vsmsrkitevents.in/.netlify/identity'
+            APIUrl: 'https://hackaura2026.netlify.app/.netlify/identity' // Using base domain for stability
         });
 
         // Set initial user
