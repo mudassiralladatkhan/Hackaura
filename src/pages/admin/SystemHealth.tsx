@@ -12,6 +12,8 @@ interface ServiceStatus {
     status: 'operational' | 'degraded' | 'down' | 'checking';
     latency: number;
     emailQuota?: number;
+    backupAccounts?: number;
+    totalCapacity?: number;
     message?: string;
 }
 
@@ -39,7 +41,9 @@ export default function SystemHealth() {
                         name: 'Google Script API',
                         status: 'operational',
                         latency,
-                        emailQuota: data.emailQuota // Expecting this from backend
+                        emailQuota: data.emailQuota,
+                        backupAccounts: data.backupAccounts,
+                        totalCapacity: data.totalCapacity
                     });
                 } else {
                     setApiStatus({ name: 'Google Script API', status: 'degraded', latency, message: 'Invalid response format' });
@@ -127,14 +131,41 @@ export default function SystemHealth() {
                                 <span className="text-white font-mono">{apiStatus.latency}ms</span>
                             </div>
 
-                            {/* Quota Section */}
-                            <div className="flex justify-between items-center p-3 rounded-lg bg-black/40 border border-white/5">
-                                <span className="text-slate-400 text-sm">Email Quota</span>
-                                <span className={`font-mono font-bold ${(apiStatus.emailQuota || 0) > 50 ? 'text-green-400' :
-                                    (apiStatus.emailQuota || 0) > 10 ? 'text-yellow-400' : 'text-red-400'
-                                    }`}>
-                                    {apiStatus.emailQuota !== undefined ? apiStatus.emailQuota : '---'}
-                                </span>
+                            {/* Email Quota Section */}
+                            <div className="p-3 rounded-lg bg-black/40 border border-white/5 space-y-3">
+                                <div className="flex justify-between items-center">
+                                    <span className="text-slate-400 text-sm">Primary Quota</span>
+                                    <span className={`font-mono font-bold ${(apiStatus.emailQuota || 0) > 50 ? 'text-green-400' :
+                                        (apiStatus.emailQuota || 0) > 10 ? 'text-yellow-400' : 'text-red-400'
+                                        }`}>
+                                        {apiStatus.emailQuota !== undefined ? apiStatus.emailQuota : '---'} / 100
+                                    </span>
+                                </div>
+                                <div className="flex justify-between items-center">
+                                    <span className="text-slate-400 text-sm">Backup Accounts</span>
+                                    <span className="font-mono font-bold text-cyan-400">
+                                        {apiStatus.backupAccounts !== undefined ? apiStatus.backupAccounts : '---'}
+                                    </span>
+                                </div>
+                                <div className="flex justify-between items-center">
+                                    <span className="text-slate-400 text-sm">Total Capacity</span>
+                                    <span className={`font-mono font-bold ${(apiStatus.totalCapacity || 0) > 200 ? 'text-green-400' :
+                                        (apiStatus.totalCapacity || 0) > 50 ? 'text-yellow-400' : 'text-red-400'
+                                        }`}>
+                                        {apiStatus.totalCapacity !== undefined ? `~${apiStatus.totalCapacity}` : '---'}
+                                    </span>
+                                </div>
+                                {/* Progress Bar */}
+                                {apiStatus.totalCapacity !== undefined && (
+                                    <div className="w-full bg-slate-800 rounded-full h-2 overflow-hidden">
+                                        <div
+                                            className={`h-full rounded-full transition-all duration-500 ${(apiStatus.totalCapacity / 400) > 0.5 ? 'bg-green-500' :
+                                                    (apiStatus.totalCapacity / 400) > 0.25 ? 'bg-yellow-500' : 'bg-red-500'
+                                                }`}
+                                            style={{ width: `${Math.min(100, (apiStatus.totalCapacity / 400) * 100)}%` }}
+                                        />
+                                    </div>
+                                )}
                             </div>
 
                             {apiStatus.message && (
