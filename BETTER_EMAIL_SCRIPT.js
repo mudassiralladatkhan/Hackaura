@@ -691,6 +691,38 @@ function doGet(e) {
             return createCORSResponse({ 'result': 'success', 'exists': exists });
         }
 
+        // --- UTR DUPLICATE CHECK ACTION ---
+        if (action === 'checkUTR') {
+            var utr = String(e.parameter.utr || '').trim();
+            if (!utr || utr.length < 8) {
+                return createCORSResponse({ 'result': 'success', 'exists': false, 'message': 'No UTR provided or too short' });
+            }
+
+            var paymentIdx = getHeaderIndex(headers, ['Payment Screenshot URL', 'Payment Proof', 'Payment', 'Screenshot URL', 'Payment Screenshot']);
+            var teamNameIdx = getHeaderIndex(headers, ['Team Name', 'Team']);
+
+            if (paymentIdx === -1) {
+                return createCORSResponse({ 'result': 'success', 'exists': false, 'message': 'Payment column not found' });
+            }
+
+            var found = false;
+            var foundTeam = '';
+            for (var i = 1; i < data.length; i++) {
+                var cellValue = String(data[i][paymentIdx] || '');
+                if (cellValue.indexOf(utr) > -1) {
+                    found = true;
+                    foundTeam = teamNameIdx > -1 ? String(data[i][teamNameIdx] || '') : '';
+                    break;
+                }
+            }
+
+            return createCORSResponse({
+                'result': 'success',
+                'exists': found,
+                'teamName': foundTeam
+            });
+        }
+
         // --- ADMIN ACTIONS ---
 
         // ACTION: GET ALL PARTICIPANTS

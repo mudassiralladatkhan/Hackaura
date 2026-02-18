@@ -71,6 +71,7 @@ export default function Register() {
     const [paymentScreenshot, setPaymentScreenshot] = useState<File | null>(null);
     const [ocrVerificationStatus, setOcrVerificationStatus] = useState<'idle' | 'analyzing' | 'success' | 'failed'>('idle');
     const [ocrResults, setOcrResults] = useState<PaymentVerificationResult | null>(null);
+    const [extractedUTR, setExtractedUTR] = useState<string | null>(null);
 
     const { register, control, handleSubmit, watch, formState: { errors, isSubmitting: formSubmitting, isValidating } } = useForm<FormData>({
         resolver: zodResolver(formSchema),
@@ -108,14 +109,44 @@ export default function Register() {
                 setOcrResults(result);
 
                 if (result.isValid) {
+                    // Extract UTR and check for duplicates
+                    const utr = result.details.transactionId || null;
+                    setExtractedUTR(utr);
+
+                    if (utr) {
+                        // Check if this UTR has already been used
+                        toast.info("Checking transaction ID...", { description: "Verifying UTR is not already used." });
+                        try {
+                            const checkResponse = await fetch(
+                                `${GOOGLE_SCRIPT_API_URL}?action=checkUTR&utr=${encodeURIComponent(utr)}`
+                            );
+                            const checkResult = await checkResponse.json();
+
+                            if (checkResult.exists) {
+                                setOcrVerificationStatus('failed');
+                                setPaymentScreenshot(null);
+                                setExtractedUTR(null);
+                                toast.error("Duplicate Payment Detected!", {
+                                    description: `This transaction (UTR: ${utr}) has already been used${checkResult.teamName ? ` by ${checkResult.teamName}` : ''}. Please use a different payment.`,
+                                    duration: 8000
+                                });
+                                return;
+                            }
+                        } catch (checkError) {
+                            console.warn('UTR check failed, continuing:', checkError);
+                            // Don't block registration if UTR check fails
+                        }
+                    }
+
                     setOcrVerificationStatus('success');
                     toast.success("Payment Verified!", {
-                        description: "Screenshot verified successfully."
+                        description: utr ? `Screenshot verified. UTR: ${utr}` : "Screenshot verified successfully."
                     });
                 } else {
                     setOcrVerificationStatus('failed');
                     // Clear the screenshot so user can upload a new one
                     setPaymentScreenshot(null);
+                    setExtractedUTR(null);
                     toast.error("Verification Failed", {
                         description: result.errorMessage || "Could not verify payment details."
                     });
@@ -125,6 +156,7 @@ export default function Register() {
                 setOcrVerificationStatus('failed');
                 // Clear the screenshot so user can upload a new one
                 setPaymentScreenshot(null);
+                setExtractedUTR(null);
                 setOcrResults({
                     isValid: false,
                     confidence: 'low',
@@ -235,7 +267,7 @@ export default function Register() {
                 toast.error("Upload Error", { description: "Could not save screenshot. Continuing..." });
             }
 
-            const verificationStatus = `Screenshot URL: ${paymentUrl} | OCR Status: Amount ₹${ocrResults?.details.amountValue || '600'}, Status: ${ocrResults?.details.statusValue || 'Success'}`;
+            const verificationStatus = `Screenshot URL: ${paymentUrl} | OCR Status: Amount ₹${ocrResults?.details.amountValue || '600'}, Status: ${ocrResults?.details.statusValue || 'Success'}${extractedUTR ? ', UTR: ' + extractedUTR : ''}`;
             formData.append(GOOGLE_FORM_ENTRY_IDS.PAYMENT_PROOF, verificationStatus);
 
 

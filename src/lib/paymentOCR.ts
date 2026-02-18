@@ -10,6 +10,7 @@ export interface PaymentVerificationResult {
         statusValue?: string;
         upiIdDetected: boolean;
         upiIdValue?: string;
+        transactionId?: string;
         suspiciousPatterns: string[];
     };
     errorMessage?: string;
@@ -67,12 +68,14 @@ export async function analyzePaymentScreenshot(
         const amountCheck = verifyPaymentAmount(text, expectedAmount);
         const statusCheck = checkPaymentStatus(text);
         const upiIdCheck = checkUpiId(text);
+        const transactionId = extractTransactionId(text);
 
         // Debug logging
         console.log('Verification Results:', {
             amount: amountCheck,
             status: statusCheck,
             upiId: upiIdCheck,
+            transactionId,
         });
 
         // Check for common UPI patterns
@@ -110,6 +113,7 @@ export async function analyzePaymentScreenshot(
                 statusValue: statusCheck.value,
                 upiIdDetected: upiIdCheck.detected,
                 upiIdValue: upiIdCheck.value,
+                transactionId: transactionId || undefined,
                 suspiciousPatterns,
             },
             errorMessage: isValid ? undefined : generateErrorMessage(amountCheck, statusCheck, upiIdCheck, suspiciousPatterns),
@@ -278,6 +282,56 @@ function checkUpiId(text: string): { detected: boolean; value?: string } {
     }
 
     return { detected: false };
+}
+
+/**
+ * Extract UTR / Transaction ID / Reference Number from OCR text
+ * UPI UTR format: typically 12-digit number
+ * Also matches labeled patterns like "UTR: XXXXX", "Ref No: XXXXX", etc.
+ */
+export function extractTransactionId(text: string): string | null {
+    // Pattern 1: Labeled transaction IDs (highest priority)
+    const labeledPatterns = [
+        /(?:UTR|UPI\s*Ref|Ref(?:erence)?\s*(?:No|Number|ID)|Transaction\s*(?:ID|No|Number|Ref)|Txn\s*(?:ID|No|Ref))\s*[:\-]?\s*([A-Za-z0-9]{8,22})/gi,
+        /(?:UPI\s*Transaction\s*ID|Google\s*Transaction\s*ID)\s*[:\-]?\s*([A-Za-z0-9]{8,22})/gi,
+    ];
+
+    for (const pattern of labeledPatterns) {
+        const matches = [...text.matchAll(pattern)];
+        for (const match of matches) {
+            const id = match[1].trim();
+            // UTR should be at least 8 chars, skip very short matches
+            if (id.length >= 8) {
+                return id;
+            }
+        }
+    }
+
+    // Pattern 2: Standalone 12-digit numbers (common UPI UTR format)
+    const standalonePattern = /\b(\d{12,16})\b/g;
+    const standaloneMatches = [...text.matchAll(standalonePattern)];
+
+    // Filter out phone numbers (10-digit starting with 6-9) and amounts
+    for (const match of standaloneMatches) {
+        const num = match[1];
+        // Skip if it looks like a phone number
+        if (num.length === 10 && /^[6-9]/.test(num)) continue;
+        // Skip if it looks like an amount (with preceding ₹ or Rs)
+        const idx = match.index || 0;
+        const before = text.substring(Math.max(0, idx - 5), idx);
+        if (/[₹]|Rs\.?|INR/i.test(before)) continue;
+
+        return num;
+    }
+
+    // Pattern 3: Alphanumeric reference codes (like T2401231234567890)
+    const alphaNumPattern = /\b([A-Z]\d{12,20})\b/g;
+    const alphaMatches = [...text.matchAll(alphaNumPattern)];
+    if (alphaMatches.length > 0) {
+        return alphaMatches[0][1];
+    }
+
+    return null;
 }
 
 /**
