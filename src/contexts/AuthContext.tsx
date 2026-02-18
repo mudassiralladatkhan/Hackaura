@@ -2,19 +2,21 @@ import React, { createContext, useContext, useState, useEffect } from 'react';
 
 interface AuthContextType {
     isAuthenticated: boolean;
-    login: (password: string) => boolean;
+    login: (username: string, password: string) => boolean;
     logout: () => void;
 }
 
 const AuthContext = createContext<AuthContextType>({
     isAuthenticated: false,
     login: () => false,
+
     logout: () => { },
 });
 
 export const useAuth = () => useContext(AuthContext);
 
-// Admin password — change this to whatever you want
+// Admin credentials — change these to whatever you want
+const ADMIN_USERNAME = 'admin';
 const ADMIN_PASSWORD = 'hackaura@admin2026';
 
 export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
@@ -28,8 +30,8 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
         }
     }, []);
 
-    const login = (password: string): boolean => {
-        if (password === ADMIN_PASSWORD) {
+    const login = (username: string, password: string): boolean => {
+        if (username === ADMIN_USERNAME && password === ADMIN_PASSWORD) {
             setIsAuthenticated(true);
             sessionStorage.setItem('hackaura_admin_auth', 'true');
             return true;

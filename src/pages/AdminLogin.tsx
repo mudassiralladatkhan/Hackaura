@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react';
 import { useAuth } from '@/contexts/AuthContext';
 import { useNavigate, useLocation } from 'react-router-dom';
-import { Lock, Eye, EyeOff, ShieldCheck, AlertCircle } from 'lucide-react';
+import { Lock, Eye, EyeOff, ShieldCheck, AlertCircle, User } from 'lucide-react';
 import { NeonButton } from '@/components/ui/neon-button';
 import { GlassCard } from '@/components/ui/glass-card';
 import { ParticleBackground } from '@/components/ui/particle-background';
@@ -12,6 +12,7 @@ export default function AdminLogin() {
     const location = useLocation();
     const from = location.state?.from?.pathname || '/admin';
 
+    const [username, setUsername] = useState('');
     const [password, setPassword] = useState('');
     const [showPassword, setShowPassword] = useState(false);
     const [error, setError] = useState('');
@@ -27,14 +28,14 @@ export default function AdminLogin() {
         e.preventDefault();
         setError('');
 
-        if (!password.trim()) {
-            setError('Please enter the admin password');
+        if (!username.trim() || !password.trim()) {
+            setError('Please enter both username and password');
             return;
         }
 
-        const success = login(password);
+        const success = login(username, password);
         if (!success) {
-            setError('Invalid password. Access denied.');
+            setError('Invalid credentials. Access denied.');
             setIsShaking(true);
             setTimeout(() => setIsShaking(false), 500);
             setPassword('');
@@ -61,14 +62,32 @@ export default function AdminLogin() {
 
                     {/* Login Form */}
                     <form onSubmit={handleSubmit} className="space-y-4 pt-2">
+                        {/* Username Field */}
                         <div className="relative">
+                            <div className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-500">
+                                <User className="w-5 h-5" />
+                            </div>
+                            <input
+                                type="text"
+                                value={username}
+                                onChange={(e) => { setUsername(e.target.value); setError(''); }}
+                                placeholder="Username"
+                                className="w-full pl-11 pr-4 py-3 bg-white/5 border border-white/10 rounded-lg text-white placeholder-gray-500 focus:outline-none focus:border-purple-500/50 focus:ring-1 focus:ring-purple-500/30 transition-all"
+                                autoFocus
+                            />
+                        </div>
+
+                        {/* Password Field */}
+                        <div className="relative">
+                            <div className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-500">
+                                <Lock className="w-5 h-5" />
+                            </div>
                             <input
                                 type={showPassword ? 'text' : 'password'}
                                 value={password}
                                 onChange={(e) => { setPassword(e.target.value); setError(''); }}
-                                placeholder="Enter admin password"
-                                className="w-full px-4 py-3 bg-white/5 border border-white/10 rounded-lg text-white placeholder-gray-500 focus:outline-none focus:border-purple-500/50 focus:ring-1 focus:ring-purple-500/30 transition-all pr-12"
-                                autoFocus
+                                placeholder="Password"
+                                className="w-full pl-11 pr-12 py-3 bg-white/5 border border-white/10 rounded-lg text-white placeholder-gray-500 focus:outline-none focus:border-purple-500/50 focus:ring-1 focus:ring-purple-500/30 transition-all"
                             />
                             <button
                                 type="button"
