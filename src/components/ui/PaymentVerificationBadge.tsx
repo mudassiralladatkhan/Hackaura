@@ -9,6 +9,7 @@ interface PaymentVerificationBadgeProps {
         statusValue?: string;
         upiIdDetected: boolean;
         upiIdValue?: string;
+        transactionId?: string;
         suspiciousPatterns: string[];
     };
     errorMessage?: string;
@@ -59,6 +60,12 @@ export function PaymentVerificationBadge({ status, details, errorMessage }: Paym
                                 <div className="flex items-center gap-2">
                                     <CheckCircle2 className="w-3 h-3" />
                                     <span>UPI ID: <strong>{details.upiIdValue || 'xxxxxx9442-3@ybl'}</strong> verified</span>
+                                </div>
+                            )}
+                            {details.transactionId && (
+                                <div className="flex items-center gap-2">
+                                    <CheckCircle2 className="w-3 h-3" />
+                                    <span>UTR: <strong>{details.transactionId}</strong> extracted</span>
                                 </div>
                             )}
                             <div className="flex items-center gap-2">
