@@ -22,7 +22,14 @@ var CONFIG = {
     REPORTING_TIME: '11:00 AM',
     VENUE_NAME: 'VSM Institute of Technology, Nipani',
     VENUE_MAP: 'https://maps.app.goo.gl/to5bjseBAVoWZ3mP7',
-    WHATSAPP_LINK: 'https://chat.whatsapp.com/DuetdcEgnGZGrfVSPxA1Sv'
+    WHATSAPP_LINK: 'https://chat.whatsapp.com/DuetdcEgnGZGrfVSPxA1Sv',
+    // Backup email scripts deployed on other Google accounts (100 emails/day each)
+    BACKUP_EMAILS: [
+        'https://script.google.com/macros/s/AKfycbxSwHZpoZybzS6a9dKtbfUi4tFeA1ua-sJrgmCMBym8HbXrJnFaYN7JHTS6tZ9RslvGqA/exec', // muffasirkhan0123@gmail.com
+        'https://script.google.com/macros/s/AKfycbxmy7Srrjl7xboZNGhEoti4kGAFG5jePacmG-7QGCbDQ6uLqaD0sLCTuP4N7rLmDmAt/exec', // babaleshwarpankaj@gmail.com
+        'https://script.google.com/macros/s/AKfycbw4jXaaNBcMOjREoWyvhJ7GkT_LPhxZM64JfldY2HP1888IanJ7zc2ql0i083u6OqAnfw/exec'  // muffasirkhan99@gmail.com
+    ],
+    QUOTA_THRESHOLD: 5 // Switch to backup when primary quota drops below this
 };
 
 /* 
@@ -215,17 +222,74 @@ function onFormSubmit(e) {
       </html>
     `;
 
-        // 4. SEND EMAIL
+        // 4. SEND EMAIL (with automatic failover to backup accounts)
         if (email) {
-            MailApp.sendEmail({
-                to: email,
-                subject: subject,
-                htmlBody: htmlBody
-            });
+            sendEmailWithFailover(email, subject, htmlBody);
         }
 
     } catch (err) {
         console.error("Error in onFormSubmit: " + err.toString());
+    }
+}
+
+/*
+   --------------------------------------------------------------
+   EMAIL FAILOVER SYSTEM
+   Automatically switches to backup accounts when quota runs low.
+   Primary (this account): 100 emails/day
+   + 3 backups: 300 emails/day
+   = Total capacity: 400 emails/day
+   --------------------------------------------------------------
+*/
+function sendEmailWithFailover(to, subject, htmlBody) {
+    var remaining = MailApp.getRemainingDailyQuota();
+
+    // Try primary account first
+    if (remaining > CONFIG.QUOTA_THRESHOLD) {
+        MailApp.sendEmail({ to: to, subject: subject, htmlBody: htmlBody });
+        Logger.log('Email sent via PRIMARY account. Remaining quota: ' + (remaining - 1));
+        return;
+    }
+
+    // Primary quota low — try backup accounts in order
+    Logger.log('Primary quota low (' + remaining + '). Trying backup accounts...');
+
+    for (var i = 0; i < CONFIG.BACKUP_EMAILS.length; i++) {
+        try {
+            var response = UrlFetchApp.fetch(CONFIG.BACKUP_EMAILS[i], {
+                method: 'post',
+                contentType: 'application/json',
+                payload: JSON.stringify({
+                    action: 'sendEmail',
+                    to: to,
+                    subject: subject,
+                    htmlBody: htmlBody
+                }),
+                muteHttpExceptions: true
+            });
+
+            var result = JSON.parse(response.getContentText());
+
+            if (result.result === 'success') {
+                Logger.log('Email sent via BACKUP #' + (i + 1) + '. Backup remaining: ' + result.remaining);
+                return; // Success! Stop trying
+            }
+
+            // This backup is also exhausted, try next
+            Logger.log('Backup #' + (i + 1) + ' failed: ' + result.message + '. Trying next...');
+
+        } catch (err) {
+            Logger.log('Backup #' + (i + 1) + ' error: ' + err.toString() + '. Trying next...');
+        }
+    }
+
+    // All backups failed — last resort: try primary even if low
+    if (remaining > 0) {
+        MailApp.sendEmail({ to: to, subject: subject, htmlBody: htmlBody });
+        Logger.log('LAST RESORT: Email sent via primary. Remaining: ' + (remaining - 1));
+    } else {
+        Logger.log('ALL EMAIL QUOTAS EXHAUSTED. Could not send email to: ' + to);
+        console.error('CRITICAL: All email quotas exhausted. Email to ' + to + ' was NOT sent.');
     }
 }
 
@@ -601,7 +665,9 @@ function doGet(e) {
                 'result': 'success',
                 'count': count,
                 'collegeCount': uniqueCount,
-                'emailQuota': emailQuota // NEW: Expose Quota
+                'emailQuota': emailQuota,
+                'backupAccounts': CONFIG.BACKUP_EMAILS.length,
+                'totalCapacity': emailQuota + (CONFIG.BACKUP_EMAILS.length * 100) // Estimated total
             });
         }
 
