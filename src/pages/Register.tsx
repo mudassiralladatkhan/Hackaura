@@ -406,12 +406,12 @@ export default function Register() {
                                                     className="w-full bg-blue-950/20 border border-blue-500/30 rounded-lg p-3 focus:border-blue-500 focus:ring-1 focus:ring-blue-500 outline-none transition-all appearance-none text-blue-100"
                                                 >
                                                     <option value="" className="bg-gray-900 text-gray-500">Select Problem Statement</option>
-                                                    <option value="PS-1" className="bg-gray-900">PS-1: Smart Water Management System ⭐⭐</option>
-                                                    <option value="PS-2" className="bg-gray-900">PS-2: Smart Agriculture Monitoring System ⭐⭐</option>
-                                                    <option value="PS-3" className="bg-gray-900">PS-3: Patient Health Monitoring & Emergency Alert ⭐⭐⭐</option>
-                                                    <option value="PS-4" className="bg-gray-900">PS-4: Smart Home Energy Monitor & Optimizer ⭐⭐⭐</option>
-                                                    <option value="PS-5" className="bg-gray-900">PS-5: Smart Parking & Traffic Management ⭐⭐⭐⭐</option>
-                                                    <option value="PS-6" className="bg-gray-900">PS-6: Industrial Safety & Environmental Monitoring ⭐⭐⭐⭐</option>
+                                                    <option value="PS-1" className="bg-gray-900">PS-1: Smart Water Management System</option>
+                                                    <option value="PS-2" className="bg-gray-900">PS-2: Smart Agriculture Monitoring System</option>
+                                                    <option value="PS-3" className="bg-gray-900">PS-3: Patient Health Monitoring & Emergency Alert</option>
+                                                    <option value="PS-4" className="bg-gray-900">PS-4: Smart Home Energy Monitor & Optimizer</option>
+                                                    <option value="PS-5" className="bg-gray-900">PS-5: Smart Parking & Traffic Management</option>
+                                                    <option value="PS-6" className="bg-gray-900">PS-6: Industrial Safety & Environmental Monitoring</option>
                                                 </select>
                                                 <div className="absolute right-3 top-3.5 pointer-events-none">
                                                     <ChevronLeft className="w-4 h-4 -rotate-90 text-blue-400" />
