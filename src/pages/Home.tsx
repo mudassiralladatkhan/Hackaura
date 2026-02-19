@@ -353,19 +353,8 @@ export default function Home() {
               </GlassCard>
             </ScrollAnimation>
           </div>
-
-          {/* College CTA */}
-          <ScrollAnimation direction="up" delay={0.7}>
-            <div className="mt-12 text-center">
-              <Link to="/college" className="inline-block">
-                <button className="px-10 py-4 bg-primary text-black font-bold text-lg rounded-xl hover:brightness-110 hover:scale-105 transition-all duration-300 shadow-[0_0_20px_rgba(0,255,255,0.4)] hover:shadow-[0_0_30px_rgba(0,255,255,0.6)]">
-                  About College
-                </button>
-              </Link>
-            </div>
-          </ScrollAnimation >
-        </div >
-      </section >
+        </div>
+      </section>
 
       <section id="domains" className="relative py-24 px-4">
         <div className="container mx-auto">
