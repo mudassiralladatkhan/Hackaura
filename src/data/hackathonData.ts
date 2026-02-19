@@ -8,7 +8,7 @@ export const HACKATHON_DATA = {
     collaboration: "Savikar & Smart Media Technology Group (Hemanth C S)",
 
     prizes: {
-        totalPool: "₹70,000",
+        totalPool: "₹1,00,000",
         breakdown: [
             "🏆 Main Awards (Per Domain):",
             "   - 1st Place: Cash Prize + Certificate",

@@ -176,7 +176,7 @@ export default function Home() {
           <ScrollAnimation direction="up" delay={0.4}>
             <p className="text-base xl:text-lg text-foreground/70 max-w-2xl mx-auto mb-8">
               Join us for a 24-hour national-level hackathon organized by Vikram Sarabhai Tech Club at VSMSRKIT, Nipani.
-              Compete in Generative AI, Cybersecurity, and Full Stack domains for a prize pool of ₹70,000.
+              Compete in Generative AI, Cybersecurity, and Full Stack domains for a prize pool of ₹1,00,000.
             </p>
           </ScrollAnimation>
 
@@ -265,7 +265,7 @@ export default function Home() {
                 <div className="flex justify-center mb-2">
                   <Trophy className="w-6 h-6 text-accent animate-pulse" />
                 </div>
-                <h4 className="text-3xl font-bold text-white mb-1">₹70k</h4>
+                <h4 className="text-3xl font-bold text-white mb-1">₹1L</h4>
                 <p className="text-xs uppercase tracking-wider text-accent/80">Prize Pool</p>
               </GlassCard>
 
@@ -473,7 +473,7 @@ export default function Home() {
             <div className="text-center mb-16">
               <div className="inline-flex items-center gap-3 glass-effect border border-neon-yellow/30 rounded-2xl px-8 py-4">
                 <Trophy className="w-8 h-8 text-neon-yellow animate-bounce" />
-                <span className="text-3xl xl:text-4xl font-bold text-neon-yellow">₹70,000</span>
+                <span className="text-3xl xl:text-4xl font-bold text-neon-yellow">₹1,00,000</span>
                 <span className="text-foreground/70">Total Prize Pool</span>
               </div>
             </div>
