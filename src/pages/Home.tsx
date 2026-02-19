@@ -1130,7 +1130,7 @@ export default function Home() {
                   <div className="w-16 h-16 mx-auto mb-4 rounded-full bg-amber-500/20 flex items-center justify-center">
                     <Users className="w-8 h-8 text-amber-500" />
                   </div>
-                  <h4 className="text-lg font-bold">Prof. S.C. Gandhi</h4>
+                  <h4 className="text-lg font-bold">Prof. S.C. Gandh</h4>
                   <p className="text-xs text-foreground/60 mb-2">Assistant Professor</p>
                   <a href="tel:7795838187" className="text-amber-500 hover:text-amber-400 transition-colors text-sm">
                     7795838187
