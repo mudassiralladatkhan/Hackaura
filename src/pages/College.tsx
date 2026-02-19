@@ -61,12 +61,11 @@ export default function College() {
                     <ScrollAnimation direction="down">
                         <div className="relative rounded-3xl overflow-hidden mb-12 border border-primary/20">
                             <img
-                                src="https://www.vsmsrkit.edu.in/uploads/slideshow/1654179710.jpg"
-                                alt="VSMSRKIT Campus"
+                                src="https://www.vsmsrkit.edu.in/images/slider/vsmsrkit-building-infrastructure-slider.jpg"
+                                alt="VSMSRKIT Campus Building"
                                 className="w-full h-[250px] md:h-[400px] object-cover"
                                 onError={(e) => {
-                                    // Fallback: try another image
-                                    e.currentTarget.src = 'https://www.vsmsrkit.edu.in/uploads/slideshow/1654179785.jpg';
+                                    e.currentTarget.src = 'https://www.vsmsrkit.edu.in/images/slider/facility-slider-010825.jpg';
                                     e.currentTarget.onerror = () => {
                                         e.currentTarget.style.display = 'none';
                                     };
@@ -76,9 +75,9 @@ export default function College() {
                             <div className="absolute bottom-0 left-0 right-0 p-6 md:p-10">
                                 <div className="flex items-center gap-4 mb-3">
                                     <img
-                                        src="/vstc-logo.png.png"
-                                        alt="VSTC Logo"
-                                        className="h-14 md:h-20 w-auto object-contain drop-shadow-glow"
+                                        src="https://www.vsmsrkit.edu.in/uploads/1602993450.png"
+                                        alt="VSMSRKIT Logo"
+                                        className="h-14 md:h-20 w-auto object-contain drop-shadow-glow bg-white/90 rounded-lg p-1"
                                         onError={(e) => { e.currentTarget.style.display = 'none'; }}
                                     />
                                     <div>
@@ -213,9 +212,12 @@ export default function College() {
                         <div className="flex justify-center mb-10">
                             <GlassCard glowColor="cyan" hover3d className="max-w-3xl w-full">
                                 <div className="text-center py-4">
-                                    <div className="w-24 h-24 mx-auto mb-4 rounded-full bg-neon-yellow/20 flex items-center justify-center border-2 border-neon-yellow/30">
-                                        <Users className="w-12 h-12 text-neon-yellow" />
-                                    </div>
+                                    <img
+                                        src="https://www.vsmsrkit.edu.in/images/chairman.jpg"
+                                        alt="Shri Chandrakanth S. Kothiwale"
+                                        className="w-28 h-28 mx-auto mb-4 rounded-full object-cover border-3 border-neon-yellow/40 shadow-lg"
+                                        onError={(e) => { e.currentTarget.style.display = 'none'; }}
+                                    />
                                     <h3 className="text-2xl font-bold text-white mb-1">Shri Chandrakanth S. Kothiwale</h3>
                                     <p className="text-neon-yellow font-semibold uppercase tracking-wider text-sm mb-4">Chairman, VSM Nipani</p>
                                     <p className="text-foreground/70 text-sm max-w-xl mx-auto leading-relaxed">
@@ -231,9 +233,12 @@ export default function College() {
                         <div className="flex justify-center mb-10">
                             <GlassCard glowColor="purple" hover3d className="max-w-3xl w-full">
                                 <div className="text-center py-4">
-                                    <div className="w-24 h-24 mx-auto mb-4 rounded-full bg-amber-500/20 flex items-center justify-center border-2 border-amber-500/30">
-                                        <GraduationCap className="w-12 h-12 text-amber-500" />
-                                    </div>
+                                    <img
+                                        src="https://www.vsmsrkit.edu.in/images/principal-dr-u-p-patil.jpg"
+                                        alt="Dr. Umesh P. Patil"
+                                        className="w-28 h-28 mx-auto mb-4 rounded-full object-cover border-3 border-amber-500/40 shadow-lg"
+                                        onError={(e) => { e.currentTarget.style.display = 'none'; }}
+                                    />
                                     <h3 className="text-2xl font-bold text-white mb-1">Dr. Umesh P. Patil</h3>
                                     <p className="text-amber-500 font-semibold uppercase tracking-wider text-sm mb-4">Principal & Director</p>
                                     <p className="text-foreground/70 text-sm max-w-xl mx-auto leading-relaxed">
