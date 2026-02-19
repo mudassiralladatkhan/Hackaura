@@ -3,14 +3,120 @@ import { ParticleBackground } from '@/components/ui/particle-background';
 import { GlassCard } from '@/components/ui/glass-card';
 import { NeonButton } from '@/components/ui/neon-button';
 import { ProblemDisplay } from '@/components/ProblemDisplay';
-import { Loader2, Cpu, Mail } from 'lucide-react';
+import { Loader2, Cpu, Mail, ChevronDown, ChevronUp } from 'lucide-react';
 import ky from 'ky';
 
 import { GOOGLE_SCRIPT_API_URL } from '@/lib/config';
 const DOMAIN = "Internet of Things";
 
+const iotProblems = [
+    {
+        id: 'PS-1',
+        icon: '🚰',
+        title: 'Smart Water Management System',
+        difficulty: 2,
+        difficultyLabel: 'Beginner-Friendly',
+        problem: 'Water wastage is a major issue in colleges and residential areas. Build an IoT system that monitors water tank levels in real-time, detects overflow/leakage, and automatically controls the motor pump.',
+        features: [
+            'Ultrasonic sensor to measure water level',
+            'Auto ON/OFF motor pump via relay module',
+            'Real-time dashboard (web/mobile) showing water level %',
+            'Alert notification when tank is full or level is critically low',
+        ],
+        components: 'Ultrasonic sensor, Relay module, ESP32/Arduino, Buzzer, LED indicators',
+    },
+    {
+        id: 'PS-2',
+        icon: '🌱',
+        title: 'Smart Agriculture Monitoring System',
+        difficulty: 2,
+        difficultyLabel: 'Beginner-Friendly',
+        problem: 'Small-scale farmers lack access to real-time crop health data. Build an IoT system that monitors soil and environmental conditions and provides actionable insights for better crop management.',
+        features: [
+            'Monitor soil moisture, temperature, and humidity',
+            'Auto-irrigation trigger when soil moisture drops below threshold',
+            'Web dashboard showing real-time sensor data with graphs',
+            'Alert system for extreme weather conditions (too hot/dry/wet)',
+        ],
+        components: 'Soil moisture sensor, DHT11/22, Relay module, Water pump/servo, ESP32',
+    },
+    {
+        id: 'PS-3',
+        icon: '🏥',
+        title: 'Patient Health Monitoring & Emergency Alert System',
+        difficulty: 3,
+        difficultyLabel: 'Intermediate',
+        problem: 'In rural healthcare, continuous patient monitoring is expensive and unavailable. Build a wearable/portable IoT device that monitors vital signs and sends emergency alerts to doctors/family.',
+        features: [
+            'Monitor heart rate (pulse sensor) and body temperature',
+            'Real-time data streaming to a web dashboard',
+            'Emergency alert (buzzer + SMS/notification) if vitals go abnormal',
+            'Data logging with timestamp for doctor review',
+        ],
+        components: 'Pulse/Heart rate sensor, Temperature sensor (LM35/DS18B20), Buzzer, ESP32, LED',
+    },
+    {
+        id: 'PS-4',
+        icon: '🏠',
+        title: 'Smart Home Energy Monitor & Optimizer',
+        difficulty: 3,
+        difficultyLabel: 'Intermediate',
+        problem: 'Households waste significant electricity due to lack of awareness about consumption patterns. Build an IoT system that monitors energy usage of appliances, identifies wastage, and suggests/automates power-saving actions.',
+        features: [
+            'Current sensor to measure power consumption of connected devices',
+            'Real-time dashboard showing per-appliance energy usage',
+            'Auto turn-off for idle appliances (via relay)',
+            'Daily/weekly consumption reports with cost estimation',
+            'Motion-based lighting control (optional)',
+        ],
+        components: 'ACS712 current sensor, Relay module, PIR motion sensor, ESP32, LED',
+    },
+    {
+        id: 'PS-5',
+        icon: '🚗',
+        title: 'Smart Parking & Traffic Management System',
+        difficulty: 4,
+        difficultyLabel: 'Advanced',
+        problem: 'Urban areas face severe parking congestion because drivers can\'t find available spots. Build an IoT-based smart parking system that detects slot availability in real-time and guides drivers to the nearest free spot.',
+        features: [
+            'IR/Ultrasonic sensors at each parking slot to detect occupancy',
+            'Live web dashboard showing parking map with available/occupied slots',
+            'Entry/exit gate control using servo motor',
+            'Counter displaying total available spots',
+            'Bonus: Reservation system via web interface',
+        ],
+        components: 'IR sensors (multiple), Servo motor, LCD display (I2C), ESP32, LEDs (Red/Green per slot)',
+    },
+    {
+        id: 'PS-6',
+        icon: '🏭',
+        title: 'Industrial Safety & Environmental Monitoring System',
+        difficulty: 4,
+        difficultyLabel: 'Advanced',
+        problem: 'Factories and labs face hazards from gas leaks, fires, and unsafe temperatures but lack affordable real-time monitoring. Build an IoT system that continuously monitors environmental safety parameters and triggers multi-level emergency responses.',
+        features: [
+            'Detect gas leaks (LPG/smoke), fire, and abnormal temperature',
+            '3-level alert system: LED warning → Buzzer alarm → Dashboard emergency notification',
+            'Automatic exhaust fan/ventilation activation on gas detection (via relay)',
+            'Data logging with timestamp for compliance reports',
+            'Live web dashboard with zone-wise safety status',
+        ],
+        components: 'MQ-2/MQ-5 gas sensor, Flame sensor, DHT11, Relay module, Buzzer, ESP32, Fan/servo',
+    },
+];
+
+function DifficultyStars({ level }: { level: number }) {
+    return (
+        <span className="inline-flex gap-0.5">
+            {[1, 2, 3, 4].map((i) => (
+                <span key={i} className={i <= level ? 'text-yellow-400' : 'text-gray-600'}>⭐</span>
+            ))}
+        </span>
+    );
+}
+
 export default function IoT() {
-    const [step, setStep] = useState<'ticket' | 'otp' | 'problem'>('ticket');
+    const [step, setStep] = useState<'problems' | 'ticket' | 'otp' | 'problem'>('problems');
     const [ticketId, setTicketId] = useState('');
     const [otp, setOtp] = useState('');
     const [_teamName, setTeamName] = useState('');
@@ -19,6 +125,7 @@ export default function IoT() {
     const [problem, setProblem] = useState<any>(null);
     const [loading, setLoading] = useState(false);
     const [error, setError] = useState('');
+    const [expandedPS, setExpandedPS] = useState<string | null>(null);
 
     const handleTicketSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
@@ -153,7 +260,7 @@ export default function IoT() {
     };
 
     return (
-        <div className="min-h-screen bg-gradient-to-br from-slate-900 via-green-900 to-slate-900 relative overflow-hidden flex flex-col items-center justify-center">
+        <div className="min-h-screen bg-gradient-to-br from-slate-900 via-green-900 to-slate-900 relative overflow-hidden">
             <ParticleBackground />
 
             <div className="relative z-10 container mx-auto px-4 py-16">
@@ -164,9 +271,84 @@ export default function IoT() {
                             IoT Domain
                         </h1>
                     </div>
-                    <p className="text-slate-300 text-lg">Your Problem Statement Awaits</p>
+                    <p className="text-slate-300 text-lg">🔌 Internet of Things — 6 Problem Statements</p>
                 </div>
 
+                {/* Problem Statements Section */}
+                {step === 'problems' && (
+                    <div className="max-w-4xl mx-auto">
+                        <div className="grid gap-4 mb-10">
+                            {iotProblems.map((ps) => (
+                                <div
+                                    key={ps.id}
+                                    onClick={() => setExpandedPS(expandedPS === ps.id ? null : ps.id)}
+                                    className="cursor-pointer"
+                                >
+                                    <GlassCard
+                                        className="p-0 overflow-hidden transition-all duration-300 hover:border-green-500/50"
+                                    >
+                                        {/* Header - always visible */}
+                                        <div className="flex items-center justify-between p-5">
+                                            <div className="flex items-center gap-3 flex-1">
+                                                <span className="text-2xl">{ps.icon}</span>
+                                                <div>
+                                                    <div className="flex items-center gap-2 flex-wrap">
+                                                        <span className="text-xs font-mono text-green-400 bg-green-500/10 px-2 py-0.5 rounded">{ps.id}</span>
+                                                        <DifficultyStars level={ps.difficulty} />
+                                                        <span className="text-xs text-slate-400">({ps.difficultyLabel})</span>
+                                                    </div>
+                                                    <h3 className="text-lg font-bold text-white mt-1">{ps.title}</h3>
+                                                </div>
+                                            </div>
+                                            <div className="text-slate-400 ml-3">
+                                                {expandedPS === ps.id ? <ChevronUp className="w-5 h-5" /> : <ChevronDown className="w-5 h-5" />}
+                                            </div>
+                                        </div>
+
+                                        {/* Expanded details */}
+                                        {expandedPS === ps.id && (
+                                            <div className="border-t border-white/10 p-5 pt-4 bg-black/20 animate-in fade-in slide-in-from-top-2 duration-300">
+                                                {/* Problem */}
+                                                <div className="mb-4">
+                                                    <h4 className="text-sm font-semibold text-green-400 uppercase tracking-wider mb-2">Problem</h4>
+                                                    <p className="text-slate-300 leading-relaxed">{ps.problem}</p>
+                                                </div>
+
+                                                {/* Expected Features */}
+                                                <div className="mb-4">
+                                                    <h4 className="text-sm font-semibold text-green-400 uppercase tracking-wider mb-2">Expected Features</h4>
+                                                    <ul className="space-y-1.5">
+                                                        {ps.features.map((f, i) => (
+                                                            <li key={i} className="flex items-start gap-2 text-slate-300">
+                                                                <span className="text-green-400 mt-1">✓</span>
+                                                                <span>{f}</span>
+                                                            </li>
+                                                        ))}
+                                                    </ul>
+                                                </div>
+
+                                                {/* Components */}
+                                                <div>
+                                                    <h4 className="text-sm font-semibold text-green-400 uppercase tracking-wider mb-2">Suggested Components</h4>
+                                                    <p className="text-slate-400 text-sm bg-slate-900/50 rounded-lg px-4 py-2 border border-slate-700">{ps.components}</p>
+                                                </div>
+                                            </div>
+                                        )}
+                                    </GlassCard>
+                                </div>
+                            ))}
+                        </div>
+
+                        {/* Verify Ticket button */}
+                        <div className="text-center">
+                            <NeonButton onClick={() => setStep('ticket')} className="min-w-[250px] py-4 text-lg">
+                                🎫 Verify Your Ticket
+                            </NeonButton>
+                        </div>
+                    </div>
+                )}
+
+                {/* Ticket Verification */}
                 <div className="max-w-2xl mx-auto">
                     {step === 'ticket' && (
                         <GlassCard className="p-8">
@@ -189,6 +371,13 @@ export default function IoT() {
                                 <NeonButton type="submit" disabled={loading} className="w-full">
                                     {loading ? <Loader2 className="w-5 h-5 animate-spin" /> : 'Verify Ticket'}
                                 </NeonButton>
+                                <button
+                                    type="button"
+                                    onClick={() => setStep('problems')}
+                                    className="w-full text-slate-400 hover:text-white text-sm py-2 transition-colors"
+                                >
+                                    ← Back to Problem Statements
+                                </button>
                             </form>
                         </GlassCard>
                     )}
