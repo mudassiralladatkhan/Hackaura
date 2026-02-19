@@ -230,10 +230,9 @@ export default function Home() {
                     <Lock className="w-4 h-4" />
                     Full Stack
                   </button>
-                  <button disabled className="w-full py-3 px-4 rounded-xl border border-neon-magenta/30 bg-neon-magenta/5 text-neon-magenta/50 font-semibold cursor-not-allowed flex items-center justify-center gap-2">
-                    <Lock className="w-4 h-4" />
+                  <Link to="/domains/iot" className="w-full py-3 px-4 rounded-xl border border-neon-magenta/50 bg-neon-magenta/10 text-neon-magenta font-semibold flex items-center justify-center gap-2 hover:bg-neon-magenta/20 hover:border-neon-magenta/70 transition-all">
                     IoT
-                  </button>
+                  </Link>
                 </div>
               </GlassCard>
             </div>
