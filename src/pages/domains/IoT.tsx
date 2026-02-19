@@ -2,7 +2,7 @@ import { useState } from 'react';
 import { ParticleBackground } from '@/components/ui/particle-background';
 import { GlassCard } from '@/components/ui/glass-card';
 import { NeonButton } from '@/components/ui/neon-button';
-import { Loader2, Cpu, Mail, Target, Code, CheckCircle2, Wrench, ArrowLeft, ChevronDown, ChevronUp } from 'lucide-react';
+import { Loader2, Cpu, Mail, Target, Code, CheckCircle2, ArrowLeft, ChevronDown, ChevronUp } from 'lucide-react';
 import ky from 'ky';
 import { Link } from 'react-router-dom';
 
@@ -282,20 +282,7 @@ export default function IoT() {
                                                 </ul>
                                             </div>
 
-                                            {/* Components */}
-                                            <div>
-                                                <div className="flex items-center gap-2 mb-2">
-                                                    <Wrench className="w-4 h-4 text-emerald-400" />
-                                                    <h4 className="text-xs font-semibold text-emerald-400 uppercase tracking-wider">Suggested Components</h4>
-                                                </div>
-                                                <div className="flex flex-wrap gap-1.5">
-                                                    {ps.components.split(', ').map((c, i) => (
-                                                        <span key={i} className="px-2.5 py-1 rounded-md bg-emerald-500/10 border border-emerald-500/15 text-emerald-300 text-xs">
-                                                            {c}
-                                                        </span>
-                                                    ))}
-                                                </div>
-                                            </div>
+
 
                                             {/* Bonus */}
                                             {ps.bonus && (
@@ -448,19 +435,7 @@ export default function IoT() {
                                                     </ul>
                                                 </div>
                                             </div>
-                                            <div>
-                                                <div className="flex items-center gap-2 mb-3">
-                                                    <Wrench className="w-5 h-5 text-emerald-400" />
-                                                    <h3 className="text-sm font-semibold text-emerald-400 uppercase tracking-wider">Suggested Components</h3>
-                                                </div>
-                                                <div className="bg-slate-900/60 rounded-xl p-5 border border-slate-800">
-                                                    <div className="flex flex-wrap gap-2">
-                                                        {assignedPSDetails.components.split(', ').map((c, i) => (
-                                                            <span key={i} className="px-3 py-1.5 rounded-lg bg-emerald-500/10 border border-emerald-500/20 text-emerald-300 text-sm">{c}</span>
-                                                        ))}
-                                                    </div>
-                                                </div>
-                                            </div>
+
                                         </>
                                     )}
 
