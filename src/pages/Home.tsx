@@ -357,24 +357,15 @@ export default function Home() {
           {/* College CTA */}
           <ScrollAnimation direction="up" delay={0.7}>
             <div className="mt-12 text-center">
-              <Link to="/college">
-                <GlassCard glowColor="cyan" className="max-w-2xl mx-auto cursor-pointer hover:scale-[1.02] transition-transform duration-300">
-                  <div className="flex flex-col sm:flex-row items-center justify-center gap-4 py-2">
-                    <div className="w-14 h-14 rounded-full bg-amber-500/20 flex items-center justify-center flex-shrink-0">
-                      <School className="w-7 h-7 text-amber-500" />
-                    </div>
-                    <div className="text-center sm:text-left">
-                      <h3 className="text-lg font-bold text-white">Explore Our College</h3>
-                      <p className="text-sm text-foreground/60">Learn about VSMSRKIT — our campus, departments, leadership & more</p>
-                    </div>
-                    <span className="text-primary text-2xl font-light">→</span>
-                  </div>
-                </GlassCard>
+              <Link to="/college" className="inline-block">
+                <button className="px-10 py-4 bg-primary text-black font-bold text-lg rounded-xl hover:brightness-110 hover:scale-105 transition-all duration-300 shadow-[0_0_20px_rgba(0,255,255,0.4)] hover:shadow-[0_0_30px_rgba(0,255,255,0.6)]">
+                  About College
+                </button>
               </Link>
             </div>
-          </ScrollAnimation>
-        </div>
-      </section>
+          </ScrollAnimation >
+        </div >
+      </section >
 
       <section id="domains" className="relative py-24 px-4">
         <div className="container mx-auto">
