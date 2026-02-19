@@ -13,77 +13,88 @@ const iotProblems = [
     {
         id: 'PS-1',
         title: 'Smart Water Management System',
-        problem: 'Water wastage is a major issue in colleges and residential areas. Build an IoT system that monitors water tank levels in real-time, detects overflow/leakage, and automatically controls the motor pump.',
+        problem: 'Water wastage is a critical issue across colleges, hostels, and residential buildings. Overhead tanks frequently overflow because motors are left running unattended, and underground tank levels go unmonitored — leading to thousands of liters wasted daily. There is no affordable, real-time system available for small-scale buildings to track water levels and automate pump control.\n\nYour challenge is to design and build an IoT-based Smart Water Management System that uses sensors to continuously monitor the water level inside a tank, automatically switches the motor pump ON when the level drops below a set threshold and OFF when the tank is full, and displays live water level data on a web or mobile dashboard. The system should also send alert notifications (buzzer/LED/push notification) for overflow detection or critically low levels.\n\nThis solution has real-world impact — it can be deployed in hostels, apartments, and agricultural setups to save water and reduce electricity costs.',
         features: [
-            'Ultrasonic sensor to measure water level',
-            'Auto ON/OFF motor pump via relay module',
-            'Real-time dashboard (web/mobile) showing water level %',
-            'Alert notification when tank is full or level is critically low',
+            'Ultrasonic sensor (HC-SR04) to measure the distance between sensor and water surface, calculating the water level percentage',
+            'Automatic motor pump control via relay module — turns ON when water drops below 20% and OFF when it reaches 90%',
+            'Real-time web dashboard showing live water level percentage with a visual gauge or progress bar',
+            'Alert system with buzzer and LED indicators for overflow warning and critically low water levels',
+            'Historical data logging — store water level readings with timestamps for usage analysis',
         ],
-        components: 'Ultrasonic sensor, Relay module, ESP32/Arduino, Buzzer, LED indicators',
+        components: 'Ultrasonic sensor (HC-SR04), Relay module (5V), ESP32/NodeMCU, Buzzer, LED indicators (Red/Green), Jumper wires, Breadboard, Small water pump (for demo)',
+        bonus: 'Add mobile push notifications using Blynk or Firebase. Implement a water usage tracker showing daily/weekly consumption trends.',
     },
     {
         id: 'PS-2',
         title: 'Smart Agriculture Monitoring System',
-        problem: 'Small-scale farmers lack access to real-time crop health data. Build an IoT system that monitors soil and environmental conditions and provides actionable insights for better crop management.',
+        problem: 'India\'s small-scale and marginal farmers — who make up over 80% of the farming community — lack access to technology for real-time crop health monitoring. Decisions about when to irrigate, how much water is needed, and whether conditions are favorable for crop growth are often based on guesswork. This leads to over-irrigation (waterlogging), under-irrigation (crop damage), and overall poor yields.\n\nYour task is to build an IoT-based Smart Agriculture Monitoring System that uses multiple sensors to continuously track soil moisture levels, ambient temperature, humidity, and optionally light intensity. Based on sensor readings, the system should automatically trigger irrigation (water pump via relay) when soil moisture falls below a critical threshold. All data should be displayed on a real-time web dashboard with interactive charts and graphs.\n\nThe system should also have an alert mechanism that notifies the farmer when environmental conditions become extreme — such as very high temperature, very low humidity, or waterlogged soil.',
         features: [
-            'Monitor soil moisture, temperature, and humidity',
-            'Auto-irrigation trigger when soil moisture drops below threshold',
-            'Web dashboard showing real-time sensor data with graphs',
-            'Alert system for extreme weather conditions (too hot/dry/wet)',
+            'Soil moisture sensor to detect real-time soil water content and determine if irrigation is needed',
+            'DHT11/DHT22 sensor to monitor ambient temperature and humidity around the crop area',
+            'Automatic irrigation — trigger water pump via relay when soil moisture drops below a configurable threshold (e.g., below 30%)',
+            'Web dashboard with live sensor data visualization using line charts and graphs showing trends over time',
+            'Alert system for extreme weather conditions — dashboard notifications and buzzer alarm for extreme heat, drought, or waterlogged conditions',
         ],
-        components: 'Soil moisture sensor, DHT11/22, Relay module, Water pump/servo, ESP32',
+        components: 'Soil moisture sensor (capacitive recommended), DHT11/DHT22 sensor, Relay module (5V), Mini water pump or servo valve, ESP32/NodeMCU, Buzzer, LED indicators, Breadboard, Jumper wires',
+        bonus: 'Add an LDR (Light Dependent Resistor) to monitor sunlight exposure. Implement a crop recommendation engine that suggests suitable crops based on current soil and weather conditions.',
     },
     {
         id: 'PS-3',
         title: 'Patient Health Monitoring & Emergency Alert System',
-        problem: 'In rural healthcare, continuous patient monitoring is expensive and unavailable. Build a wearable/portable IoT device that monitors vital signs and sends emergency alerts to doctors/family.',
+        problem: 'In rural India and resource-limited healthcare settings, continuous patient monitoring systems are either too expensive or entirely unavailable. Patients recovering from surgeries, elderly individuals living alone, and those with chronic conditions like heart disease often lack any kind of real-time health tracking. Delayed detection of abnormal vital signs — such as irregular heartbeat or sudden fever spikes — can lead to medical emergencies or even fatalities.\n\nYour challenge is to build a portable or wearable IoT-based Patient Health Monitoring System that continuously tracks the patient\'s heart rate (using a pulse sensor) and body temperature (using a temperature sensor). The data should be streamed in real-time to a web-based dashboard accessible by doctors or family members.\n\nIf any vital sign goes outside the normal range (e.g., heart rate above 120 bpm or below 50 bpm, temperature above 38.5 degrees C), the system must trigger an emergency alert — activating a buzzer, flashing an LED, and sending a notification to the dashboard. All readings should be logged with timestamps so doctors can review patient history.',
         features: [
-            'Monitor heart rate (pulse sensor) and body temperature',
-            'Real-time data streaming to a web dashboard',
-            'Emergency alert (buzzer + SMS/notification) if vitals go abnormal',
-            'Data logging with timestamp for doctor review',
+            'Pulse/Heart rate sensor to continuously monitor heartbeats per minute (BPM) with real-time display',
+            'Body temperature sensor (LM35 or DS18B20) for continuous fever and hypothermia detection',
+            'Real-time web dashboard showing live heart rate and temperature with visual indicators (normal/warning/critical)',
+            'Emergency alert system — buzzer sounds, red LED flashes, and dashboard notification when vitals cross predefined thresholds',
+            'Data logging with timestamps — store every reading in a database or spreadsheet for doctor review and trend analysis',
         ],
-        components: 'Pulse/Heart rate sensor, Temperature sensor (LM35/DS18B20), Buzzer, ESP32, LED',
+        components: 'Pulse sensor (SEN-11574), Temperature sensor (LM35 or DS18B20), ESP32/NodeMCU, Buzzer (active), LEDs (Green/Red), OLED display (optional for bedside readings), Breadboard, Jumper wires',
+        bonus: 'Add SpO2 (blood oxygen) monitoring using a MAX30100/MAX30102 sensor. Implement SMS alerts to emergency contacts using Twilio or a GSM module.',
     },
     {
         id: 'PS-4',
         title: 'Smart Home Energy Monitor & Optimizer',
-        problem: 'Households waste significant electricity due to lack of awareness about consumption patterns. Build an IoT system that monitors energy usage of appliances, identifies wastage, and suggests/automates power-saving actions.',
+        problem: 'Indian households pay an average electricity bill of Rs. 1,500 to 5,000 per month, but most families have no idea which appliances consume the most power or when they are wasting electricity. Fans, lights, chargers, and other devices are often left running even when rooms are unoccupied. Without visibility into consumption patterns, there is no way to make informed decisions about reducing energy usage.\n\nYour task is to design and build an IoT-based Smart Home Energy Monitor that measures the real-time power consumption of connected appliances using a current sensor (ACS712). The system should display per-appliance energy usage on a web dashboard with graphs showing hourly and daily trends. It should also calculate estimated electricity cost based on local tariff rates.\n\nFor optimization, the system should include a relay module that can automatically turn off appliances that have been idle for a configurable time period. Optionally, a PIR motion sensor can be added to implement motion-based lighting — lights turn on when someone enters the room and off when the room is empty.',
         features: [
-            'Current sensor to measure power consumption of connected devices',
-            'Real-time dashboard showing per-appliance energy usage',
-            'Auto turn-off for idle appliances (via relay)',
-            'Daily/weekly consumption reports with cost estimation',
-            'Motion-based lighting control (optional)',
+            'ACS712 current sensor to measure real-time power consumption (watts) of connected appliances',
+            'Real-time web dashboard showing per-appliance energy usage with hourly and daily consumption graphs',
+            'Automatic idle appliance detection — if no significant current draw is detected for X minutes, the relay cuts off power',
+            'Cost estimation — calculate daily, weekly, and monthly electricity cost based on local unit rate',
+            'PIR motion sensor for motion-based lighting control — auto ON when room is occupied, auto OFF when empty (optional but recommended)',
         ],
-        components: 'ACS712 current sensor, Relay module, PIR motion sensor, ESP32, LED',
+        components: 'ACS712 current sensor (5A/20A), Relay module (single/dual channel), PIR motion sensor (HC-SR501), ESP32/NodeMCU, LED indicators, OLED display (optional), Breadboard, Jumper wires, AC bulb/fan for demo',
+        bonus: 'Add a daily energy report emailed to the user. Implement a peak hours detector that warns when usage is high during expensive tariff windows.',
     },
     {
         id: 'PS-5',
         title: 'Smart Parking & Traffic Management System',
-        problem: 'Urban areas face severe parking congestion because drivers can\'t find available spots. Build an IoT-based smart parking system that detects slot availability in real-time and guides drivers to the nearest free spot.',
+        problem: 'Finding a parking spot in colleges, malls, and urban areas is a daily struggle. Drivers spend an average of 15 to 20 minutes circling parking lots looking for an available space, wasting fuel, time, and causing unnecessary traffic congestion and emissions. Most parking lots have no system to indicate which spots are free and which are occupied — drivers have to physically drive through every lane to check.\n\nYour challenge is to build an IoT-based Smart Parking System that uses IR or ultrasonic sensors placed at each parking slot to detect whether the slot is occupied or vacant. This occupancy data should be displayed on a live web dashboard showing a visual parking map — green for available slots, red for occupied ones. The system should also include an entry/exit gate mechanism using a servo motor and an LCD or LED counter at the entrance showing the total number of available spots.\n\nThis is a highly practical project that can be scaled and deployed in real parking lots, college campuses, and commercial buildings with minimal hardware investment.',
         features: [
-            'IR/Ultrasonic sensors at each parking slot to detect occupancy',
-            'Live web dashboard showing parking map with available/occupied slots',
-            'Entry/exit gate control using servo motor',
-            'Counter displaying total available spots',
-            'Bonus: Reservation system via web interface',
+            'IR or ultrasonic sensors at each parking slot to detect vehicle presence (occupied or vacant)',
+            'Live web dashboard displaying a real-time parking map — green (available) and red (occupied) indicators for each slot',
+            'Entry/exit gate control using servo motor that lifts when a vehicle approaches and lowers after entry',
+            'Available spot counter on LCD display at the parking entrance showing remaining spots (e.g., Available: 12/50)',
+            'Data logging — track parking lot utilization over time, peak hours, and average occupancy rate',
         ],
-        components: 'IR sensors (multiple), Servo motor, LCD display (I2C), ESP32, LEDs (Red/Green per slot)',
+        components: 'IR sensors (2-4 for demo slots), Servo motor (SG90 for gate), LCD display (16x2 I2C), ESP32/NodeMCU, LEDs (Red/Green per slot), Breadboard, Jumper wires, Cardboard or 3D printed parking model for demo',
+        bonus: 'Add a reservation system via the web dashboard where users can reserve a slot in advance. Implement automatic billing based on parking duration.',
     },
     {
         id: 'PS-6',
         title: 'Industrial Safety & Environmental Monitoring System',
-        problem: 'Factories and labs face hazards from gas leaks, fires, and unsafe temperatures but lack affordable real-time monitoring. Build an IoT system that continuously monitors environmental safety parameters and triggers multi-level emergency responses.',
+        problem: 'Industrial workplaces such as factories, chemical plants, laboratories, and even commercial kitchens are vulnerable to serious hazards including gas leaks (LPG, methane, carbon monoxide), fire outbreaks, and dangerously high temperatures. India witnesses thousands of industrial accidents annually, many of which could be prevented with early detection systems. However, existing industrial safety systems are prohibitively expensive for small factories and workshops.\n\nYour task is to build an affordable IoT-based Industrial Safety and Environmental Monitoring System that continuously monitors the environment for gas leaks (using MQ-2 or MQ-5 gas sensor), fire (using a flame sensor), and abnormal temperature or humidity (using DHT11). The system must implement a 3-level emergency response: Level 1 (Warning) — yellow LED and dashboard warning when gas concentration slightly increases. Level 2 (Alert) — red LED and buzzer alarm when gas crosses a dangerous threshold or flame is detected. Level 3 (Emergency) — activate exhaust fan or ventilation via relay and send emergency notification to dashboard.\n\nAll sensor readings should be logged with timestamps for regulatory compliance and safety audits. The web dashboard should show a zone-wise safety status overview with real-time data.',
         features: [
-            'Detect gas leaks (LPG/smoke), fire, and abnormal temperature',
-            '3-level alert system: LED warning, Buzzer alarm, Dashboard emergency notification',
-            'Automatic exhaust fan/ventilation activation on gas detection (via relay)',
-            'Data logging with timestamp for compliance reports',
-            'Live web dashboard with zone-wise safety status',
+            'MQ-2/MQ-5 gas sensor for continuous monitoring of LPG, methane, smoke, and combustible gases with configurable threshold levels',
+            'Flame sensor for real-time fire detection — triggers immediate Level 2 alert upon detection',
+            'DHT11/DHT22 temperature and humidity sensor to detect overheating or abnormal environmental conditions',
+            '3-level graduated alert system: Level 1 (Yellow LED warning), Level 2 (Buzzer + Red LED alarm), Level 3 (Relay activates exhaust fan + dashboard emergency alert)',
+            'Automatic ventilation — exhaust fan or servo-controlled vent activated via relay when gas concentration exceeds safe limits',
+            'Data logging with timestamps for every sensor reading — exportable for compliance reports and safety audits',
+            'Live web dashboard showing zone-wise safety status with color-coded indicators (Green/Yellow/Red)',
         ],
-        components: 'MQ-2/MQ-5 gas sensor, Flame sensor, DHT11, Relay module, Buzzer, ESP32, Fan/servo',
+        components: 'MQ-2 or MQ-5 gas sensor, Flame sensor (IR-based), DHT11/DHT22 sensor, Relay module (for fan/vent), Buzzer (active), LEDs (Green/Yellow/Red), ESP32/NodeMCU, Mini DC fan (for demo exhaust), Breadboard, Jumper wires',
+        bonus: 'Add SMS/email emergency alerts to safety officers using Twilio or SMTP. Implement a Safety Score metric that rates workplace safety based on sensor history.',
     },
 ];
 
@@ -250,7 +261,7 @@ export default function IoT() {
                                                     <Code className="w-4 h-4 text-emerald-400" />
                                                     <h4 className="text-xs font-semibold text-emerald-400 uppercase tracking-wider">Problem</h4>
                                                 </div>
-                                                <p className="text-slate-300 leading-relaxed text-sm">{ps.problem}</p>
+                                                <p className="text-slate-300 leading-relaxed text-sm whitespace-pre-line">{ps.problem}</p>
                                             </div>
 
                                             {/* Features */}
@@ -285,6 +296,14 @@ export default function IoT() {
                                                     ))}
                                                 </div>
                                             </div>
+
+                                            {/* Bonus */}
+                                            {ps.bonus && (
+                                                <div className="bg-amber-500/5 border border-amber-500/20 rounded-lg p-4">
+                                                    <h4 className="text-xs font-semibold text-amber-400 uppercase tracking-wider mb-1.5">Bonus Tip</h4>
+                                                    <p className="text-slate-400 text-sm">{ps.bonus}</p>
+                                                </div>
+                                            )}
                                         </div>
                                     )}
                                 </GlassCard>
