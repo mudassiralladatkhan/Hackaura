@@ -198,6 +198,12 @@ export default function Home() {
                   Chat with AI
                 </NeonButton>
               </Link>
+              <Link to="/college">
+                <NeonButton variant="secondary" className="w-full sm:w-auto min-w-[200px] text-lg py-6 border-amber-500/50 hover:bg-amber-500/10 hover:border-amber-400 text-amber-300 flex items-center justify-center gap-2">
+                  <School className="w-5 h-5" />
+                  About College
+                </NeonButton>
+              </Link>
             </div>
 
             {/* Problem Statement Announcements */}
