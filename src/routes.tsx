@@ -1,4 +1,5 @@
 import Home from './pages/Home';
+import College from './pages/College';
 import Register from './pages/Register';
 import RegistrationSuccess from './pages/RegistrationSuccess';
 import TicketVerification from './pages/TicketVerification';
@@ -34,6 +35,11 @@ const routes: RouteConfig[] = [
     name: 'Register',
     path: '/register',
     element: <Register />
+  },
+  {
+    name: 'Our College',
+    path: '/college',
+    element: <College />
   },
   {
     name: 'Success',

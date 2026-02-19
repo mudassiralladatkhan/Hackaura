@@ -45,7 +45,7 @@ export default function Home() {
       <nav className="fixed top-0 left-0 right-0 z-50 glass-effect border-b border-primary/20">
         <div className="container mx-auto px-4 py-4">
           <div className="flex items-center justify-between">
-            <div className="flex items-center gap-2 mr-8">
+            <Link to="/college" className="flex items-center gap-2 mr-8 hover:opacity-80 transition-opacity">
               <img
                 src="/vsm-logo.png.png"
                 alt="vsm Logo"
@@ -55,7 +55,7 @@ export default function Home() {
                 }}
               />
               <span className="text-sm md:text-base font-bold gradient-text whitespace-nowrap overflow-hidden text-ellipsis max-w-[200px] md:max-w-none">VSM's Somashekhar R Kothiwale Institute of Technology</span>
-            </div>
+            </Link>
 
             <div className="hidden xl:flex items-center gap-8">
               {navItems.map((item) => (
