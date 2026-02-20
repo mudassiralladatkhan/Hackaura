@@ -7,9 +7,9 @@ import { ScrollAnimation } from '@/components/ui/scroll-animation';
 
 const GOVERNING_COUNCIL = [
     { name: 'Shri Chandrakanth S. Kothiwale', role: 'Chairman', org: 'VSM, Nipani' },
-    { name: 'Vice Chairman', role: 'Vice Chairman', org: 'VSM, Nipani' },
-    { name: 'President', role: 'President', org: 'VSM, Nipani' },
-    { name: 'Secretary', role: 'Secretary', org: 'VSM, Nipani' },
+    { name: 'Shri R. Y. Patil', role: 'Vice Chairman', org: 'VSM, Nipani' },
+    { name: 'Shri B. R. Patil', role: 'President', org: 'VSM, Nipani' },
+    { name: 'Shri S. M. Khaded', role: 'Secretary', org: 'VSM, Nipani' },
 ];
 
 const DEPARTMENTS_BE = [
