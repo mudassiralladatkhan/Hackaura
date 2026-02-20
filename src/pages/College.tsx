@@ -233,7 +233,18 @@ export default function College() {
                         <div className="flex justify-center mb-10">
                             <GlassCard glowColor="pink" hover3d className="max-w-3xl w-full">
                                 <div className="text-center py-4">
-                                    <div className="w-28 h-28 mx-auto mb-4 rounded-full bg-primary/20 flex items-center justify-center border-3 border-neon-magenta/40 shadow-lg">
+                                    <img
+                                        src="/ceo.jpg"
+                                        alt="Dr. Siddagouda Patil"
+                                        className="w-28 h-28 mx-auto mb-4 rounded-full object-cover border-3 border-neon-magenta/40 shadow-lg"
+                                        onError={(e) => {
+                                            // Fallback to placeholder if image not found
+                                            e.currentTarget.style.display = 'none';
+                                            e.currentTarget.nextElementSibling?.classList.remove('hidden');
+                                        }}
+                                    />
+                                    {/* Fallback avatar if image is missing */}
+                                    <div className="w-28 h-28 mx-auto mb-4 rounded-full bg-primary/20 flex items-center justify-center border-3 border-neon-magenta/40 shadow-lg hidden">
                                         <Users className="w-12 h-12 text-primary" />
                                     </div>
                                     <h3 className="text-2xl font-bold text-white mb-1">Dr. Siddagouda Patil</h3>
