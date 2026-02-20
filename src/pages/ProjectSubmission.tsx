@@ -112,11 +112,17 @@ export default function ProjectSubmission() {
                     if (teamResponse.problemTitle) {
                         const iotMap: Record<string, string> = {
                             "PS-1": "PS-1: Smart Water Management System",
+                            "Internet of Things Problem Statement 1": "PS-1: Smart Water Management System",
                             "PS-2": "PS-2: Smart Agriculture Monitoring System",
+                            "Internet of Things Problem Statement 2": "PS-2: Smart Agriculture Monitoring System",
                             "PS-3": "PS-3: Patient Health Monitoring & Emergency Alert",
+                            "Internet of Things Problem Statement 3": "PS-3: Patient Health Monitoring & Emergency Alert",
                             "PS-4": "PS-4: Smart Home Energy Monitor & Optimizer",
+                            "Internet of Things Problem Statement 4": "PS-4: Smart Home Energy Monitor & Optimizer",
                             "PS-5": "PS-5: Smart Parking & Traffic Management",
-                            "PS-6": "PS-6: Industrial Safety & Environmental Monitoring"
+                            "Internet of Things Problem Statement 5": "PS-5: Smart Parking & Traffic Management",
+                            "PS-6": "PS-6: Industrial Safety & Environmental Monitoring",
+                            "Internet of Things Problem Statement 6": "PS-6: Industrial Safety & Environmental Monitoring"
                         };
 
                         const displayTitle = iotMap[teamResponse.problemTitle] || teamResponse.problemTitle;
