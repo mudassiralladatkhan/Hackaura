@@ -1124,7 +1124,7 @@ export default function Home() {
                   <div className="w-16 h-16 mx-auto mb-4 rounded-full bg-amber-500/20 flex items-center justify-center">
                     <Users className="w-8 h-8 text-amber-500" />
                   </div>
-                  <h4 className="text-lg font-bold">Prof. Prabhu Kichade</h4>
+                  <h4 className="text-lg font-bold">Prof. Prabhu Kichadi</h4>
                   <p className="text-xs text-foreground/60 mb-2">Assistant Professor</p>
                   <a href="tel:9880437187" className="text-amber-500 hover:text-amber-400 transition-colors text-sm">
                     9880437187

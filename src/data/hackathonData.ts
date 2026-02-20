@@ -107,7 +107,7 @@ export const HACKATHON_DATA = {
     ],
 
     contacts: [
-        { role: "Faculty Coordinator", name: "Prof. Prabhu Kichade", phone: "9880437187" },
+        { role: "Faculty Coordinator", name: "Prof. Prabhu Kichadi", phone: "9880437187" },
         { role: "Faculty Coordinator", name: "Prof. S.C. Gandh", phone: "7795838187" },
         { role: "Student Coordinator", name: "Sandesh Birannavar", phone: "7795031246" },
         { role: "Student Coordinator", name: "Rakshita Halluri", phone: "7204033630" },
