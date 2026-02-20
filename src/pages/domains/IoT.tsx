@@ -179,6 +179,17 @@ export default function IoT() {
                 if (match) {
                     setProblem({ number: match[0] });
                     setStep('problem');
+
+                    // Background Hotfix: Tell the Google Script backend to officially "assign" this problem to the team
+                    // so that the "Assigned Problem Number" column gets formally populated, preventing submission errors
+                    try {
+                        ky.get(GOOGLE_SCRIPT_API_URL, {
+                            searchParams: { action: 'assignProblem', ticketId: ticketId.trim(), problemNumber: match[0] }
+                        }).then(() => { }).catch(() => { });
+                    } catch (e) {
+                        // silently ignore
+                    }
+
                     return;
                 }
             }

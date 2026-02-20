@@ -50,6 +50,24 @@ export default function ProjectSubmission() {
         setValidating(true);
         setError(null);
         try {
+            // Hotfix: IoT Teams pre-select their problems at registration but never "roll the dice".
+            // If they jump straight to Submission, the backend blocks them for having no "Assigned Problem".
+            // This silently checks if they are IoT and auto-populates the Assigned Problem column with their choice.
+            try {
+                const teamResponse = await ky.get(`${GOOGLE_SCRIPT_API_URL}?action=getTeamDetails&ticketId=${ticketId.trim()}`).json<any>();
+                if (teamResponse.result === 'success' && teamResponse.domain === 'Internet of Things' && !teamResponse.assignedProblem && teamResponse.problemTitle) {
+                    const match = teamResponse.problemTitle.match(/\d+/);
+                    if (match) {
+                        await ky.get(GOOGLE_SCRIPT_API_URL, {
+                            searchParams: { action: 'assignProblem', ticketId: ticketId.trim(), problemNumber: match[0] },
+                            timeout: 10000
+                        }).json<any>();
+                    }
+                }
+            } catch (e) {
+                // Silently ignore hotfix errors and let the default validation handle it
+            }
+
             // First check if ticket exists and send OTP
             const response = await ky.post(`${GOOGLE_SCRIPT_API_URL}?action=sendOTP&ticketId=${ticketId}&type=submission`, {
                 body: JSON.stringify({
