@@ -200,98 +200,102 @@ export default function IoT() {
             <div className="relative z-10 container mx-auto px-4 py-16 md:py-20">
 
                 {/* Header */}
-                <div className="text-center mb-12">
-                    <Link to="/" className="inline-flex items-center gap-1 text-slate-500 hover:text-slate-300 text-sm transition-colors mb-6">
-                        <ArrowLeft className="w-3.5 h-3.5" />
-                        Back to Home
-                    </Link>
-                    <div className="inline-flex items-center gap-3 mb-6 px-5 py-2 rounded-full border border-emerald-500/20 bg-emerald-500/5 mx-auto block w-fit">
-                        <Cpu className="w-5 h-5 text-emerald-400" />
-                        <span className="text-emerald-400 text-sm font-medium tracking-wide uppercase">Internet of Things</span>
-                    </div>
-                    <h1 className="text-4xl md:text-6xl font-bold mb-4">
-                        <span className="bg-gradient-to-r from-emerald-300 via-green-400 to-teal-300 bg-clip-text text-transparent">
-                            IoT Problem Statements
-                        </span>
-                    </h1>
-                    <p className="text-slate-400 text-lg max-w-lg mx-auto">
-                        6 challenges across beginner to advanced levels. Click any problem to view details.
-                    </p>
-                </div>
+                {step !== 'problem' && (
+                    <>
+                        <div className="text-center mb-12">
+                            <Link to="/" className="inline-flex items-center gap-1 text-slate-500 hover:text-slate-300 text-sm transition-colors mb-6">
+                                <ArrowLeft className="w-3.5 h-3.5" />
+                                Back to Home
+                            </Link>
+                            <div className="inline-flex items-center gap-3 mb-6 px-5 py-2 rounded-full border border-emerald-500/20 bg-emerald-500/5 mx-auto block w-fit">
+                                <Cpu className="w-5 h-5 text-emerald-400" />
+                                <span className="text-emerald-400 text-sm font-medium tracking-wide uppercase">Internet of Things</span>
+                            </div>
+                            <h1 className="text-4xl md:text-6xl font-bold mb-4">
+                                <span className="bg-gradient-to-r from-emerald-300 via-green-400 to-teal-300 bg-clip-text text-transparent">
+                                    IoT Problem Statements
+                                </span>
+                            </h1>
+                            <p className="text-slate-400 text-lg max-w-lg mx-auto">
+                                6 challenges across beginner to advanced levels. Click any problem to view details.
+                            </p>
+                        </div>
 
-                {/* Problem Statements Grid */}
-                <div className="max-w-4xl mx-auto space-y-4 mb-16">
-                    {iotProblems.map((ps, index) => {
-                        const isExpanded = expandedPS === ps.id;
-                        return (
-                            <div
-                                key={ps.id}
-                                className="cursor-pointer"
-                                onClick={() => setExpandedPS(isExpanded ? null : ps.id)}
-                            >
-                                <GlassCard className="p-0 overflow-hidden transition-all duration-300 hover:border-emerald-500/40">
-                                    {/* Header row */}
-                                    <div className="flex items-center justify-between p-5 md:p-6">
-                                        <div className="flex items-center gap-4 flex-1 min-w-0">
-                                            <div className="flex-shrink-0 w-10 h-10 rounded-xl bg-emerald-500/10 border border-emerald-500/20 flex items-center justify-center">
-                                                <span className="text-emerald-400 font-bold text-sm">{index + 1}</span>
-                                            </div>
-                                            <div className="min-w-0">
-                                                <span className="text-xs font-mono text-emerald-400/70 tracking-wider">{ps.id}</span>
-                                                <h3 className="text-base md:text-lg font-semibold text-white truncate">{ps.title}</h3>
-                                            </div>
-                                        </div>
-                                        <div className="flex-shrink-0 ml-3 text-slate-500">
-                                            {isExpanded ? <ChevronUp className="w-5 h-5" /> : <ChevronDown className="w-5 h-5" />}
-                                        </div>
-                                    </div>
-
-                                    {/* Expanded content */}
-                                    {isExpanded && (
-                                        <div className="border-t border-white/5 bg-black/20 p-5 md:p-6 space-y-5">
-                                            {/* Problem */}
-                                            <div>
-                                                <div className="flex items-center gap-2 mb-2">
-                                                    <Code className="w-4 h-4 text-emerald-400" />
-                                                    <h4 className="text-xs font-semibold text-emerald-400 uppercase tracking-wider">Problem</h4>
+                        {/* Problem Statements Grid */}
+                        <div className="max-w-4xl mx-auto space-y-4 mb-16">
+                            {iotProblems.map((ps, index) => {
+                                const isExpanded = expandedPS === ps.id;
+                                return (
+                                    <div
+                                        key={ps.id}
+                                        className="cursor-pointer"
+                                        onClick={() => setExpandedPS(isExpanded ? null : ps.id)}
+                                    >
+                                        <GlassCard className="p-0 overflow-hidden transition-all duration-300 hover:border-emerald-500/40">
+                                            {/* Header row */}
+                                            <div className="flex items-center justify-between p-5 md:p-6">
+                                                <div className="flex items-center gap-4 flex-1 min-w-0">
+                                                    <div className="flex-shrink-0 w-10 h-10 rounded-xl bg-emerald-500/10 border border-emerald-500/20 flex items-center justify-center">
+                                                        <span className="text-emerald-400 font-bold text-sm">{index + 1}</span>
+                                                    </div>
+                                                    <div className="min-w-0">
+                                                        <span className="text-xs font-mono text-emerald-400/70 tracking-wider">{ps.id}</span>
+                                                        <h3 className="text-base md:text-lg font-semibold text-white truncate">{ps.title}</h3>
+                                                    </div>
                                                 </div>
-                                                <p className="text-slate-300 leading-relaxed text-sm whitespace-pre-line">{ps.problem}</p>
-                                            </div>
-
-                                            {/* Features */}
-                                            <div>
-                                                <div className="flex items-center gap-2 mb-2">
-                                                    <CheckCircle2 className="w-4 h-4 text-emerald-400" />
-                                                    <h4 className="text-xs font-semibold text-emerald-400 uppercase tracking-wider">Expected Features</h4>
+                                                <div className="flex-shrink-0 ml-3 text-slate-500">
+                                                    {isExpanded ? <ChevronUp className="w-5 h-5" /> : <ChevronDown className="w-5 h-5" />}
                                                 </div>
-                                                <ul className="space-y-2">
-                                                    {ps.features.map((f, i) => (
-                                                        <li key={i} className="flex items-start gap-2.5 text-slate-300 text-sm">
-                                                            <span className="flex-shrink-0 w-5 h-5 rounded-full bg-emerald-500/10 border border-emerald-500/25 flex items-center justify-center text-[10px] text-emerald-400 font-medium mt-0.5">
-                                                                {i + 1}
-                                                            </span>
-                                                            <span>{f}</span>
-                                                        </li>
-                                                    ))}
-                                                </ul>
                                             </div>
 
+                                            {/* Expanded content */}
+                                            {isExpanded && (
+                                                <div className="border-t border-white/5 bg-black/20 p-5 md:p-6 space-y-5">
+                                                    {/* Problem */}
+                                                    <div>
+                                                        <div className="flex items-center gap-2 mb-2">
+                                                            <Code className="w-4 h-4 text-emerald-400" />
+                                                            <h4 className="text-xs font-semibold text-emerald-400 uppercase tracking-wider">Problem</h4>
+                                                        </div>
+                                                        <p className="text-slate-300 leading-relaxed text-sm whitespace-pre-line">{ps.problem}</p>
+                                                    </div>
+
+                                                    {/* Features */}
+                                                    <div>
+                                                        <div className="flex items-center gap-2 mb-2">
+                                                            <CheckCircle2 className="w-4 h-4 text-emerald-400" />
+                                                            <h4 className="text-xs font-semibold text-emerald-400 uppercase tracking-wider">Expected Features</h4>
+                                                        </div>
+                                                        <ul className="space-y-2">
+                                                            {ps.features.map((f, i) => (
+                                                                <li key={i} className="flex items-start gap-2.5 text-slate-300 text-sm">
+                                                                    <span className="flex-shrink-0 w-5 h-5 rounded-full bg-emerald-500/10 border border-emerald-500/25 flex items-center justify-center text-[10px] text-emerald-400 font-medium mt-0.5">
+                                                                        {i + 1}
+                                                                    </span>
+                                                                    <span>{f}</span>
+                                                                </li>
+                                                            ))}
+                                                        </ul>
+                                                    </div>
 
 
-                                            {/* Bonus */}
-                                            {ps.bonus && (
-                                                <div className="bg-amber-500/5 border border-amber-500/20 rounded-lg p-4">
-                                                    <h4 className="text-xs font-semibold text-amber-400 uppercase tracking-wider mb-1.5">Bonus Tip</h4>
-                                                    <p className="text-slate-400 text-sm">{ps.bonus}</p>
+
+                                                    {/* Bonus */}
+                                                    {ps.bonus && (
+                                                        <div className="bg-amber-500/5 border border-amber-500/20 rounded-lg p-4">
+                                                            <h4 className="text-xs font-semibold text-amber-400 uppercase tracking-wider mb-1.5">Bonus Tip</h4>
+                                                            <p className="text-slate-400 text-sm">{ps.bonus}</p>
+                                                        </div>
+                                                    )}
                                                 </div>
                                             )}
-                                        </div>
-                                    )}
-                                </GlassCard>
-                            </div>
-                        );
-                    })}
-                </div>
+                                        </GlassCard>
+                                    </div>
+                                );
+                            })}
+                        </div>
+                    </>
+                )}
 
                 {/* Verify Your Ticket Section */}
                 <div className="max-w-xl mx-auto">
