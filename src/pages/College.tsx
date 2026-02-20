@@ -474,9 +474,10 @@ export default function College() {
                     <p className="text-sm text-foreground/50 mb-2">
                         © 2026 VSM's Somashekhar R. Kothiwale Institute of Technology, Nipani. All Rights Reserved.
                     </p>
-                    <p className="text-sm text-foreground/40 mt-3 pt-3 border-t border-primary/10 max-w-sm mx-auto">
-                        Website Developed by Mudassir Alladatkhan and team
-                    </p>
+                    <div className="text-sm text-foreground/40 mt-3 pt-3 border-t border-primary/10 max-w-sm mx-auto space-y-1">
+                        <p>Website Developed by Mudassir Alladatkhan and team</p>
+                        <p>All rights are reserved by Vikram Sarabhai Tech Club.</p>
+                    </div>
                 </div>
             </footer>
         </div>

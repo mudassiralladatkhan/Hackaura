@@ -1295,9 +1295,10 @@ export default function Home() {
               VSM's Somashekhar R Kothiwale Institute of Technology, Nipani
             </p>
 
-            <p className="text-sm text-foreground/50 mt-4 border-t border-primary/20 pt-4 max-w-lg mx-auto">
-              Website Developed by Mudassir Alladatkhan and team © 2026. All Rights Reserved.
-            </p>
+            <div className="text-sm text-foreground/50 mt-4 border-t border-primary/20 pt-4 max-w-lg mx-auto space-y-1">
+              <p>Website Developed by Mudassir Alladatkhan and team</p>
+              <p>All rights are reserved by Vikram Sarabhai Tech Club.</p>
+            </div>
           </div>
         </div>
       </footer>
