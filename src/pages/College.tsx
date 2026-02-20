@@ -471,8 +471,11 @@ export default function College() {
             {/* Footer */}
             <footer className="relative py-8 px-4 border-t border-primary/20">
                 <div className="container mx-auto text-center">
-                    <p className="text-sm text-foreground/50">
+                    <p className="text-sm text-foreground/50 mb-2">
                         © 2026 VSM's Somashekhar R. Kothiwale Institute of Technology, Nipani. All Rights Reserved.
+                    </p>
+                    <p className="text-sm text-foreground/40 mt-3 pt-3 border-t border-primary/10 max-w-sm mx-auto">
+                        Website Developed by Mudassir Alladatkhan and team
                     </p>
                 </div>
             </footer>
