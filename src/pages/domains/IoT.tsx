@@ -158,15 +158,7 @@ export default function IoT() {
                 timeout: 30000
             }).json<any>();
             if (response.result === 'success') {
-                if (_assignedProblem) { await fetchAssignedProblem(); return; }
-                try {
-                    const assignResponse = await ky.get(GOOGLE_SCRIPT_API_URL, {
-                        searchParams: { action: 'assignProblem', ticketId: ticketId.trim(), problemNumber: '1' },
-                        timeout: 30000
-                    }).json<any>();
-                    if (assignResponse.result === 'success') { await fetchAssignedProblem(); }
-                    else { setError(assignResponse.message || 'Failed to assign problem'); }
-                } catch { await fetchAssignedProblem(); }
+                await fetchAssignedProblem();
             } else {
                 setError(response.message || 'Invalid OTP');
             }
