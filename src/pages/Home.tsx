@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { Zap, Calendar, Sparkles, Users, Trophy, Clock, Award, MapPin, Phone, Menu, X, Coffee, Utensils, Mail, Flame, School, Cpu, Lock, MessageSquare } from 'lucide-react';
+import { Zap, Calendar, Sparkles, Users, Trophy, Clock, Award, MapPin, Phone, Menu, X, Coffee, Utensils, Mail, Flame, School, Cpu, Lock, MessageSquare, ChevronRight } from 'lucide-react';
 import { ParticleBackground } from '@/components/ui/particle-background';
 import { CountdownTimer } from '@/components/ui/countdown-timer';
 import { NeonButton } from '@/components/ui/neon-button';
@@ -207,17 +207,17 @@ export default function Home() {
             </div>
 
             {/* Problem Statement Announcements */}
-            <div className="mt-12 animate-fade-in">
-              <GlassCard className="max-w-4xl mx-auto p-6 border-neon-yellow/30 bg-neon-yellow/5">
+            <div className="mt-12 animate-fade-in space-y-6 max-w-4xl mx-auto">
+              <GlassCard className="p-6 border-neon-yellow/30 bg-neon-yellow/5">
                 <h3 className="text-xl md:text-2xl font-bold mb-2 text-neon-yellow flex items-center justify-center gap-2">
                   <Lock className="w-6 h-6" />
                   PROBLEM STATEMENTS
                   <Lock className="w-6 h-6" />
                 </h3>
-                <p className="text-neon-yellow/60 text-sm mb-6 uppercase tracking-widest">
+                <p className="text-neon-yellow/60 text-sm mb-6 uppercase tracking-widest text-center">
                   Revealing at Venue on March 12th
                 </p>
-                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+                <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
                   <button disabled className="w-full py-3 px-4 rounded-xl border border-cyan-500/30 bg-cyan-500/5 text-cyan-500/50 font-semibold cursor-not-allowed flex items-center justify-center gap-2">
                     <Lock className="w-4 h-4" />
                     Gen AI
@@ -230,9 +230,29 @@ export default function Home() {
                     <Lock className="w-4 h-4" />
                     Full Stack
                   </button>
-                  <Link to="/domains/iot" className="w-full py-3 px-4 rounded-xl border border-neon-magenta/50 bg-neon-magenta/10 text-neon-magenta font-semibold flex items-center justify-center gap-2 hover:bg-neon-magenta/20 hover:border-neon-magenta/70 transition-all">
-                    IoT
-                  </Link>
+                </div>
+              </GlassCard>
+
+              <GlassCard className="p-6 border-emerald-500/30 bg-emerald-500/5 relative overflow-hidden group">
+                {/* Decorative background glow */}
+                <div className="absolute top-0 right-0 w-64 h-64 bg-emerald-500/10 rounded-full blur-3xl group-hover:bg-emerald-500/20 transition-all duration-500 pointer-events-none" />
+
+                <div className="relative z-10 flex flex-col md:flex-row items-center justify-between gap-6">
+                  <div className="text-center md:text-left flex-1">
+                    <h3 className="text-xl md:text-2xl font-bold mb-2 text-emerald-400 flex items-center justify-center md:justify-start gap-2">
+                      <Cpu className="w-6 h-6" />
+                      IoT Problems are Public!
+                    </h3>
+                    <p className="text-emerald-400/80 text-sm md:text-base leading-relaxed">
+                      The Internet of Things challenges require hardware preparation. View the detailed problem statements early so you can prepare your solutions!
+                    </p>
+                  </div>
+                  <div className="flex-shrink-0 w-full md:w-auto">
+                    <Link to="/domains/iot" className="w-full py-4 px-6 rounded-xl border border-emerald-500/50 bg-emerald-500/10 text-emerald-400 font-semibold flex items-center justify-center gap-2 hover:bg-emerald-500/20 hover:border-emerald-400 hover:shadow-[0_0_20px_rgba(16,185,129,0.3)] transition-all">
+                      View IoT Problems
+                      <ChevronRight className="w-5 h-5" />
+                    </Link>
+                  </div>
                 </div>
               </GlassCard>
             </div>

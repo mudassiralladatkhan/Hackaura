@@ -21,7 +21,6 @@ const iotProblems = [
             'Alert system with buzzer and LED indicators for overflow warning and critically low water levels',
             'Historical data logging — store water level readings with timestamps for usage analysis',
         ],
-        components: 'Ultrasonic sensor (HC-SR04), Relay module (5V), ESP32/NodeMCU, Buzzer, LED indicators (Red/Green), Jumper wires, Breadboard, Small water pump (for demo)',
         bonus: 'Add mobile push notifications using Blynk or Firebase. Implement a water usage tracker showing daily/weekly consumption trends.',
     },
     {
@@ -35,7 +34,6 @@ const iotProblems = [
             'Web dashboard with live sensor data visualization using line charts and graphs showing trends over time',
             'Alert system for extreme weather conditions — dashboard notifications and buzzer alarm for extreme heat, drought, or waterlogged conditions',
         ],
-        components: 'Soil moisture sensor (capacitive recommended), DHT11/DHT22 sensor, Relay module (5V), Mini water pump or servo valve, ESP32/NodeMCU, Buzzer, LED indicators, Breadboard, Jumper wires',
         bonus: 'Add an LDR (Light Dependent Resistor) to monitor sunlight exposure. Implement a crop recommendation engine that suggests suitable crops based on current soil and weather conditions.',
     },
     {
@@ -49,8 +47,7 @@ const iotProblems = [
             'Emergency alert system — buzzer sounds, red LED flashes, and dashboard notification when vitals cross predefined thresholds',
             'Data logging with timestamps — store every reading in a database or spreadsheet for doctor review and trend analysis',
         ],
-        components: 'Pulse sensor (SEN-11574), Temperature sensor (LM35 or DS18B20), ESP32/NodeMCU, Buzzer (active), LEDs (Green/Red), OLED display (optional for bedside readings), Breadboard, Jumper wires',
-        bonus: 'Add SpO2 (blood oxygen) monitoring using a MAX30100/MAX30102 sensor. Implement SMS alerts to emergency contacts using Twilio or a GSM module.',
+        bonus: 'Add SpO2 (blood oxygen) monitoring using a MAX30102 sensor. Implement SMS alerts to emergency contacts using Twilio or a GSM module.',
     },
     {
         id: 'PS-4',
@@ -63,7 +60,6 @@ const iotProblems = [
             'Cost estimation — calculate daily, weekly, and monthly electricity cost based on local unit rate',
             'PIR motion sensor for motion-based lighting control — auto ON when room is occupied, auto OFF when empty (optional but recommended)',
         ],
-        components: 'ACS712 current sensor (5A/20A), Relay module (single/dual channel), PIR motion sensor (HC-SR501), ESP32/NodeMCU, LED indicators, OLED display (optional), Breadboard, Jumper wires, AC bulb/fan for demo',
         bonus: 'Add a daily energy report emailed to the user. Implement a peak hours detector that warns when usage is high during expensive tariff windows.',
     },
     {
@@ -77,7 +73,6 @@ const iotProblems = [
             'Available spot counter on LCD display at the parking entrance showing remaining spots (e.g., Available: 12/50)',
             'Data logging — track parking lot utilization over time, peak hours, and average occupancy rate',
         ],
-        components: 'IR sensors (2-4 for demo slots), Servo motor (SG90 for gate), LCD display (16x2 I2C), ESP32/NodeMCU, LEDs (Red/Green per slot), Breadboard, Jumper wires, Cardboard or 3D printed parking model for demo',
         bonus: 'Add a reservation system via the web dashboard where users can reserve a slot in advance. Implement automatic billing based on parking duration.',
     },
     {
@@ -93,7 +88,6 @@ const iotProblems = [
             'Data logging with timestamps for every sensor reading — exportable for compliance reports and safety audits',
             'Live web dashboard showing zone-wise safety status with color-coded indicators (Green/Yellow/Red)',
         ],
-        components: 'MQ-2 or MQ-5 gas sensor, Flame sensor (IR-based), DHT11/DHT22 sensor, Relay module (for fan/vent), Buzzer (active), LEDs (Green/Yellow/Red), ESP32/NodeMCU, Mini DC fan (for demo exhaust), Breadboard, Jumper wires',
         bonus: 'Add SMS/email emergency alerts to safety officers using Twilio or SMTP. Implement a Safety Score metric that rates workplace safety based on sensor history.',
     },
 ];
@@ -436,6 +430,15 @@ export default function IoT() {
                                                 </div>
                                             </div>
 
+                                            <div>
+                                                <div className="flex items-center gap-2 mb-3">
+                                                    <Target className="w-5 h-5 text-emerald-400" />
+                                                    <h3 className="text-sm font-semibold text-emerald-400 uppercase tracking-wider">Bonus Tip</h3>
+                                                </div>
+                                                <div className="bg-amber-500/5 border border-amber-500/20 rounded-xl p-5">
+                                                    <p className="text-slate-300 text-sm">{assignedPSDetails.bonus}</p>
+                                                </div>
+                                            </div>
                                         </>
                                     )}
 
