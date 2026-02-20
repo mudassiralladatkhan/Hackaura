@@ -187,11 +187,10 @@ export default function Home() {
                   Register Now
                 </NeonButton>
               </Link>
-              <Link to="/submit">
-                <NeonButton variant="secondary" className="w-full sm:w-auto min-w-[200px] text-lg py-6 border-purple-500/50 hover:bg-purple-500/10 hover:border-purple-400 text-purple-300">
-                  Submit Project
-                </NeonButton>
-              </Link>
+              <button disabled className="w-full sm:w-auto min-w-[200px] text-lg py-6 rounded-xl border border-purple-500/30 bg-purple-500/5 text-purple-500/50 font-semibold cursor-not-allowed flex items-center justify-center gap-2">
+                <Lock className="w-5 h-5" />
+                Submit Project
+              </button>
               <Link to="/chatbot">
                 <NeonButton variant="secondary" className="w-full sm:w-auto min-w-[200px] text-lg py-6 border-pink-500/50 hover:bg-pink-500/10 hover:border-pink-400 text-pink-300 flex items-center justify-center gap-2">
                   <MessageSquare className="w-5 h-5" />
