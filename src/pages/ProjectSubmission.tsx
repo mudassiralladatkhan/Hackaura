@@ -66,6 +66,7 @@ export default function ProjectSubmission() {
             }
         } catch (error) {
             setError('Network error. Please try again.');
+        } finally {
             setValidating(false);
         }
     };
@@ -101,6 +102,7 @@ export default function ProjectSubmission() {
             }
         } catch (error) {
             setError('Verification failed. Please check your connection.');
+        } finally {
             setValidating(false);
         }
     };
@@ -175,6 +177,7 @@ export default function ProjectSubmission() {
             }
         } catch (error) {
             alert('Network error. Please try again.');
+        } finally {
             setSubmitting(false);
         }
     };
