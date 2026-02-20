@@ -92,7 +92,17 @@ export default function ProjectSubmission() {
 
                     // Pre-fill the project title if a problem statement exists
                     if (teamResponse.problemTitle) {
-                        setValue('title', teamResponse.problemTitle);
+                        const iotMap: Record<string, string> = {
+                            "Internet of Things Problem Statement 1": "Smart Water Management System",
+                            "Internet of Things Problem Statement 2": "Smart Agriculture Monitoring System",
+                            "Internet of Things Problem Statement 3": "Patient Health Monitoring & Emergency Alert",
+                            "Internet of Things Problem Statement 4": "Smart Home Energy Monitor & Optimizer",
+                            "Internet of Things Problem Statement 5": "Smart Parking & Traffic Management",
+                            "Internet of Things Problem Statement 6": "Industrial Safety & Environmental Monitoring"
+                        };
+
+                        const displayTitle = iotMap[teamResponse.problemTitle] || teamResponse.problemTitle;
+                        setValue('title', displayTitle);
                     }
 
                     setStep('form');
