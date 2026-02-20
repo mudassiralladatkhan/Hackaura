@@ -243,9 +243,14 @@ export default function Home() {
                       <Cpu className="w-6 h-6" />
                       IoT Problems are Public!
                     </h3>
-                    <p className="text-emerald-400/80 text-sm md:text-base leading-relaxed">
+                    <p className="text-emerald-400/80 text-sm md:text-base leading-relaxed mb-3">
                       The Internet of Things challenges require hardware preparation. View the detailed problem statements early so you can prepare your solutions!
                     </p>
+                    <div className="bg-emerald-500/20 border border-emerald-500/30 rounded-lg p-3 inline-block">
+                      <p className="text-emerald-300 text-xs md:text-sm font-medium">
+                        ⚖️ <strong className="text-emerald-200">Point System:</strong> The judging criteria is heavily weighted based on the complexity of the problem. Harder problems will yield more points!
+                      </p>
+                    </div>
                   </div>
                   <div className="flex-shrink-0 w-full md:w-auto">
                     <Link to="/iot" className="w-full py-4 px-6 rounded-xl border border-emerald-500/50 bg-emerald-500/10 text-emerald-400 font-semibold flex items-center justify-center gap-2 hover:bg-emerald-500/20 hover:border-emerald-400 hover:shadow-[0_0_20px_rgba(16,185,129,0.3)] transition-all">

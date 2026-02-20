@@ -2,7 +2,7 @@ import { useState } from 'react';
 import { ParticleBackground } from '@/components/ui/particle-background';
 import { GlassCard } from '@/components/ui/glass-card';
 import { NeonButton } from '@/components/ui/neon-button';
-import { Loader2, Cpu, Mail, Target, Code, CheckCircle2, ArrowLeft, ChevronDown, ChevronUp } from 'lucide-react';
+import { Loader2, Cpu, Mail, Target, Code, CheckCircle2, ArrowLeft, ChevronDown, ChevronUp, AlertTriangle } from 'lucide-react';
 import ky from 'ky';
 import { Link } from 'react-router-dom';
 
@@ -216,9 +216,22 @@ export default function IoT() {
                                     IoT Problem Statements
                                 </span>
                             </h1>
-                            <p className="text-slate-400 text-lg max-w-lg mx-auto">
+                            <p className="text-slate-400 text-lg max-w-lg mx-auto mb-8">
                                 6 challenges across beginner to advanced levels. Click any problem to view details.
                             </p>
+
+                            {/* Point System Disclaimer */}
+                            <div className="max-w-3xl mx-auto bg-amber-500/10 border border-amber-500/30 rounded-2xl p-4 md:p-5 flex items-start gap-4 text-left shadow-[0_0_20px_rgba(245,158,11,0.1)]">
+                                <div className="p-2 bg-amber-500/20 rounded-lg flex-shrink-0 mt-1">
+                                    <AlertTriangle className="w-6 h-6 text-amber-400" />
+                                </div>
+                                <div>
+                                    <h3 className="text-amber-400 font-bold text-lg mb-1">Important: Fairness & Point Weightage</h3>
+                                    <p className="text-amber-200/80 text-sm leading-relaxed">
+                                        To ensure a fair competition since these problem statements are public, <strong>the judging criteria is heavily weighted based on the complexity of the problem chosen</strong>. Attempting and executing a harder problem statement will yield significantly more points than an easier one. Choose your challenge wisely!
+                                    </p>
+                                </div>
+                            </div>
                         </div>
 
                         {/* Problem Statements Grid */}
