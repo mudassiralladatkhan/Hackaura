@@ -176,7 +176,7 @@ export default function Home() {
           <ScrollAnimation direction="up" delay={0.4}>
             <p className="text-base xl:text-lg text-foreground/70 max-w-2xl mx-auto mb-8">
               Join us for a 24-hour national-level hackathon organized by Vikram Sarabhai Tech Club at VSMSRKIT, Nipani.
-              Compete in Generative AI, Cybersecurity, and Full Stack domains for a prize pool of ₹1,00,000.
+              Compete in Generative AI, Cybersecurity, Full Stack, and IoT domains for a prize pool of ₹1,00,000.
             </p>
           </ScrollAnimation>
 
