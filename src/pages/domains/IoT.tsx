@@ -169,6 +169,21 @@ export default function IoT() {
     const fetchAssignedProblem = async () => {
         setLoading(true);
         try {
+            // Since IoT teams choose problems at registration, we fetch it from team details
+            const teamResponse = await ky.get(`${GOOGLE_SCRIPT_API_URL}?action=getTeamDetails&ticketId=${ticketId.trim()}`, {
+                timeout: 30000
+            }).json<any>();
+
+            if (teamResponse.result === 'success' && teamResponse.problemTitle) {
+                const match = teamResponse.problemTitle.match(/\d+/);
+                if (match) {
+                    setProblem({ number: match[0] });
+                    setStep('problem');
+                    return;
+                }
+            }
+
+            // Fallback for edge cases
             const response = await ky.get(GOOGLE_SCRIPT_API_URL, {
                 searchParams: { action: 'getAssignedProblem', ticketId: ticketId.trim() },
                 timeout: 30000
