@@ -248,7 +248,7 @@ export default function Home() {
                     </p>
                   </div>
                   <div className="flex-shrink-0 w-full md:w-auto">
-                    <Link to="/domains/iot" className="w-full py-4 px-6 rounded-xl border border-emerald-500/50 bg-emerald-500/10 text-emerald-400 font-semibold flex items-center justify-center gap-2 hover:bg-emerald-500/20 hover:border-emerald-400 hover:shadow-[0_0_20px_rgba(16,185,129,0.3)] transition-all">
+                    <Link to="/iot" className="w-full py-4 px-6 rounded-xl border border-emerald-500/50 bg-emerald-500/10 text-emerald-400 font-semibold flex items-center justify-center gap-2 hover:bg-emerald-500/20 hover:border-emerald-400 hover:shadow-[0_0_20px_rgba(16,185,129,0.3)] transition-all">
                       View IoT Problems
                       <ChevronRight className="w-5 h-5" />
                     </Link>
