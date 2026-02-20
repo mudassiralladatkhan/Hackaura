@@ -117,7 +117,8 @@ export const HACKATHON_DATA = {
     faqs: {
         accommodation: "Yes, accommodation is provided for the night at the venue.",
         washrooms: "Yes, separate washrooms and facilities to freshen up are available.",
-        food: "Food is provided! 🍽️ Includes Evening Snacks, Dinner, Midnight Snacks, Breakfast, and Lunch.",
+        food: "Food is provided! 🍽️ Includes Evening Snacks, Dinner, Midnight Snacks, Breakfast, and Lunch. We also provide special arrangements for Sehri and Iftar for fasting participants.",
+        roza: "Yes! Special arrangements for Sehri and Iftar will be provided for all participants who are observing Roza (fasting).",
         wifi: "Yes, Wi-Fi/Internet is available at the venue.",
         power: "We provide a single power socket per team. Please BRING YOUR OWN EXTENSION BOARD/SPIKE BUSTER.",
         iot: "For IoT track: You must BRING YOUR OWN COMPONENTS (Sensors, Arduino, Pi, etc.) relevant to your problem statement.",
