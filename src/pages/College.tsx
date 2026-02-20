@@ -234,7 +234,7 @@ export default function College() {
                             <GlassCard glowColor="pink" hover3d className="max-w-3xl w-full">
                                 <div className="text-center py-4">
                                     <img
-                                        src="/ceo.jpg"
+                                        src="/ceo.png"
                                         alt="Dr. Siddagouda Patil"
                                         className="w-28 h-28 mx-auto mb-4 rounded-full object-cover border-3 border-neon-magenta/40 shadow-lg"
                                         onError={(e) => {
