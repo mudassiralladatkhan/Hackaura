@@ -221,7 +221,7 @@ export default function College() {
                                     <h3 className="text-2xl font-bold text-white mb-1">Shri Chandrakanth S. Kothiwale</h3>
                                     <p className="text-neon-yellow font-semibold uppercase tracking-wider text-sm mb-4">Chairman, VSM Nipani</p>
                                     <p className="text-foreground/70 text-sm max-w-xl mx-auto leading-relaxed">
-                                        "VSMSRKIT was established in 2010 with the aim to impart quality education to the rural youth and to the border area students of Karnataka and Maharashtra states. The institute is located on National Highway No. 4, 70 km from Belagavi and 35 km from Kolhapur."
+                                        The institute was established in 2010 by the Vidya Samvardhak Mandal (VSM) to empower rural youth through technical education. The institution is run by the Vidya Samvardhak Mandal (VSM), which has been operating various educational institutions in the area since 1963.
                                     </p>
                                 </div>
                             </GlassCard>
@@ -271,11 +271,16 @@ export default function College() {
                                     <h3 className="text-2xl font-bold text-white mb-1">Dr. Umesh P. Patil</h3>
                                     <p className="text-amber-500 font-semibold uppercase tracking-wider text-sm mb-4">Principal & Director</p>
                                     <p className="text-foreground/70 text-sm max-w-xl mx-auto leading-relaxed">
-                                        "It is my great pleasure to welcome you to VSM's Somashekhar R. Kothiwale Institute Of Technology run by Vidya Samvardhak Mandal. Today, the role of an Institute is not only to pursue academic excellence but also to motivate and empower students."
+                                        Dr. Umesh P Patil is a highly experienced academic leader with over 31 years of experience in the field of structural engineering and holds an ME and Ph.D. He plays a key role in the administration of the institute, which focuses on providing quality education to rural youth and technical training in the border areas of Karnataka.
                                     </p>
-                                    <a href="tel:9880217636" className="inline-flex items-center gap-2 mt-4 text-primary hover:text-primary/80 transition-colors text-sm font-medium">
-                                        <Phone className="w-4 h-4" /> 9880217636
-                                    </a>
+                                    <div className="flex flex-col sm:flex-row items-center justify-center gap-4 mt-4">
+                                        <a href="tel:9964639584" className="inline-flex items-center gap-2 text-primary hover:text-primary/80 transition-colors text-sm font-medium">
+                                            <Phone className="w-4 h-4" /> 9964639584
+                                        </a>
+                                        <a href="mailto:principalvsmit@gmail.com" className="inline-flex items-center gap-2 text-primary hover:text-primary/80 transition-colors text-sm font-medium">
+                                            <Mail className="w-4 h-4" /> principalvsmit@gmail.com
+                                        </a>
+                                    </div>
                                 </div>
                             </GlassCard>
                         </div>
