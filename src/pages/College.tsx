@@ -228,6 +228,24 @@ export default function College() {
                         </div>
                     </ScrollAnimation>
 
+                    {/* CEO */}
+                    <ScrollAnimation direction="up" delay={0.25}>
+                        <div className="flex justify-center mb-10">
+                            <GlassCard glowColor="pink" hover3d className="max-w-3xl w-full">
+                                <div className="text-center py-4">
+                                    <div className="w-28 h-28 mx-auto mb-4 rounded-full bg-primary/20 flex items-center justify-center border-3 border-neon-magenta/40 shadow-lg">
+                                        <Users className="w-12 h-12 text-primary" />
+                                    </div>
+                                    <h3 className="text-2xl font-bold text-white mb-1">Dr. Siddagouda Patil</h3>
+                                    <p className="text-neon-magenta font-semibold uppercase tracking-wider text-sm mb-4">CEO, VSM Nipani</p>
+                                    <p className="text-foreground/70 text-sm max-w-xl mx-auto leading-relaxed">
+                                        As the CEO of the VSM Group of Institutions, Dr. Siddagouda Patil is a key member of the management, fostering technical education in the region and guiding VSMSRKIT towards fulfilling its vision of empowering rural youth.
+                                    </p>
+                                </div>
+                            </GlassCard>
+                        </div>
+                    </ScrollAnimation>
+
                     {/* Principal */}
                     <ScrollAnimation direction="up" delay={0.3}>
                         <div className="flex justify-center mb-10">
