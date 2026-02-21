@@ -548,6 +548,12 @@ export default function Register() {
                                         <Download className="w-3 h-3" />
                                         Download QR
                                     </a>
+                                    <div className="mt-3 p-2.5 bg-yellow-500/10 border border-yellow-500/30 rounded-lg text-center">
+                                        <p className="text-xs font-semibold text-yellow-400 flex items-center justify-center gap-1.5">
+                                            <AlertTriangle className="w-3.5 h-3.5" />
+                                            Note: Only PhonePe payment screenshots are accepted with UTR Transaction ID.
+                                        </p>
+                                    </div>
                                 </div>
 
                                 <p className="flex items-center gap-2 mb-2">
