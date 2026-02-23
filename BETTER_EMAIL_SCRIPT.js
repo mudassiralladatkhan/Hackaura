@@ -649,10 +649,38 @@ function doGet(e) {
             var emailQuota = MailApp.getRemainingDailyQuota(); // NEW: Get Quota
 
             if (collegeIdx > -1) {
+                // Patterns to detect VSMSRKIT variations, including full names
+                var vsmPatterns = [
+                    'vsmsrkit', 'vsm srkit', 'vsm s r k', 'v.s.m',
+                    'vsmit', 'vsm it',
+                    'kothiwale', 'kothawal', 'somashekhar', 'somasekhar',
+                    'vsm nipani', 'vsm, nipani',
+                    'vidya samvardhak mandal', 'vidya samvardhak',
+                    'institute of technology nipani', 'institute of technology, nipani'
+                ];
+
                 for (var k = 1; k < data.length; k++) {
                     var collegeName = data[k][collegeIdx];
                     if (collegeName && String(collegeName).trim() !== "") {
                         var normalized = String(collegeName).trim().toLowerCase();
+
+                        // Check if it's a variation of VSMSRKIT
+                        var isVSM = false;
+                        for (var p = 0; p < vsmPatterns.length; p++) {
+                            if (normalized.indexOf(vsmPatterns[p]) > -1) {
+                                isVSM = true;
+                                break;
+                            }
+                        }
+
+                        // Group all VSM variations under exactly one name
+                        if (isVSM) {
+                            normalized = 'vsmsrkit_standardized';
+                        } else {
+                            // Basic normalization for other colleges (removes punctuation/spaces)
+                            normalized = normalized.replace(/[^a-z0-9]/g, '');
+                        }
+
                         if (!uniqueColleges[normalized]) {
                             uniqueColleges[normalized] = true;
                             uniqueCount++;
@@ -720,6 +748,60 @@ function doGet(e) {
                 'result': 'success',
                 'exists': found,
                 'teamName': foundTeam
+            });
+        }
+
+        // --- HOST COLLEGE REGISTRATION LIMIT CHECK ---
+        if (action === 'checkCollegeCount') {
+            var collegeIdx = getHeaderIndex(headers, ['College', 'College Name', 'Institute']);
+            var count = 0;
+
+            if (collegeIdx > -1) {
+                // All known variations/keywords for VSMSRKIT (matches getStats logic)
+                var vsmsrkitKeywords = [
+                    'vsmsrkit', 'vsm srkit', 'vsm s r k', 'v.s.m',
+                    'vsmit', 'vsm it',
+                    'kothiwale', 'kothawal', 'somashekhar', 'somasekhar',
+                    'vsm nipani', 'vsm, nipani',
+                    'vidya samvardhak mandal', 'vidya samvardhak',
+                    'institute of technology nipani', 'institute of technology, nipani'
+                ];
+
+                for (var i = 1; i < data.length; i++) {
+                    var cellValue = String(data[i][collegeIdx] || '').toLowerCase().trim();
+                    if (!cellValue) continue;
+
+                    var isMatch = false;
+
+                    // Check direct keyword matches
+                    for (var j = 0; j < vsmsrkitKeywords.length; j++) {
+                        if (cellValue.indexOf(vsmsrkitKeywords[j]) > -1) {
+                            isMatch = true;
+                            break;
+                        }
+                    }
+
+                    // Check combination patterns (VSM + institute/technology/nipani)
+                    if (!isMatch) {
+                        var hasVSM = cellValue.indexOf('vsm') > -1;
+                        var hasNipani = cellValue.indexOf('nipani') > -1;
+                        var hasTech = cellValue.indexOf('technology') > -1 || cellValue.indexOf('tech') > -1;
+                        var hasInstitute = cellValue.indexOf('institute') > -1 || cellValue.indexOf('inst') > -1;
+
+                        if (hasVSM && (hasNipani || hasTech || hasInstitute)) {
+                            isMatch = true;
+                        }
+                    }
+
+                    if (isMatch) count++;
+                }
+            }
+
+            return createCORSResponse({
+                'result': 'success',
+                'count': count,
+                'college': 'VSMSRKIT',
+                'limit': 10
             });
         }
 

@@ -1,4 +1,4 @@
-import { useState, useCallback } from 'react';
+import { useState, useCallback, useEffect } from 'react';
 import { useForm, useFieldArray } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import * as z from 'zod';
@@ -13,6 +13,50 @@ import { analyzePaymentScreenshot, type PaymentVerificationResult } from '@/lib/
 import { PaymentVerificationBadge } from '@/components/ui/PaymentVerificationBadge';
 
 import { GOOGLE_SCRIPT_API_URL, GOOGLE_FORM_ACTION_URL, GOOGLE_FORM_ENTRY_IDS } from '@/lib/config';
+
+// ── Host College Registration Limit ──────────────────────────────
+const HOST_COLLEGE_MAX_TEAMS = 10;
+const HOST_COLLEGE_OFFICIAL_NAME = "VSM's Somashekhar R Kothiwale Institute of Technology, Nipani";
+
+/**
+ * Detects whether the entered college name is a variation of VSMSRKIT.
+ * Catches all common abbreviations, typos, and alternate names.
+ */
+function isHostCollege(collegeName: string): boolean {
+    if (!collegeName || collegeName.length < 3) return false;
+    const n = collegeName.toLowerCase().trim().replace(/[\u2018\u2019'']/g, "'").replace(/\s+/g, ' ');
+
+    // Direct abbreviation matches
+    const directMatches = ['vsmsrkit', 'vsmit', 'vsm it', 'vsm srkit', 'vsm\'s srkit'];
+    for (const alias of directMatches) {
+        if (n.includes(alias)) return true;
+    }
+
+    // Phrase-based matches
+    const phraseMatches = [
+        'vsm\'s somashekhar', 'vsm somashekhar', 'somashekhar r kothiwale',
+        'somashekhar r. kothiwale', 'kothiwale institute of technology',
+        'vsm institute of technology', 'vsm\'s institute of technology',
+        'vidya samvardhak mandal',
+    ];
+    for (const phrase of phraseMatches) {
+        if (n.includes(phrase)) return true;
+    }
+
+    // Combination-based detection
+    const hasVSM = /\bvsm\b/.test(n) || n.includes('vidya samvardhak');
+    const hasKothiwale = n.includes('kothiwale');
+    const hasNipani = n.includes('nipani');
+    const hasTech = n.includes('technology') || n.includes('tech');
+    const hasInstitute = n.includes('institute') || n.includes('inst');
+    const hasSomashekhar = n.includes('somashekhar') || n.includes('somshekhar') || n.includes('somashekar');
+
+    if (hasVSM && (hasKothiwale || hasNipani || hasTech || hasInstitute)) return true;
+    if (hasKothiwale && (hasInstitute || hasTech || hasNipani)) return true;
+    if (hasSomashekhar && (hasInstitute || hasTech || hasKothiwale)) return true;
+
+    return false;
+}
 
 // Generic Duplicate Checker Helper
 
@@ -72,6 +116,9 @@ export default function Register() {
     const [ocrVerificationStatus, setOcrVerificationStatus] = useState<'idle' | 'analyzing' | 'success' | 'failed'>('idle');
     const [ocrResults, setOcrResults] = useState<PaymentVerificationResult | null>(null);
     const [extractedUTR, setExtractedUTR] = useState<string | null>(null);
+    const [collegeLimitReached, setCollegeLimitReached] = useState(false);
+    const [collegeLimitCount, setCollegeLimitCount] = useState<number | null>(null);
+    const [checkingCollegeLimit, setCheckingCollegeLimit] = useState(false);
 
     const { register, control, handleSubmit, watch, formState: { errors, isSubmitting: formSubmitting, isValidating } } = useForm<FormData>({
         resolver: zodResolver(formSchema),
@@ -92,6 +139,33 @@ export default function Register() {
         control,
         name: "members"
     });
+
+    // Watch college name for host college limit check
+    const watchedCollegeName = watch('collegeName');
+
+    useEffect(() => {
+        const timer = setTimeout(async () => {
+            if (watchedCollegeName && watchedCollegeName.length >= 3 && isHostCollege(watchedCollegeName)) {
+                setCheckingCollegeLimit(true);
+                try {
+                    const response = await fetch(`${GOOGLE_SCRIPT_API_URL}?action=checkCollegeCount&college=VSMSRKIT`);
+                    const data = await response.json();
+                    const count = data.count || 0;
+                    setCollegeLimitCount(count);
+                    setCollegeLimitReached(count >= HOST_COLLEGE_MAX_TEAMS);
+                } catch (error) {
+                    console.error('Failed to check college limit:', error);
+                    setCollegeLimitReached(false);
+                    setCollegeLimitCount(null);
+                }
+                setCheckingCollegeLimit(false);
+            } else {
+                setCollegeLimitReached(false);
+                setCollegeLimitCount(null);
+            }
+        }, 600);
+        return () => clearTimeout(timer);
+    }, [watchedCollegeName]);
 
     const onDrop = useCallback(async (acceptedFiles: File[]) => {
         if (acceptedFiles.length > 0) {
@@ -198,6 +272,27 @@ export default function Register() {
 
     const onSubmit = async (data: FormData) => {
         setIsSubmitting(true);
+
+        // Double-check college limit at submit time for host college
+        if (isHostCollege(data.collegeName)) {
+            try {
+                const response = await fetch(`${GOOGLE_SCRIPT_API_URL}?action=checkCollegeCount&college=VSMSRKIT`);
+                const result = await response.json();
+                const currentCount = result.count || 0;
+                if (currentCount >= HOST_COLLEGE_MAX_TEAMS) {
+                    setCollegeLimitReached(true);
+                    setCollegeLimitCount(currentCount);
+                    toast.error("Registration Limit Reached!", {
+                        description: `Maximum ${HOST_COLLEGE_MAX_TEAMS} teams from VSMSRKIT have already been registered. No more registrations are accepted from this college.`,
+                        duration: 8000
+                    });
+                    setIsSubmitting(false);
+                    return;
+                }
+            } catch (error) {
+                console.warn('College limit check failed at submit, continuing:', error);
+            }
+        }
 
         if (!paymentScreenshot) {
             toast.error("Payment Screenshot Required", {
@@ -362,6 +457,40 @@ export default function Register() {
                                         />
                                     </div>
                                     {errors.collegeName && <p className="text-red-400 text-xs">{errors.collegeName.message}</p>}
+
+                                    {/* Host College Registration Limit Warning */}
+                                    {watchedCollegeName && isHostCollege(watchedCollegeName) && (
+                                        <div className={`mt-2 p-3 rounded-lg border text-sm animate-in fade-in slide-in-from-top-2 duration-300 ${collegeLimitReached
+                                            ? 'bg-red-500/10 border-red-500/30'
+                                            : 'bg-blue-500/10 border-blue-500/30'
+                                            }`}>
+                                            {checkingCollegeLimit ? (
+                                                <div className="flex items-center gap-2 text-blue-400 text-xs">
+                                                    <Loader2 className="w-3.5 h-3.5 animate-spin" />
+                                                    Checking registration limit for VSMSRKIT...
+                                                </div>
+                                            ) : collegeLimitReached ? (
+                                                <div className="flex items-start gap-2 text-red-400">
+                                                    <AlertTriangle className="w-4 h-4 mt-0.5 flex-shrink-0" />
+                                                    <div>
+                                                        <p className="font-semibold text-sm">🚫 Registration Limit Reached!</p>
+                                                        <p className="text-xs mt-1 text-red-400/80">
+                                                            Maximum {HOST_COLLEGE_MAX_TEAMS} teams ({collegeLimitCount}/{HOST_COLLEGE_MAX_TEAMS}) from {HOST_COLLEGE_OFFICIAL_NAME} have already registered.
+                                                            No more registrations from this college are accepted.
+                                                        </p>
+                                                    </div>
+                                                </div>
+                                            ) : collegeLimitCount !== null ? (
+                                                <div className="flex items-center gap-2 text-blue-400">
+                                                    <CheckCircle2 className="w-4 h-4 flex-shrink-0" />
+                                                    <p className="text-xs">
+                                                        VSMSRKIT: <strong>{collegeLimitCount}/{HOST_COLLEGE_MAX_TEAMS}</strong> team slots used.
+                                                        <strong className="text-green-400"> {HOST_COLLEGE_MAX_TEAMS - collegeLimitCount} slots remaining</strong>
+                                                    </p>
+                                                </div>
+                                            ) : null}
+                                        </div>
+                                    )}
                                 </div>
 
                                 <div className="space-y-2 md:col-span-2">
@@ -551,7 +680,7 @@ export default function Register() {
                                     <div className="mt-3 p-2.5 bg-yellow-500/10 border border-yellow-500/30 rounded-lg text-center">
                                         <p className="text-xs font-semibold text-yellow-400 flex items-center justify-center gap-1.5">
                                             <AlertTriangle className="w-3.5 h-3.5" />
-                                            Note: Only PhonePe payment screenshots are accepted with UTR Transaction ID.
+                                            Upload a clear screenshot (PhonePe / GPay / Paytm / Amazon Pay) showing ₹600, success status &amp; UTR.
                                         </p>
                                     </div>
                                 </div>
@@ -668,7 +797,7 @@ export default function Register() {
                             <NeonButton
                                 variant="primary"
                                 className="w-full relative overflow-hidden"
-                                disabled={isSubmitting || formSubmitting || isValidating}
+                                disabled={isSubmitting || formSubmitting || isValidating || collegeLimitReached}
                                 type="submit"
                             >
                                 {isSubmitting || formSubmitting || isValidating ? (
