@@ -115,12 +115,8 @@ export async function analyzePaymentScreenshot(
 
         const amountPassedOrBypass =
             amountCheck.detected ||
-            // Structural bypasses: only activate when OCR genuinely couldn't read the
-            // amount (detected=false AND no wrong value found). If OCR reads a WRONG
-            // amount (e.g. ₹500 or ₹1000), the bypass is denied — amount check fails.
-            (!amountCheck.value && upiIdCheck.detected && statusCheck.detected && (
-                isGPayReceipt || isAmazonPayReceipt
-            ));
+            (isGPayReceipt && upiIdCheck.detected && statusCheck.detected) ||
+            (isAmazonPayReceipt && upiIdCheck.detected && statusCheck.detected);
 
         if (!amountCheck.detected && upiIdCheck.detected && statusCheck.detected) {
             if (isGPayReceipt) console.log('GPay Structural Bypass: Amount OCR failed but GPay receipt structure verified ✓');
@@ -189,7 +185,6 @@ function verifyPaymentAmount(text: string, expectedAmount: number): { detected: 
     /**
      * Helper: Check if a number at a given position is likely a date/year, not an amount.
      * Filters out: years (2020-2030), numbers near month names, AM/PM, date separators.
-     * IMPORTANT: Never filters if a currency symbol directly precedes the number.
      */
     function isDateOrYear(num: number, matchIndex: number): boolean {
         // Skip year-like numbers (2020-2030)
@@ -199,11 +194,6 @@ function verifyPaymentAmount(text: string, expectedAmount: number): { detected: 
         const before = text.substring(Math.max(0, matchIndex - 20), matchIndex).toLowerCase();
         const after = text.substring(matchIndex, Math.min(text.length, matchIndex + 20)).toLowerCase();
         const context = before + after;
-
-        // OVERRIDE: If a currency symbol is within 5 chars BEFORE the number,
-        // it's definitely a payment amount, never a date — skip date filtering.
-        const immediateBefore = text.substring(Math.max(0, matchIndex - 5), matchIndex);
-        if (/[₹$€]|rs\.?|inr/i.test(immediateBefore)) return false;
 
         // Month names, date keywords, time indicators
         const datePatterns = /jan|feb|mar|apr|may|jun|jul|aug|sep|oct|nov|dec|am\b|pm\b|:\d{2}/i;

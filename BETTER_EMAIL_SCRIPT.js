@@ -649,38 +649,10 @@ function doGet(e) {
             var emailQuota = MailApp.getRemainingDailyQuota(); // NEW: Get Quota
 
             if (collegeIdx > -1) {
-                // Patterns to detect VSMSRKIT variations, including full names
-                var vsmPatterns = [
-                    'vsmsrkit', 'vsm srkit', 'vsm s r k', 'v.s.m',
-                    'vsmit', 'vsm it',
-                    'kothiwale', 'kothawal', 'somashekhar', 'somasekhar',
-                    'vsm nipani', 'vsm, nipani',
-                    'vidya samvardhak mandal', 'vidya samvardhak',
-                    'institute of technology nipani', 'institute of technology, nipani'
-                ];
-
                 for (var k = 1; k < data.length; k++) {
                     var collegeName = data[k][collegeIdx];
                     if (collegeName && String(collegeName).trim() !== "") {
                         var normalized = String(collegeName).trim().toLowerCase();
-
-                        // Check if it's a variation of VSMSRKIT
-                        var isVSM = false;
-                        for (var p = 0; p < vsmPatterns.length; p++) {
-                            if (normalized.indexOf(vsmPatterns[p]) > -1) {
-                                isVSM = true;
-                                break;
-                            }
-                        }
-
-                        // Group all VSM variations under exactly one name
-                        if (isVSM) {
-                            normalized = 'vsmsrkit_standardized';
-                        } else {
-                            // Basic normalization for other colleges (removes punctuation/spaces)
-                            normalized = normalized.replace(/[^a-z0-9]/g, '');
-                        }
-
                         if (!uniqueColleges[normalized]) {
                             uniqueColleges[normalized] = true;
                             uniqueCount++;
@@ -757,14 +729,11 @@ function doGet(e) {
             var count = 0;
 
             if (collegeIdx > -1) {
-                // All known variations/keywords for VSMSRKIT (matches getStats logic)
+                // All known variations/keywords for VSMSRKIT
                 var vsmsrkitKeywords = [
-                    'vsmsrkit', 'vsm srkit', 'vsm s r k', 'v.s.m',
-                    'vsmit', 'vsm it',
-                    'kothiwale', 'kothawal', 'somashekhar', 'somasekhar',
-                    'vsm nipani', 'vsm, nipani',
-                    'vidya samvardhak mandal', 'vidya samvardhak',
-                    'institute of technology nipani', 'institute of technology, nipani'
+                    'vsmsrkit', 'vsmit', 'vsm it', 'vsm srkit',
+                    'kothiwale', 'somashekhar', 'somashekar', 'somshekhar',
+                    'vidya samvardhak'
                 ];
 
                 for (var i = 1; i < data.length; i++) {
