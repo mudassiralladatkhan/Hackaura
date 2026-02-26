@@ -25,6 +25,7 @@ export const useAuth = () => useContext(AuthContext);
 const ADMIN_USERS: { username: string; password: string; displayName: string }[] = [
     { username: 'mudassir', password: 'mudassir@2026', displayName: "Mudassir & Sana's Team" },
     { username: 'pankaj', password: 'pankaj@2026', displayName: "Pankaj & Bhagya's Team" },
+    { username: 'hod', password: 'hod@2026', displayName: "HOD Admin" },
 ];
 
 export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
