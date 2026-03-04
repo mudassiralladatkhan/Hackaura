@@ -182,12 +182,6 @@ export default function Home() {
 
           <ScrollAnimation direction="up" delay={0.6}>
             <div className="flex flex-col items-center justify-center gap-4">
-              <div className="p-3 bg-red-500/10 border border-red-500/30 rounded-lg text-center">
-                <p className="text-sm font-semibold text-red-400">
-                  🗓️ Last Date of Registration: <span className="text-white">9th March 2026</span>
-                </p>
-              </div>
-
               {/* ALL Registrations Closed Notice */}
               <div className="w-full max-w-2xl mx-auto p-5 rounded-xl border-2 border-red-500/50 bg-red-500/10 text-center">
                 <p className="text-2xl mb-2">🚫</p>
