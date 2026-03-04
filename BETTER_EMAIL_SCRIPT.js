@@ -638,23 +638,160 @@ function doGet(e) {
         var data = sheet.getDataRange().getValues();
         var headers = data[0];
 
-        // --- NEW: STATS ACTION (Restored) ---
+        // --- NEW: STATS ACTION ---
         if (action === 'getStats') {
             var count = Math.max(0, sheet.getLastRow() - 1); // Total teams
 
-            // Calculate Unique Colleges
-            var collegeIdx = getHeaderIndex(headers, ['College', 'College Name', 'Institute']);
+            // Smart college deduplication: normalize all known name variants
+            // to a single canonical key so fuzzy names don't inflate the count.
+            var collegeIdx2 = getHeaderIndex(headers, ['College Name', 'College', 'Institute']);
             var uniqueColleges = {};
             var uniqueCount = 0;
-            var emailQuota = MailApp.getRemainingDailyQuota(); // NEW: Get Quota
+            var emailQuota = MailApp.getRemainingDailyQuota();
 
-            if (collegeIdx > -1) {
+            // Maps a raw college name to a canonical lowercase key.
+            function normalizeCollege(raw) {
+                var n = String(raw || '').toLowerCase()
+                    .replace(/['\u2018\u2019]/g, '')   // remove apostrophes
+                    .replace(/[^a-z0-9 ]/g, ' ')       // strip punctuation
+                    .replace(/\s+/g, ' ')               // collapse spaces
+                    .trim();
+
+                // ── VSM / VSMSRKIT (all variations) ─────────────────────
+                if (n.indexOf('vsmsrkit') > -1 || n.indexOf('vsmit') > -1 ||
+                    n.indexOf('kothiwale') > -1 || n.indexOf('somashekhar') > -1 ||
+                    n.indexOf('somashekar') > -1 || n.indexOf('somshekhar') > -1 ||
+                    n.indexOf('vidya samvardhak') > -1 ||
+                    (n.indexOf('vsm') > -1 && (n.indexOf('nipani') > -1 || n.indexOf('nippani') > -1 || n.indexOf('technology') > -1 || n.indexOf('institute') > -1))) {
+                    return 'vsmsrkit_nipani';
+                }
+
+                // ── KLE College of Engineering & Technology, Chikodi ────
+                if ((n.indexOf('kle') > -1 || n.indexOf('k le') > -1) &&
+                    (n.indexOf('chikodi') > -1 || n.indexOf('chikod') > -1) &&
+                    (n.indexOf('engineering') > -1 || n.indexOf('college') > -1 || n.indexOf('technology') > -1 || n.indexOf('institute') > -1)) {
+                    return 'kle_chikodi';
+                }
+
+                // ── KLE Technological University Belagavi ────────────────
+                if (n.indexOf('kle') > -1 && (n.indexOf('technological university') > -1 || n.indexOf('tech university') > -1) ||
+                    n.indexOf('kle tech') > -1 && n.indexOf('university') > -1) {
+                    return 'kle_tech_university';
+                }
+
+                // ── KLE Society BCA College Gokak ──────────────────────
+                if (n.indexOf('kle') > -1 && n.indexOf('bca') > -1 && (n.indexOf('gokak') > -1)) {
+                    return 'kle_bca_gokak';
+                }
+
+                // ── KLE Society GIB BCA College Nipani ─────────────────
+                if (n.indexOf('kle') > -1 && n.indexOf('bca') > -1 && n.indexOf('nipani') > -1) {
+                    return 'kle_bca_nipani';
+                }
+
+                // ── KLE (generic - catch-all for remaining KLE) ─────────
+                if (n.indexOf('kle') > -1 && (n.indexOf('belagavi') > -1 || n.indexOf('belgavi') > -1 || n.indexOf('belgaum') > -1)) {
+                    return 'kle_belagavi';
+                }
+
+                // ── Jain College of Engineering, Belagavi/Belgaum ───────
+                if (n.indexOf('jain') > -1 && (n.indexOf('engineering') > -1 || n.indexOf('college') > -1)) {
+                    return 'jain_college_belagavi';
+                }
+
+                // ── AGM / AGMR Rural College ─────────────────────────────
+                if ((n.indexOf('agm') > -1 || n.indexOf('agmr') > -1) &&
+                    (n.indexOf('rural') > -1 || n.indexOf('college') > -1 || n.indexOf('engineering') > -1)) {
+                    return 'agmr_varur';
+                }
+
+                // ── Rural Engineering College Hulkoti ────────────────────
+                if ((n.indexOf('rural') > -1 && n.indexOf('hulkoti') > -1) ||
+                    (n.indexOf('rte') > -1 && n.indexOf('hulkoti') > -1)) {
+                    return 'rural_engineering_hulkoti';
+                }
+
+                // ── Hirasugar Institute of Technology, Nidasoshi ─────────
+                if (n.indexOf('hirasugar') > -1 || n.indexOf('hirasuger') > -1) {
+                    return 'hirasugar_nidasoshi';
+                }
+
+                // ── KLS Vishwanathrao Deshpande Institute ────────────────
+                if (n.indexOf('kls') > -1 && (n.indexOf('vishwanathrao') > -1 || n.indexOf('deshpande') > -1 || n.indexOf('vdit') > -1)) {
+                    return 'kls_vdit';
+                }
+
+                // ── KLS Gogte Institute of Technology ───────────────────
+                if (n.indexOf('kls') > -1 && n.indexOf('gogte') > -1) {
+                    return 'kls_gogte';
+                }
+
+                // ── KLS VDIT Hallyal ─────────────────────────────────────
+                if (n.indexOf('kls') > -1 && n.indexOf('hallyal') > -1) {
+                    return 'kls_vdit_hallyal';
+                }
+
+                // ── S.G. Balekundri Institute ────────────────────────────
+                if (n.indexOf('balekundri') > -1 || n.indexOf('sg balekundri') > -1) {
+                    return 'sg_balekundri';
+                }
+
+                // ── Sanjay Ghodawat ──────────────────────────────────────
+                if (n.indexOf('ghodawat') > -1 || n.indexOf('sanjay ghodawat') > -1) {
+                    return 'sanjay_ghodawat';
+                }
+
+                // ── Kolhapur Institute of Technology ─────────────────────
+                if (n.indexOf('kolhapur institute') > -1) {
+                    return 'kolhapur_institute';
+                }
+
+                // ── KIT's College of Engineering Kolhapur ────────────────
+                if (n.indexOf('kit') > -1 && n.indexOf('kolhapur') > -1) {
+                    return 'kits_kolhapur';
+                }
+
+                // ── Manorama College Gadag ───────────────────────────────
+                if (n.indexOf('manorama') > -1) {
+                    return 'manorama_gadag';
+                }
+
+                // ── Basaveshwara Engineering College ─────────────────────
+                if (n.indexOf('basaveshwara') > -1) {
+                    return 'basaveshwara';
+                }
+
+                // ── SVES B R Darur ───────────────────────────────────────
+                if (n.indexOf('sves') > -1 || n.indexOf('darur') > -1) {
+                    return 'sves_darur';
+                }
+
+                // ── Visvesvaraya Technological University ────────────────
+                if (n.indexOf('visvesvaraya') > -1 || n.indexOf('vtu') > -1) {
+                    return 'vtu_belagavi';
+                }
+
+                // ── Biluru Gurubasava Mahaswamiji ────────────────────────
+                if (n.indexOf('biluru') > -1 || n.indexOf('gurubasava') > -1 || n.indexOf('mahaswamiji') > -1) {
+                    return 'biluru_gurubasava';
+                }
+
+                // ── AITM ─────────────────────────────────────────────────
+                if (n === 'aitm' || n.indexOf('aitm') > -1) {
+                    return 'aitm';
+                }
+
+                // Default: use the normalized string itself
+                return n;
+            }
+
+            if (collegeIdx2 > -1) {
                 for (var k = 1; k < data.length; k++) {
-                    var collegeName = data[k][collegeIdx];
-                    if (collegeName && String(collegeName).trim() !== "") {
-                        var normalized = String(collegeName).trim().toLowerCase();
-                        if (!uniqueColleges[normalized]) {
-                            uniqueColleges[normalized] = true;
+                    var rawName = data[k][collegeIdx2];
+                    if (rawName && String(rawName).trim() !== '') {
+                        var key = normalizeCollege(rawName);
+                        if (!uniqueColleges[key]) {
+                            uniqueColleges[key] = true;
                             uniqueCount++;
                         }
                     }
@@ -667,9 +804,10 @@ function doGet(e) {
                 'collegeCount': uniqueCount,
                 'emailQuota': emailQuota,
                 'backupAccounts': CONFIG.BACKUP_EMAILS.length,
-                'totalCapacity': emailQuota + (CONFIG.BACKUP_EMAILS.length * 100) // Estimated total
+                'totalCapacity': emailQuota + (CONFIG.BACKUP_EMAILS.length * 100)
             });
         }
+
 
         // --- DUPLICATE CHECK ACTION ---
         if (action === 'checkUnique') {
