@@ -28,6 +28,9 @@ const DOMAIN_GROUPS: Record<string, { group: string; label: string; limit: numbe
 };
 const OVERALL_VSM_LIMIT = 20; // 12 + 8
 
+// Domains closed for new registrations
+const CLOSED_DOMAINS = ['Full Stack', 'Generative AI'];
+
 /**
  * Detects whether the entered college name is a variation of VSMSRKIT.
  * Catches all common abbreviations, typos, and alternate names.
@@ -303,6 +306,16 @@ export default function Register() {
     const onSubmit = async (data: FormData) => {
         setIsSubmitting(true);
 
+        // Block submission for closed domains
+        if (CLOSED_DOMAINS.includes(data.domain)) {
+            toast.error('Domain Closed', {
+                description: `Registrations for ${data.domain} are closed. Only Cybersecurity and Internet of Things are open.`,
+                duration: 8000
+            });
+            setIsSubmitting(false);
+            return;
+        }
+
         // Double-check group limit at submit time for VSM college
         const domainGroup = data.domain ? DOMAIN_GROUPS[data.domain] : null;
         if (isHostCollege(data.collegeName) && domainGroup) {
@@ -492,8 +505,8 @@ export default function Register() {
                                     {/* Host College (VSM) Group-Based Registration Limit Warning */}
                                     {watchedCollegeName && isHostCollege(watchedCollegeName) && (
                                         <div className={`mt-2 p-3 rounded-lg border text-sm animate-in fade-in slide-in-from-top-2 duration-300 ${collegeLimitReached
-                                                ? 'bg-red-500/10 border-red-500/30'
-                                                : 'bg-blue-500/10 border-blue-500/30'
+                                            ? 'bg-red-500/10 border-red-500/30'
+                                            : 'bg-blue-500/10 border-blue-500/30'
                                             }`}>
                                             {checkingCollegeLimit ? (
                                                 <div className="flex items-center gap-2 text-blue-400 text-xs">
@@ -549,16 +562,40 @@ export default function Register() {
                                             className="w-full bg-black/40 border border-white/10 rounded-lg p-3 focus:border-primary/50 focus:ring-1 focus:ring-primary outline-none transition-all appearance-none text-gray-300"
                                         >
                                             <option value="" className="bg-gray-900 text-gray-500">Select Domain</option>
-                                            <option value="Full Stack" className="bg-gray-900">Full Stack</option>
-                                            <option value="Cybersecurity" className="bg-gray-900">Cybersecurity</option>
-                                            <option value="Generative AI" className="bg-gray-900">Generative AI</option>
-                                            <option value="Internet of Things" className="bg-gray-900">Internet of Things</option>
+                                            <option value="Full Stack" disabled className="bg-gray-900 text-gray-600 line-through">Full Stack (Closed)</option>
+                                            <option value="Cybersecurity" className="bg-gray-900">Cybersecurity ✅ Open</option>
+                                            <option value="Generative AI" disabled className="bg-gray-900 text-gray-600 line-through">Generative AI (Closed)</option>
+                                            <option value="Internet of Things" className="bg-gray-900">Internet of Things ✅ Open</option>
                                         </select>
                                         <div className="absolute right-3 top-3.5 pointer-events-none">
                                             <ChevronLeft className="w-4 h-4 -rotate-90 text-gray-500" />
                                         </div>
                                     </div>
                                     {errors.domain && <p className="text-red-400 text-xs">{errors.domain.message}</p>}
+
+                                    {/* ── Domain Closed Banner ── */}
+                                    <div className="mt-3 p-4 rounded-xl border border-red-500/40 bg-red-500/10 animate-in fade-in duration-300">
+                                        <div className="flex items-start gap-3">
+                                            <span className="text-xl flex-shrink-0">🚫</span>
+                                            <div>
+                                                <p className="text-red-400 font-bold text-sm">
+                                                    Full Stack &amp; Generative AI — Registrations Closed
+                                                </p>
+                                                <p className="text-red-400/70 text-xs mt-1">
+                                                    These two domains are full and no longer accepting registrations.
+                                                    Only <span className="text-green-400 font-semibold">Cybersecurity</span> and{' '}
+                                                    <span className="text-green-400 font-semibold">Internet of Things</span> are still open.
+                                                </p>
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    {/* Closed domain error if somehow selected */}
+                                    {CLOSED_DOMAINS.includes(watch('domain')) && (
+                                        <p className="text-red-400 text-xs mt-1 font-semibold">
+                                            ⛔ This domain is closed. Please select Cybersecurity or Internet of Things.
+                                        </p>
+                                    )}
 
                                     {/* Problem Statement Info */}
                                     {watch('domain') && (

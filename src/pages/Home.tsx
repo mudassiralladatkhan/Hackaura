@@ -187,6 +187,23 @@ export default function Home() {
                   🗓️ Last Date of Registration: <span className="text-white">9th March 2026</span>
                 </p>
               </div>
+
+              {/* Domain Status Notice */}
+              <div className="w-full max-w-2xl mx-auto p-4 rounded-xl border border-orange-500/40 bg-orange-500/5 text-left">
+                <div className="flex items-start gap-3">
+                  <span className="text-2xl flex-shrink-0">🚫</span>
+                  <div>
+                    <p className="text-orange-400 font-bold text-sm md:text-base">
+                      Full Stack &amp; Generative AI — Registrations Closed
+                    </p>
+                    <p className="text-orange-400/70 text-xs md:text-sm mt-1">
+                      These domains have reached their registration limit.
+                      <span className="text-green-400 font-semibold"> Cybersecurity</span> and
+                      <span className="text-green-400 font-semibold"> Internet of Things</span> are still open — register now!
+                    </p>
+                  </div>
+                </div>
+              </div>
               <div className="flex flex-col sm:flex-row items-center justify-center gap-4 w-full">
                 <Link to="/register">
                   <NeonButton variant="primary" className="w-full sm:w-auto min-w-[200px] text-lg py-6">
@@ -407,15 +424,19 @@ export default function Home() {
 
           <div className="grid grid-cols-1 md:grid-cols-2 gap-8 max-w-6xl mx-auto">
             <ScrollAnimation direction="left" delay={0.3}>
-              <GlassCard glowColor="cyan" hover3d>
+              <GlassCard glowColor="cyan" hover3d className="opacity-50 relative">
+                <div className="absolute top-3 right-3">
+                  <span className="text-xs font-bold bg-red-500/20 border border-red-500/40 text-red-400 px-2 py-0.5 rounded-full">🚫 CLOSED
+                  </span>
+                </div>
                 <div className="space-y-4">
                   <div className="flex items-center gap-3">
                     <div className="w-12 h-12 rounded-xl bg-primary/20 flex items-center justify-center">
                       <Sparkles className="w-6 h-6 text-primary" />
                     </div>
-                    <h3 className="text-2xl font-bold">Generative AI</h3>
+                    <h3 className="text-2xl font-bold line-through text-foreground/40">Generative AI</h3>
                   </div>
-                  <p className="text-foreground/70">
+                  <p className="text-foreground/40">
                     Focus on AI-powered innovative solutions using generative models and machine learning.
                     Create intelligent systems that can generate content, solve complex problems, and push
                     the boundaries of artificial intelligence.
@@ -425,7 +446,11 @@ export default function Home() {
             </ScrollAnimation>
 
             <ScrollAnimation direction="right" delay={0.4}>
-              <GlassCard glowColor="purple" hover3d>
+              <GlassCard glowColor="purple" hover3d className="relative">
+                <div className="absolute top-3 right-3">
+                  <span className="text-xs font-bold bg-green-500/20 border border-green-500/40 text-green-400 px-2 py-0.5 rounded-full">✅ Open
+                  </span>
+                </div>
                 <div className="space-y-4">
                   <div className="flex items-center gap-3">
                     <div className="w-12 h-12 rounded-xl bg-secondary/20 flex items-center justify-center">
@@ -443,15 +468,19 @@ export default function Home() {
             </ScrollAnimation>
 
             <ScrollAnimation direction="left" delay={0.5}>
-              <GlassCard glowColor="pink" hover3d>
+              <GlassCard glowColor="pink" hover3d className="opacity-50 relative">
+                <div className="absolute top-3 right-3">
+                  <span className="text-xs font-bold bg-red-500/20 border border-red-500/40 text-red-400 px-2 py-0.5 rounded-full">🚫 CLOSED
+                  </span>
+                </div>
                 <div className="space-y-4">
                   <div className="flex items-center gap-3">
                     <div className="w-12 h-12 rounded-xl bg-accent/20 flex items-center justify-center">
                       <Award className="w-6 h-6 text-accent" />
                     </div>
-                    <h3 className="text-2xl font-bold">Full Stack</h3>
+                    <h3 className="text-2xl font-bold line-through text-foreground/40">Full Stack</h3>
                   </div>
-                  <p className="text-foreground/70">
+                  <p className="text-foreground/40">
                     Build complete end-to-end web applications. Showcase your skills in both frontend and
                     backend development, creating seamless user experiences with modern frameworks and
                     scalable architectures.
@@ -461,7 +490,11 @@ export default function Home() {
             </ScrollAnimation>
 
             <ScrollAnimation direction="right" delay={0.6}>
-              <GlassCard glowColor="magenta" hover3d>
+              <GlassCard glowColor="magenta" hover3d className="relative">
+                <div className="absolute top-3 right-3">
+                  <span className="text-xs font-bold bg-green-500/20 border border-green-500/40 text-green-400 px-2 py-0.5 rounded-full">✅ Open
+                  </span>
+                </div>
                 <div className="space-y-4">
                   <div className="flex items-center gap-3">
                     <div className="w-12 h-12 rounded-xl bg-neon-magenta/20 flex items-center justify-center">
