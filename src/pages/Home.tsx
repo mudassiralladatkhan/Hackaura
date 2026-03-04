@@ -188,28 +188,24 @@ export default function Home() {
                 </p>
               </div>
 
-              {/* Domain Status Notice */}
-              <div className="w-full max-w-2xl mx-auto p-4 rounded-xl border border-orange-500/40 bg-orange-500/5 text-left">
-                <div className="flex items-start gap-3">
-                  <span className="text-2xl flex-shrink-0">🚫</span>
-                  <div>
-                    <p className="text-orange-400 font-bold text-sm md:text-base">
-                      Full Stack &amp; Generative AI — Registrations Closed
-                    </p>
-                    <p className="text-orange-400/70 text-xs md:text-sm mt-1">
-                      These domains have reached their registration limit.
-                      <span className="text-green-400 font-semibold"> Cybersecurity</span> and
-                      <span className="text-green-400 font-semibold"> Internet of Things</span> are still open — register now!
-                    </p>
-                  </div>
-                </div>
+              {/* ALL Registrations Closed Notice */}
+              <div className="w-full max-w-2xl mx-auto p-5 rounded-xl border-2 border-red-500/50 bg-red-500/10 text-center">
+                <p className="text-2xl mb-2">🚫</p>
+                <p className="text-red-400 font-bold text-base md:text-lg">
+                  Registrations Are Closed — All Slots Filled!
+                </p>
+                <p className="text-foreground/60 text-xs md:text-sm mt-2">
+                  We have reached our maximum intake across all domains.<br />
+                  Thank you to everyone who registered — see you at the event on <strong className="text-white">March 12–13, 2026</strong>!
+                </p>
               </div>
+
               <div className="flex flex-col sm:flex-row items-center justify-center gap-4 w-full">
-                <Link to="/register">
-                  <NeonButton variant="primary" className="w-full sm:w-auto min-w-[200px] text-lg py-6">
-                    Register Now
-                  </NeonButton>
-                </Link>
+                <button disabled className="w-full sm:w-auto min-w-[200px] text-lg py-6 rounded-xl border border-red-500/30 bg-red-500/5 text-red-500/50 font-semibold cursor-not-allowed flex items-center justify-center gap-2">
+                  <Lock className="w-5 h-5" />
+                  Registrations Closed
+                </button>
+
                 <button disabled className="w-full sm:w-auto min-w-[200px] text-lg py-6 rounded-xl border border-purple-500/30 bg-purple-500/5 text-purple-500/50 font-semibold cursor-not-allowed flex items-center justify-center gap-2">
                   <Lock className="w-5 h-5" />
                   Submit Project

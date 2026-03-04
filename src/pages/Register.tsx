@@ -462,445 +462,73 @@ export default function Register() {
                     Back to Home
                 </Link>
 
-                <GlassCard glowColor="cyan" className="max-w-3xl mx-auto p-8 border-primary/20">
-                    <div className="text-center mb-10">
-                        <h1 className="text-4xl font-bold mb-2 gradient-text">Team Registration</h1>
-                        <p className="text-foreground/60">HACKAURA 2026 • Join the Innovation</p>
+                <GlassCard glowColor="cyan" className="max-w-3xl mx-auto p-8 border-red-500/30 bg-red-500/5">
+                    {/* Registration Closed Screen */}
+                    <div className="text-center space-y-6">
+
+                        {/* Icon */}
+                        <div className="flex justify-center">
+                            <div className="w-24 h-24 rounded-full bg-red-500/10 border-2 border-red-500/30 flex items-center justify-center animate-pulse">
+                                <span className="text-5xl">🚫</span>
+                            </div>
+                        </div>
+
+                        {/* Title */}
+                        <div>
+                            <h1 className="text-4xl md:text-5xl font-bold mb-3 text-red-400">
+                                Registrations Closed
+                            </h1>
+                            <p className="text-xl text-foreground/60 font-medium">
+                                HACKAURA 2026
+                            </p>
+                        </div>
+
+                        {/* Main message */}
+                        <div className="p-5 rounded-xl border border-red-500/30 bg-red-500/10 text-left">
+                            <p className="text-red-300 font-semibold text-base md:text-lg text-center">
+                                🎯 All slots are filled — Intake Complete!
+                            </p>
+                            <p className="text-foreground/60 text-sm mt-2 text-center">
+                                We have reached our maximum participant capacity across all domains.
+                                Thank you to everyone who registered — we can't wait to see you at the event!
+                            </p>
+                        </div>
+
+                        {/* Domain status grid */}
+                        <div className="grid grid-cols-2 gap-3 text-sm">
+                            {[
+                                { name: 'Full Stack', icon: '💻' },
+                                { name: 'Generative AI', icon: '🤖' },
+                                { name: 'Cybersecurity', icon: '🔐' },
+                                { name: 'Internet of Things', icon: '📡' },
+                            ].map((d) => (
+                                <div key={d.name} className="flex items-center gap-2 p-3 rounded-lg border border-white/10 bg-white/5">
+                                    <span>{d.icon}</span>
+                                    <span className="font-medium text-foreground/70">{d.name}</span>
+                                    <span className="ml-auto text-xs font-bold text-red-400 bg-red-500/10 border border-red-500/20 px-2 py-0.5 rounded-full">Full</span>
+                                </div>
+                            ))}
+                        </div>
+
+                        {/* Info note */}
+                        <div className="p-4 rounded-xl border border-white/10 bg-white/5 text-sm text-foreground/50">
+                            <p>📅 Event Date: <strong className="text-foreground/80">March 12–13, 2026</strong></p>
+                            <p className="mt-1">📍 Venue: <strong className="text-foreground/80">VSMSRKIT, Nipani</strong></p>
+                        </div>
+
+                        {/* Back button */}
+                        <Link
+                            to="/"
+                            className="inline-flex items-center justify-center gap-2 px-8 py-3 rounded-xl border border-primary/40 bg-primary/10 text-primary font-semibold hover:bg-primary/20 hover:border-primary/60 transition-all"
+                        >
+                            <ChevronLeft className="w-4 h-4" />
+                            Back to Home
+                        </Link>
                     </div>
 
-                    <form onSubmit={handleSubmit(onSubmit)} className="space-y-8">
 
-                        {/* Team Details Section */}
-                        <div className="space-y-4">
-                            <h3 className="text-xl font-semibold flex items-center gap-2 text-secondary">
-                                <Users className="w-5 h-5" />
-                                Team Information
-                            </h3>
-
-                            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                                <div className="space-y-2">
-                                    <label className="text-sm font-medium">Team Name</label>
-                                    <div className="relative">
-                                        <input
-                                            {...register("teamName")}
-                                            className="w-full bg-black/40 border border-white/10 rounded-lg p-3 focus:border-primary/50 focus:ring-1 focus:ring-primary outline-none transition-all pr-10"
-                                            placeholder="e.g. Code Wizards"
-                                        />
-                                    </div>
-                                    {errors.teamName && <p className="text-red-400 text-xs">{errors.teamName.message}</p>}
-                                </div>
-
-                                <div className="space-y-2">
-                                    <label className="text-sm font-medium">College Name</label>
-                                    <div className="relative">
-                                        <School className="absolute left-3 top-3 w-5 h-5 text-gray-500" />
-                                        <input
-                                            {...register("collegeName")}
-                                            className="w-full bg-black/40 border border-white/10 rounded-lg p-3 pl-10 focus:border-primary/50 focus:ring-1 focus:ring-primary outline-none transition-all"
-                                            placeholder="Your Institute Name"
-                                        />
-                                    </div>
-                                    {errors.collegeName && <p className="text-red-400 text-xs">{errors.collegeName.message}</p>}
-
-                                    {/* Host College (VSM) Group-Based Registration Limit Warning */}
-                                    {watchedCollegeName && isHostCollege(watchedCollegeName) && (
-                                        <div className={`mt-2 p-3 rounded-lg border text-sm animate-in fade-in slide-in-from-top-2 duration-300 ${collegeLimitReached
-                                            ? 'bg-red-500/10 border-red-500/30'
-                                            : 'bg-blue-500/10 border-blue-500/30'
-                                            }`}>
-                                            {checkingCollegeLimit ? (
-                                                <div className="flex items-center gap-2 text-blue-400 text-xs">
-                                                    <Loader2 className="w-3.5 h-3.5 animate-spin" />
-                                                    Checking VSMSRKIT registration limit...
-                                                </div>
-                                            ) : !watchedDomain || !DOMAIN_GROUPS[watchedDomain] ? (
-                                                <div className="flex items-center gap-2 text-yellow-400 text-xs">
-                                                    <AlertTriangle className="w-3.5 h-3.5" />
-                                                    VSMSRKIT detected — please select a domain to see available slots.
-                                                </div>
-                                            ) : collegeLimitReached ? (
-                                                <div className="flex items-start gap-2 text-red-400">
-                                                    <AlertTriangle className="w-4 h-4 mt-0.5 flex-shrink-0" />
-                                                    <div>
-                                                        <p className="font-semibold text-sm">🚫 Registration Limit Reached!</p>
-                                                        <p className="text-xs mt-1 text-red-400/80">
-                                                            {collegeLimitInfo?.groupReached
-                                                                ? `The "${collegeLimitInfo.groupLabel}" group is full: ${collegeLimitInfo.groupCount}/${collegeLimitInfo.groupLimit} combined VSM teams registered.`
-                                                                : `VSMSRKIT has reached the overall cap: ${collegeLimitInfo?.totalCount ?? '?'}/${OVERALL_VSM_LIMIT} total teams.`
-                                                            }
-                                                            {' '}No more registrations from {HOST_COLLEGE_OFFICIAL_NAME} are accepted for this group.
-                                                        </p>
-                                                    </div>
-                                                </div>
-                                            ) : collegeLimitInfo ? (
-                                                <div className="space-y-1">
-                                                    <div className="flex items-center gap-2 text-blue-400">
-                                                        <CheckCircle2 className="w-4 h-4 flex-shrink-0" />
-                                                        <p className="text-xs">
-                                                            <strong>{collegeLimitInfo.groupLabel}</strong> group:{' '}
-                                                            <strong>{collegeLimitInfo.groupCount}/{collegeLimitInfo.groupLimit}</strong> combined VSM teams registered.
-                                                            <strong className="text-green-400"> {collegeLimitInfo.groupLimit - collegeLimitInfo.groupCount} slots remaining</strong>
-                                                        </p>
-                                                    </div>
-                                                    <div className="flex items-center gap-2 text-blue-400/60">
-                                                        <CheckCircle2 className="w-3.5 h-3.5 flex-shrink-0" />
-                                                        <p className="text-xs">
-                                                            Overall VSMSRKIT: <strong>{collegeLimitInfo.totalCount}/{OVERALL_VSM_LIMIT}</strong> total teams.
-                                                        </p>
-                                                    </div>
-                                                </div>
-                                            ) : null}
-                                        </div>
-                                    )}
-                                </div>
-
-                                <div className="space-y-2 md:col-span-2">
-                                    <label className="text-sm font-medium">Project Domain</label>
-                                    <div className="relative">
-                                        <select
-                                            {...register("domain")}
-                                            className="w-full bg-black/40 border border-white/10 rounded-lg p-3 focus:border-primary/50 focus:ring-1 focus:ring-primary outline-none transition-all appearance-none text-gray-300"
-                                        >
-                                            <option value="" className="bg-gray-900 text-gray-500">Select Domain</option>
-                                            <option value="Full Stack" disabled className="bg-gray-900 text-gray-600 line-through">Full Stack (Closed)</option>
-                                            <option value="Cybersecurity" className="bg-gray-900">Cybersecurity ✅ Open</option>
-                                            <option value="Generative AI" disabled className="bg-gray-900 text-gray-600 line-through">Generative AI (Closed)</option>
-                                            <option value="Internet of Things" className="bg-gray-900">Internet of Things ✅ Open</option>
-                                        </select>
-                                        <div className="absolute right-3 top-3.5 pointer-events-none">
-                                            <ChevronLeft className="w-4 h-4 -rotate-90 text-gray-500" />
-                                        </div>
-                                    </div>
-                                    {errors.domain && <p className="text-red-400 text-xs">{errors.domain.message}</p>}
-
-                                    {/* ── Domain Closed Banner ── */}
-                                    <div className="mt-3 p-4 rounded-xl border border-red-500/40 bg-red-500/10 animate-in fade-in duration-300">
-                                        <div className="flex items-start gap-3">
-                                            <span className="text-xl flex-shrink-0">🚫</span>
-                                            <div>
-                                                <p className="text-red-400 font-bold text-sm">
-                                                    Full Stack &amp; Generative AI — Registrations Closed
-                                                </p>
-                                                <p className="text-red-400/70 text-xs mt-1">
-                                                    These two domains are full and no longer accepting registrations.
-                                                    Only <span className="text-green-400 font-semibold">Cybersecurity</span> and{' '}
-                                                    <span className="text-green-400 font-semibold">Internet of Things</span> are still open.
-                                                </p>
-                                            </div>
-                                        </div>
-                                    </div>
-
-                                    {/* Closed domain error if somehow selected */}
-                                    {CLOSED_DOMAINS.includes(watch('domain')) && (
-                                        <p className="text-red-400 text-xs mt-1 font-semibold">
-                                            ⛔ This domain is closed. Please select Cybersecurity or Internet of Things.
-                                        </p>
-                                    )}
-
-                                    {/* Problem Statement Info */}
-                                    {watch('domain') && (
-                                        <div className={`text-xs mt-2 p-2 rounded border ${watch('domain') === 'Internet of Things'
-                                            ? 'bg-blue-500/10 border-blue-500/30 text-blue-400'
-                                            : 'bg-white/5 border-white/10 text-gray-400'
-                                            }`}>
-                                            <span className="font-semibold">Note: </span>
-                                            {watch('domain') === 'Internet of Things'
-                                                ? 'Please select your IOT Problem Statement below'
-                                                : 'Problem Statement will be provided On Venue'}
-                                        </div>
-                                    )}
-
-                                    {/* Conditional Problem Statement Dropdown for IOT */}
-                                    {watch('domain') === 'Internet of Things' && (
-                                        <div className="space-y-2 mt-4 animate-in fade-in slide-in-from-top-2">
-                                            <label className="text-sm font-medium text-blue-400">Select Problem Statement</label>
-                                            <div className="relative">
-                                                <select
-                                                    {...register("problemStatement")}
-                                                    className="w-full bg-blue-950/20 border border-blue-500/30 rounded-lg p-3 focus:border-blue-500 focus:ring-1 focus:ring-blue-500 outline-none transition-all appearance-none text-blue-100"
-                                                >
-                                                    <option value="" className="bg-gray-900 text-gray-500">Select Problem Statement</option>
-                                                    <option value="PS-1" className="bg-gray-900">PS-1: Smart Water Management System</option>
-                                                    <option value="PS-2" className="bg-gray-900">PS-2: Smart Agriculture Monitoring System</option>
-                                                    <option value="PS-3" className="bg-gray-900">PS-3: Patient Health Monitoring & Emergency Alert</option>
-                                                    <option value="PS-4" className="bg-gray-900">PS-4: Smart Home Energy Monitor & Optimizer</option>
-                                                    <option value="PS-5" className="bg-gray-900">PS-5: Smart Parking & Traffic Management</option>
-                                                    <option value="PS-6" className="bg-gray-900">PS-6: Industrial Safety & Environmental Monitoring</option>
-                                                </select>
-                                                <div className="absolute right-3 top-3.5 pointer-events-none">
-                                                    <ChevronLeft className="w-4 h-4 -rotate-90 text-blue-400" />
-                                                </div>
-                                            </div>
-                                        </div>
-                                    )}
-                                </div>
-                            </div>
-
-                        </div>
-
-                        {/* Team Leader Section */}
-                        <div className="space-y-4">
-                            <h3 className="text-xl font-semibold flex items-center gap-2 text-accent">
-                                <User className="w-5 h-5" />
-                                Team Leader Details
-                            </h3>
-
-                            <div className="space-y-2">
-                                <label className="text-sm font-medium">Full Name</label>
-                                <input
-                                    {...register("leaderName")}
-                                    className="w-full bg-black/40 border border-white/10 rounded-lg p-3 focus:border-primary/50 focus:ring-1 focus:ring-primary outline-none transition-all"
-                                    placeholder="Leader's Name"
-                                />
-                                {errors.leaderName && <p className="text-red-400 text-xs">{errors.leaderName.message}</p>}
-                            </div>
-
-                            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                                <div className="space-y-2">
-                                    <label className="text-sm font-medium">Email</label>
-                                    <div className="relative">
-                                        <Mail className="absolute left-3 top-3 w-5 h-5 text-gray-500" />
-                                        <input
-                                            {...register("leaderEmail")}
-                                            type="email"
-                                            className="w-full bg-black/40 border border-white/10 rounded-lg p-3 pl-10 focus:border-primary/50 focus:ring-1 focus:ring-primary outline-none transition-all pr-10"
-                                            placeholder="leader@example.com"
-                                        />
-                                    </div>
-                                    {errors.leaderEmail && <p className="text-red-400 text-xs">{errors.leaderEmail.message}</p>}
-                                </div>
-
-                                <div className="space-y-2">
-                                    <label className="text-sm font-medium">Phone Number</label>
-                                    <div className="relative">
-                                        <Phone className="absolute left-3 top-3 w-5 h-5 text-gray-500" />
-                                        <input
-                                            {...register("leaderPhone")}
-                                            className="w-full bg-black/40 border border-white/10 rounded-lg p-3 pl-10 focus:border-primary/50 focus:ring-1 focus:ring-primary outline-none transition-all pr-10"
-                                            placeholder="9876543210"
-                                        />
-                                    </div>
-                                    {errors.leaderPhone && <p className="text-red-400 text-xs">{errors.leaderPhone.message}</p>}
-                                </div>
-                            </div>
-                        </div>
-
-                        {/* Team Members Section */}
-                        <div className="space-y-4">
-                            <div className="flex items-center justify-between">
-                                <h3 className="text-xl font-semibold flex items-center gap-2 text-neon-magenta">
-                                    <Users className="w-5 h-5" />
-                                    Team Members
-                                </h3>
-                                {fields.length < 3 && (
-                                    <button
-                                        type="button"
-                                        onClick={() => append({ name: '', email: '' })}
-                                        className="text-sm text-primary hover:text-primary/80 flex items-center gap-1"
-                                    >
-                                        <Plus className="w-4 h-4" /> Add Member
-                                    </button>
-                                )}
-                            </div>
-
-                            <div className="space-y-3">
-                                {fields.map((field, index) => (
-                                    <div key={field.id} className="p-4 bg-white/5 rounded-xl border border-white/5 relative group animate-in slide-in-from-left-4 fade-in duration-300">
-                                        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                                            <div className="space-y-1">
-                                                <label className="text-xs text-muted-foreground">Member {index + 1} Name</label>
-                                                <input
-                                                    {...register(`members.${index}.name` as const)}
-                                                    className="w-full bg-transparent border-b border-white/20 focus:border-primary px-0 py-2 outline-none transition-colors"
-                                                    placeholder="Full Name"
-                                                />
-                                                {errors.members?.[index]?.name && <p className="text-red-400 text-xs">{errors.members[index]?.name?.message}</p>}
-                                            </div>
-                                            <div className="space-y-1">
-                                                <label className="text-xs text-muted-foreground">Member {index + 1} Email</label>
-                                                <input
-                                                    {...register(`members.${index}.email` as const)}
-                                                    className="w-full bg-transparent border-b border-white/20 focus:border-primary px-0 py-2 outline-none transition-colors"
-                                                    placeholder="Email Address"
-                                                />
-                                                {errors.members?.[index]?.email && <p className="text-red-400 text-xs">{errors.members[index]?.email?.message}</p>}
-                                            </div>
-                                        </div>
-
-                                        {fields.length > 1 && (
-                                            <button
-                                                type="button"
-                                                onClick={() => remove(index)}
-                                                className="absolute -top-2 -right-2 bg-red-500/20 text-red-400 p-1.5 rounded-full opacity-0 group-hover:opacity-100 transition-all hover:bg-red-500/40"
-                                            >
-                                                <Trash2 className="w-3 h-3" />
-                                            </button>
-                                        )}
-                                    </div>
-                                ))}
-                            </div>
-                        </div>
-
-                        {/* Payment Section */}
-                        <div className="space-y-4">
-                            <h3 className="text-xl font-semibold flex items-center gap-2 text-green-400">
-                                <CreditCard className="w-5 h-5" />
-                                Payment Verification
-                            </h3>
-
-                            <div className="bg-white/5 border border-white/10 rounded-xl p-4 mb-4 text-sm text-gray-300">
-                                <div className="flex flex-col items-center mb-4">
-                                    <div className="bg-white p-2 rounded-lg mb-2">
-                                        <img src="/payment-qr.jpg" alt="Payment QR Code" className="w-48 h-48 object-contain" />
-                                    </div>
-                                    <p className="text-xs text-center text-gray-400 mb-2">Scan to Pay via PhonePe / UPI</p>
-                                    <a
-                                        href="/payment-qr.jpg"
-                                        download="hackaura-payment-qr.jpg"
-                                        className="inline-flex items-center gap-1.5 px-3 py-1.5 text-xs bg-white/10 hover:bg-white/20 text-white rounded-md transition-colors"
-                                    >
-                                        <Download className="w-3 h-3" />
-                                        Download QR
-                                    </a>
-                                    <div className="mt-3 p-2.5 bg-yellow-500/10 border border-yellow-500/30 rounded-lg text-center">
-                                        <p className="text-xs font-semibold text-yellow-400 flex items-center justify-center gap-1.5">
-                                            <AlertTriangle className="w-3.5 h-3.5" />
-                                            Upload a clear screenshot (PhonePe / GPay / Paytm / Amazon Pay) showing ₹600, success status &amp; UTR.
-                                        </p>
-                                    </div>
-                                </div>
-
-                                <p className="flex items-center gap-2 mb-2">
-                                    <AlertTriangle className="w-4 h-4 text-yellow-400" />
-                                    <strong>Important:</strong> Upload a screenshot of your payment.
-                                </p>
-                                <ul className="list-disc list-inside space-y-1 text-gray-400 ml-1">
-                                    <li>Transfer <strong>₹600</strong> to the UPI ID provided below.</li>
-                                    <li>Ensure the screenshot clearly shows the <strong>Amount (₹600)</strong>, <strong>Success</strong> status.</li>
-                                </ul>
-                            </div>
-
-                            <div
-                                {...getRootProps()}
-                                className={`border-2 border-dashed rounded-xl p-8 text-center cursor-pointer transition-all duration-300 ${ocrVerificationStatus === 'analyzing'
-                                    ? 'border-yellow-500/50 bg-yellow-500/10'
-                                    : ocrVerificationStatus === 'success'
-                                        ? 'border-green-500/50 bg-green-500/10'
-                                        : ocrVerificationStatus === 'failed'
-                                            ? 'border-red-500/50 bg-red-500/10'
-                                            : paymentScreenshot
-                                                ? 'border-blue-500/50 bg-blue-500/10'
-                                                : isDragActive
-                                                    ? 'border-primary bg-primary/10'
-                                                    : 'border-white/10 hover:border-primary/50 hover:bg-white/5'
-                                    }`}
-                            >
-                                <input {...getInputProps()} />
-                                <div className="flex flex-col items-center gap-3">
-                                    {paymentScreenshot ? (
-                                        <>
-                                            <div className={`w-12 h-12 rounded-full flex items-center justify-center ${ocrVerificationStatus === 'analyzing'
-                                                ? 'bg-yellow-500/20'
-                                                : ocrVerificationStatus === 'success'
-                                                    ? 'bg-green-500/20'
-                                                    : ocrVerificationStatus === 'failed'
-                                                        ? 'bg-red-500/20'
-                                                        : 'bg-blue-500/20'
-                                                }`}>
-                                                {ocrVerificationStatus === 'analyzing' ? (
-                                                    <Loader2 className="w-6 h-6 text-yellow-400 animate-spin" />
-                                                ) : ocrVerificationStatus === 'success' ? (
-                                                    <CheckCircle2 className="w-6 h-6 text-green-500" />
-                                                ) : ocrVerificationStatus === 'failed' ? (
-                                                    <XCircle className="w-6 h-6 text-red-500" />
-                                                ) : (
-                                                    <CheckCircle2 className="w-6 h-6 text-blue-500" />
-                                                )}
-                                            </div>
-
-                                            <div>
-                                                <div className="flex items-center justify-center gap-2 mb-1">
-                                                    <span className="font-medium truncate max-w-[200px] text-white">{paymentScreenshot.name}</span>
-                                                    <button
-                                                        type="button"
-                                                        onClick={(e) => {
-                                                            e.stopPropagation();
-                                                            setPaymentScreenshot(null);
-                                                            setOcrVerificationStatus('idle');
-                                                            setOcrResults(null);
-                                                        }}
-                                                        className="hover:text-red-400 transition-colors"
-                                                    >
-                                                        <X className="w-4 h-4" />
-                                                    </button>
-                                                </div>
-                                                <p className={`text-sm font-medium ${ocrVerificationStatus === 'analyzing'
-                                                    ? 'text-yellow-400'
-                                                    : ocrVerificationStatus === 'success'
-                                                        ? 'text-green-400'
-                                                        : ocrVerificationStatus === 'failed'
-                                                            ? 'text-red-400'
-                                                            : 'text-blue-400'
-                                                    }`}>
-                                                    {ocrVerificationStatus === 'analyzing'
-                                                        ? 'Analyzing Screenshot...'
-                                                        : ocrVerificationStatus === 'success'
-                                                            ? '✓ Payment Verified!'
-                                                            : ocrVerificationStatus === 'failed'
-                                                                ? '✗ Verification Failed'
-                                                                : 'Screenshot Uploaded'}
-                                                </p>
-                                            </div>
-                                        </>
-                                    ) : (
-                                        <>
-                                            <div className="w-12 h-12 rounded-full bg-white/5 flex items-center justify-center">
-                                                <Upload className={`w-6 h-6 ${isDragActive ? 'text-primary' : 'text-gray-400'}`} />
-                                            </div>
-                                            <div>
-                                                <p className="text-base font-medium">Drop payment screenshot here</p>
-                                                <p className="text-sm text-foreground/50 mt-1">or click to browse (JPG, PNG)</p>
-                                            </div>
-                                        </>
-                                    )}
-                                </div>
-
-                                {/* OCR Verification Details - Inside upload box */}
-                                {ocrVerificationStatus !== 'idle' && ocrVerificationStatus !== 'analyzing' && (
-                                    <div className="mt-4">
-                                        <PaymentVerificationBadge
-                                            status={ocrVerificationStatus}
-                                            details={ocrResults?.details}
-                                            errorMessage={ocrResults?.errorMessage}
-                                        />
-                                    </div>
-                                )}
-                            </div>
-                        </div>
-
-                        <div className="pt-6">
-                            <NeonButton
-                                variant="primary"
-                                className="w-full relative overflow-hidden"
-                                disabled={isSubmitting || formSubmitting || isValidating || collegeLimitReached}
-                                type="submit"
-                            >
-                                {isSubmitting || formSubmitting || isValidating ? (
-                                    <span className="flex items-center gap-2">
-                                        <Loader2 className="animate-spin" /> {isValidating ? 'Checking Details...' : 'Submission in Progress...'}
-                                    </span>
-                                ) : (
-                                    <span className="flex items-center gap-2">
-                                        Submit Registration <Send className="w-4 h-4" />
-                                    </span>
-                                )}
-                            </NeonButton>
-                        </div>
-
-                    </form>
                 </GlassCard>
             </div>
         </div>
     );
 }
-
