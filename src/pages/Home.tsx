@@ -188,11 +188,14 @@ export default function Home() {
                 <p className="text-red-400 font-bold text-base md:text-lg">
                   Registrations Are Closed — All Slots Filled!
                 </p>
-                <p className="text-foreground/60 text-xs md:text-sm mt-2">
-                  We have reached our maximum intake across all domains.<br />
-                  Thank you to everyone who registered — see you at the event on <strong className="text-white">March 12–13, 2026</strong>!
+                <p className="text-foreground/60 text-xs md:text-sm mt-2 leading-relaxed">
+                  We have successfully registered <strong className="text-white">80 teams</strong> across all domains —
+                  our maximum intake capacity has been reached.<br />
+                  Due to this, we have officially closed registrations for HACKAURA 2026.<br />
+                  Thank you to everyone who registered — see you at the event on <strong className="text-white">March 12–13, 2026</strong>! 🎉
                 </p>
               </div>
+
 
               <div className="flex flex-col sm:flex-row items-center justify-center gap-4 w-full">
                 <button disabled className="w-full sm:w-auto min-w-[200px] text-lg py-6 rounded-xl border border-red-500/30 bg-red-500/5 text-red-500/50 font-semibold cursor-not-allowed flex items-center justify-center gap-2">
@@ -436,9 +439,9 @@ export default function Home() {
             </ScrollAnimation>
 
             <ScrollAnimation direction="right" delay={0.4}>
-              <GlassCard glowColor="purple" hover3d className="relative">
+              <GlassCard glowColor="purple" hover3d className="opacity-50 relative">
                 <div className="absolute top-3 right-3">
-                  <span className="text-xs font-bold bg-green-500/20 border border-green-500/40 text-green-400 px-2 py-0.5 rounded-full">✅ Open
+                  <span className="text-xs font-bold bg-red-500/20 border border-red-500/40 text-red-400 px-2 py-0.5 rounded-full">🚫 CLOSED
                   </span>
                 </div>
                 <div className="space-y-4">
@@ -446,9 +449,9 @@ export default function Home() {
                     <div className="w-12 h-12 rounded-xl bg-secondary/20 flex items-center justify-center">
                       <Zap className="w-6 h-6 text-secondary" />
                     </div>
-                    <h3 className="text-2xl font-bold">Cybersecurity</h3>
+                    <h3 className="text-2xl font-bold line-through text-foreground/40">Cybersecurity</h3>
                   </div>
-                  <p className="text-foreground/70">
+                  <p className="text-foreground/40">
                     Build robust security solutions against cyber threats. Develop innovative tools and
                     systems to protect digital assets, detect vulnerabilities, and create a safer digital
                     ecosystem for everyone.
@@ -480,9 +483,9 @@ export default function Home() {
             </ScrollAnimation>
 
             <ScrollAnimation direction="right" delay={0.6}>
-              <GlassCard glowColor="magenta" hover3d className="relative">
+              <GlassCard glowColor="magenta" hover3d className="opacity-50 relative">
                 <div className="absolute top-3 right-3">
-                  <span className="text-xs font-bold bg-green-500/20 border border-green-500/40 text-green-400 px-2 py-0.5 rounded-full">✅ Open
+                  <span className="text-xs font-bold bg-red-500/20 border border-red-500/40 text-red-400 px-2 py-0.5 rounded-full">🚫 CLOSED
                   </span>
                 </div>
                 <div className="space-y-4">
@@ -490,9 +493,9 @@ export default function Home() {
                     <div className="w-12 h-12 rounded-xl bg-neon-magenta/20 flex items-center justify-center">
                       <Cpu className="w-6 h-6 text-neon-magenta" />
                     </div>
-                    <h3 className="text-2xl font-bold">Internet of Things</h3>
+                    <h3 className="text-2xl font-bold line-through text-foreground/40">Internet of Things</h3>
                   </div>
-                  <p className="text-foreground/70">
+                  <p className="text-foreground/40">
                     Develop smart connected solutions bridging the physical and digital worlds.
                     Create innovative IoT systems using sensors, microcontrollers, and cloud platforms
                     to solve real-world problems efficiently.
