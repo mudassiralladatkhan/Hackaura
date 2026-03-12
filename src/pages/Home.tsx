@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { Zap, Calendar, Sparkles, Users, Trophy, Clock, Award, MapPin, Phone, Menu, X, Coffee, Utensils, Mail, Flame, School, Cpu, Lock, MessageSquare, ChevronRight } from 'lucide-react';
+import { Zap, Calendar, Sparkles, Users, Trophy, Clock, Award, MapPin, Phone, Menu, X, Coffee, Utensils, Mail, Flame, School, Cpu, Lock, MessageSquare, ChevronRight, Shield, Code2 } from 'lucide-react';
 import { ParticleBackground } from '@/components/ui/particle-background';
 import { CountdownTimer } from '@/components/ui/countdown-timer';
 import { NeonButton } from '@/components/ui/neon-button';
@@ -226,26 +226,24 @@ export default function Home() {
             <div className="mt-12 animate-fade-in space-y-6 max-w-4xl mx-auto">
               <GlassCard className="p-6 border-neon-yellow/30 bg-neon-yellow/5">
                 <h3 className="text-xl md:text-2xl font-bold mb-2 text-neon-yellow flex items-center justify-center gap-2">
-                  <Lock className="w-6 h-6" />
-                  PROBLEM STATEMENTS
-                  <Lock className="w-6 h-6" />
+                  🎯 PROBLEM STATEMENTS
                 </h3>
                 <p className="text-neon-yellow/60 text-sm mb-6 uppercase tracking-widest text-center">
-                  Revealing at Venue on March 12th
+                  Now Live — Click to view your domain
                 </p>
                 <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
-                  <button disabled className="w-full py-3 px-4 rounded-xl border border-cyan-500/30 bg-cyan-500/5 text-cyan-500/50 font-semibold cursor-not-allowed flex items-center justify-center gap-2">
-                    <Lock className="w-4 h-4" />
+                  <Link to="/genai" className="w-full py-3 px-4 rounded-xl border border-cyan-500/50 bg-cyan-500/10 text-cyan-400 font-semibold flex items-center justify-center gap-2 hover:bg-cyan-500/20 hover:border-cyan-400 hover:shadow-[0_0_20px_rgba(6,182,212,0.3)] transition-all">
+                    <Sparkles className="w-4 h-4" />
                     Gen AI
-                  </button>
-                  <button disabled className="w-full py-3 px-4 rounded-xl border border-purple-500/30 bg-purple-500/5 text-purple-500/50 font-semibold cursor-not-allowed flex items-center justify-center gap-2">
-                    <Lock className="w-4 h-4" />
+                  </Link>
+                  <Link to="/cybersecurity" className="w-full py-3 px-4 rounded-xl border border-purple-500/50 bg-purple-500/10 text-purple-400 font-semibold flex items-center justify-center gap-2 hover:bg-purple-500/20 hover:border-purple-400 hover:shadow-[0_0_20px_rgba(168,85,247,0.3)] transition-all">
+                    <Shield className="w-4 h-4" />
                     Cybersecurity
-                  </button>
-                  <button disabled className="w-full py-3 px-4 rounded-xl border border-pink-500/30 bg-pink-500/5 text-pink-500/50 font-semibold cursor-not-allowed flex items-center justify-center gap-2">
-                    <Lock className="w-4 h-4" />
+                  </Link>
+                  <Link to="/fullstack" className="w-full py-3 px-4 rounded-xl border border-pink-500/50 bg-pink-500/10 text-pink-400 font-semibold flex items-center justify-center gap-2 hover:bg-pink-500/20 hover:border-pink-400 hover:shadow-[0_0_20px_rgba(236,72,153,0.3)] transition-all">
+                    <Code2 className="w-4 h-4" />
                     Full Stack
-                  </button>
+                  </Link>
                 </div>
               </GlassCard>
 
