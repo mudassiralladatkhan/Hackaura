@@ -4,9 +4,10 @@ import { motion } from 'framer-motion';
 interface DiceRollProps {
     onRollComplete: (number: number) => void;
     isLocked: boolean;
+    maxFaces?: number; // default 6
 }
 
-export function DiceRoll({ onRollComplete, isLocked }: DiceRollProps) {
+export function DiceRoll({ onRollComplete, isLocked, maxFaces = 6 }: DiceRollProps) {
     const [isRolling, setIsRolling] = useState(false);
     const [result, setResult] = useState<number | null>(null);
     const [hasRolled, setHasRolled] = useState(false);
@@ -17,15 +18,14 @@ export function DiceRoll({ onRollComplete, isLocked }: DiceRollProps) {
         setIsRolling(true);
         setHasRolled(true);
 
-        // Simulate dice roll animation
         let count = 0;
         const interval = setInterval(() => {
-            setResult(Math.floor(Math.random() * 6) + 1);
+            setResult(Math.floor(Math.random() * maxFaces) + 1);
             count++;
 
             if (count >= 20) {
                 clearInterval(interval);
-                const finalNumber = Math.floor(Math.random() * 6) + 1;
+                const finalNumber = Math.floor(Math.random() * maxFaces) + 1;
                 setResult(finalNumber);
                 setIsRolling(false);
                 onRollComplete(finalNumber);
@@ -36,8 +36,7 @@ export function DiceRoll({ onRollComplete, isLocked }: DiceRollProps) {
     return (
         <div className="flex flex-col items-center gap-6">
             <motion.div
-                className={`w-32 h-32 bg-gradient-to-br from-purple-500 to-pink-500 rounded-2xl flex items-center justify-center text-white text-6xl font-bold shadow-2xl cursor-pointer ${isLocked ? 'opacity-50 cursor-not-allowed' : 'hover:scale-110'
-                    }`}
+                className={`w-32 h-32 bg-gradient-to-br from-purple-500 to-pink-500 rounded-2xl flex items-center justify-center text-white text-6xl font-bold shadow-2xl cursor-pointer ${isLocked ? 'opacity-50 cursor-not-allowed' : 'hover:scale-110'}`}
                 animate={isRolling ? { rotate: 360 } : {}}
                 transition={{ duration: 0.1, repeat: isRolling ? Infinity : 0 }}
                 onClick={rollDice}
@@ -45,22 +44,21 @@ export function DiceRoll({ onRollComplete, isLocked }: DiceRollProps) {
                 {result || '?'}
             </motion.div>
 
+            <p className="text-slate-400 text-sm">Rolls 1 – {maxFaces}</p>
+
             <button
                 onClick={rollDice}
                 disabled={isLocked || isRolling || hasRolled}
                 className={`px-8 py-3 rounded-lg font-bold text-lg transition-all ${isLocked || hasRolled
                     ? 'bg-gray-600 cursor-not-allowed opacity-50'
-                    : 'bg-gradient-to-r from-purple-500 to-pink-500 hover:from-purple-600 hover:to-pink-600 text-white shadow-lg hover:shadow-xl'
-                    }`}
+                    : 'bg-gradient-to-r from-purple-500 to-pink-500 hover:from-purple-600 hover:to-pink-600 text-white shadow-lg hover:shadow-xl'}`}
             >
                 {isLocked ? '🔒 Locked' : isRolling ? '🎲 Rolling...' : hasRolled ? '⏳ Processing...' : '🎲 Roll the Dice!'}
             </button>
 
             {(isLocked || hasRolled) && (
                 <p className="text-sm text-slate-400 text-center">
-                    {isLocked
-                        ? "You've already rolled the dice. Your problem statement is locked."
-                        : "Processing your roll... Please wait."}
+                    {isLocked ? "You've already rolled. Your problem statement is locked." : "Processing your roll... Please wait."}
                 </p>
             )}
         </div>

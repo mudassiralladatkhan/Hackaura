@@ -2,7 +2,6 @@ import { useState } from 'react';
 import { ParticleBackground } from '@/components/ui/particle-background';
 import { GlassCard } from '@/components/ui/glass-card';
 import { NeonButton } from '@/components/ui/neon-button';
-import { DiceRoll } from '@/components/DiceRoll';
 import { ProblemDisplay } from '@/components/ProblemDisplay';
 import { Loader2, Shield, Mail } from 'lucide-react';
 import ky from 'ky';
@@ -10,8 +9,22 @@ import ky from 'ky';
 import { GOOGLE_SCRIPT_API_URL } from '@/lib/config';
 const DOMAIN = "Cybersecurity";
 
+const CYBER_PROBLEM = {
+    number: 1,
+    title: '"Kavach" — Real-Time Scam Shield',
+    description: `The Problem: As millions of first-time users enter the digital economy via UPI and WhatsApp, they are becoming targets for "Digital Arrest" scams and phishing links that steal their life savings.
+
+The Task: Develop a Real-Time Phishing and Scam Detection Layer that analyzes incoming messages or transaction requests for patterns of fraud common in rural India.
+
+Your system should be able to:
+• Detect suspicious URLs, fake UPI payment requests, and social engineering patterns
+• Alert users in their local language before they fall victim
+• Work with minimal internet connectivity for rural areas
+• Provide a trust score for incoming digital communications`
+};
+
 export default function Cybersecurity() {
-    const [step, setStep] = useState<'ticket' | 'otp' | 'dice' | 'problem'>('ticket');
+    const [step, setStep] = useState<'ticket' | 'otp' | 'problem'>('ticket');
     const [ticketId, setTicketId] = useState('');
     const [otp, setOtp] = useState('');
     const [_teamName, setTeamName] = useState('');
@@ -91,11 +104,8 @@ export default function Cybersecurity() {
             }).json<any>();
 
             if (response.result === 'success') {
-                if (_assignedProblem) {
-                    await fetchAssignedProblem();
-                } else {
-                    setStep('dice');
-                }
+                setProblem(CYBER_PROBLEM);
+                setStep('problem');
             } else {
                 setError(response.message || 'Invalid OTP');
             }
@@ -103,53 +113,6 @@ export default function Cybersecurity() {
             setError('OTP verification failed');
         } finally {
             setLoading(false);
-        }
-    };
-
-    const handleDiceRoll = async (number: number) => {
-        setLoading(true);
-        setError('');
-
-        try {
-            const assignResponse = await ky.get(GOOGLE_SCRIPT_API_URL, {
-                searchParams: {
-                    action: 'assignProblem',
-                    ticketId: ticketId.trim(),
-                    problemNumber: number
-                },
-                timeout: 30000
-            }).json<any>();
-
-            if (assignResponse.result === 'success') {
-                await fetchAssignedProblem();
-            } else {
-                setError(assignResponse.message || 'Failed to assign problem');
-            }
-        } catch (err: any) {
-            setError(err.message || 'Failed to save dice result');
-        } finally {
-            setLoading(false);
-        }
-    };
-
-    const fetchAssignedProblem = async () => {
-        try {
-            const response = await ky.get(GOOGLE_SCRIPT_API_URL, {
-                searchParams: {
-                    action: 'getAssignedProblem',
-                    ticketId: ticketId.trim()
-                },
-                timeout: 30000
-            }).json<any>();
-
-            if (response.result === 'success') {
-                setProblem(response.problem);
-                setStep('problem');
-            } else {
-                setError('Failed to fetch problem details');
-            }
-        } catch (err) {
-            setError('Failed to load problem');
         }
     };
 
@@ -217,17 +180,6 @@ export default function Cybersecurity() {
                                     {loading ? <Loader2 className="w-5 h-5 animate-spin" /> : 'Verify OTP'}
                                 </NeonButton>
                             </form>
-                        </GlassCard>
-                    )}
-
-                    {step === 'dice' && (
-                        <GlassCard className="p-8">
-                            <h2 className="text-3xl font-bold text-white mb-4 text-center">Roll the Dice!</h2>
-                            <p className="text-slate-300 mb-8 text-center">
-                                Roll the dice to discover your problem statement (1-6)
-                            </p>
-                            <DiceRoll onRollComplete={handleDiceRoll} isLocked={false} />
-                            {error && <p className="text-red-400 text-sm text-center mt-4">{error}</p>}
                         </GlassCard>
                     )}
 

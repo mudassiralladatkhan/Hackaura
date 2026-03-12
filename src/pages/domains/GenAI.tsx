@@ -10,6 +10,31 @@ import ky from 'ky';
 import { GOOGLE_SCRIPT_API_URL } from '@/lib/config';
 const DOMAIN = "Generative AI";
 
+const GENAI_PROBLEMS: Record<number, { number: number; title: string; description: string }> = {
+    1: {
+        number: 1,
+        title: '"Vani-Kanoon" — The Legal Bridge',
+        description: `The Problem: In rural India, access to justice is often blocked because legal documents, court circulars, and rights are written in complex English legalese. A person in a village cannot understand their own property rights or the details of a small-scale contract.
+
+The Task: Build an AI-powered Legal Document Translator & Advisor that:
+• Accepts legal documents (PDFs, scanned images) as input
+• Translates and simplifies them into the user's regional language
+• Answers follow-up questions about their rights in plain, simple language
+• Works offline or on low-bandwidth connections for rural accessibility`
+    },
+    2: {
+        number: 2,
+        title: '"Sarkari-Sahayak" — The Regional Scheme Navigator',
+        description: `The Problem: The government releases hundreds of "Viksit Bharat" schemes for farmers and women (like PM-Kisan or Ayushman Bharat). However, these are published as 50-page English/Hindi PDFs. Most rural citizens never apply because they cannot read the eligibility criteria or the application process.
+
+The Task: Create an AI-powered "Scheme Bot" that:
+• Ingests official Government PDFs and policy documents
+• Answers citizen queries via Voice in their mother tongue
+• Checks eligibility and guides users through the application process step by step
+• Supports multiple regional Indian languages`
+    }
+};
+
 export default function GenAI() {
     const [step, setStep] = useState<'ticket' | 'otp' | 'dice' | 'problem'>('ticket');
     const [ticketId, setTicketId] = useState('');
@@ -110,14 +135,13 @@ export default function GenAI() {
         }
     };
 
-    // Step 4: Handle Dice Roll
     const handleDiceRoll = async (number: number) => {
         setLoading(true);
         setError('');
 
         try {
-            // Save the dice result
-            const assignResponse = await ky.get(GOOGLE_SCRIPT_API_URL, {
+            // Save the dice result to backend (fire and forget)
+            await ky.get(GOOGLE_SCRIPT_API_URL, {
                 searchParams: {
                     action: 'assignProblem',
                     ticketId: ticketId.trim(),
@@ -125,39 +149,25 @@ export default function GenAI() {
                 },
                 timeout: 30000
             }).json<any>();
-
-            if (assignResponse.result === 'success') {
-                // Fetch the assigned problem
-                await fetchAssignedProblem();
-            } else {
-                setError(assignResponse.message || 'Failed to assign problem');
-            }
-        } catch (err: any) {
-            setError(err.message || 'Failed to save dice result');
+        } catch {
+            // Ignore backend errors — always show local PS
         } finally {
+            // Always display local PS content immediately
+            const ps = number <= 2 ? GENAI_PROBLEMS[number] : GENAI_PROBLEMS[(number % 2) + 1];
+            setProblem(ps);
+            setStep('problem');
             setLoading(false);
         }
     };
 
-    // Fetch assigned problem details
     const fetchAssignedProblem = async () => {
-        try {
-            const response = await ky.get(GOOGLE_SCRIPT_API_URL, {
-                searchParams: {
-                    action: 'getAssignedProblem',
-                    ticketId: ticketId.trim()
-                },
-                timeout: 30000
-            }).json<any>();
-
-            if (response.result === 'success') {
-                setProblem(response.problem);
-                setStep('problem');
-            } else {
-                setError('Failed to fetch problem details');
-            }
-        } catch (err) {
-            setError('Failed to load problem');
+        // Use local PS data — bypass backend placeholder content
+        if (_assignedProblem && typeof _assignedProblem === 'number') {
+            const ps = GENAI_PROBLEMS[_assignedProblem] || GENAI_PROBLEMS[1];
+            setProblem(ps);
+            setStep('problem');
+        } else {
+            setStep('dice');
         }
     };
 
@@ -234,9 +244,9 @@ export default function GenAI() {
                         <GlassCard className="p-8">
                             <h2 className="text-3xl font-bold text-white mb-4 text-center">Roll the Dice!</h2>
                             <p className="text-slate-300 mb-8 text-center">
-                                Roll the dice to discover your problem statement (1-6)
+                                Roll to discover your problem statement (1 or 2)
                             </p>
-                            <DiceRoll onRollComplete={handleDiceRoll} isLocked={false} />
+                            <DiceRoll onRollComplete={handleDiceRoll} isLocked={false} maxFaces={2} />
                             {error && <p className="text-red-400 text-sm text-center mt-4">{error}</p>}
                         </GlassCard>
                     )}

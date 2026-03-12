@@ -10,6 +10,42 @@ import ky from 'ky';
 import { GOOGLE_SCRIPT_API_URL } from '@/lib/config';
 const DOMAIN = "Full Stack";
 
+const FULLSTACK_PROBLEMS: Record<number, { number: number; title: string; description: string }> = {
+    1: {
+        number: 1,
+        title: '"Mandi-Connect" — Direct Farm-to-Retail Logistics & Marketplace',
+        description: `The Problem: Small-scale farmers in regions like Nipani often sell their produce to local middlemen at low prices because they lack a direct link to urban retailers or bulk buyers. Existing platforms are too complex and require high-speed internet, which is often unavailable in the fields.
+
+The Task: Build a Low-Bandwidth, Offline-First Marketplace that:
+• Allows farmers to list their harvests and set prices
+• Enables retailers to place bulk orders directly
+• Works with minimal internet connectivity
+• Includes logistics coordination and payment integration via UPI`
+    },
+    2: {
+        number: 2,
+        title: '"Daksh-Bharat" — The Skill-Verified Rural Labor Exchange',
+        description: `The Problem: In rural India, skilled laborers (plumbers, masons, electricians, solar technicians) struggle to find consistent work, while local businesses struggle to find verified, skilled talent. There is no digital "record of trust" or portfolio for the unorganized sector.
+
+The Task: Create a Verified Skill-Portfolio Platform where:
+• Rural workers can build a digital identity and showcase their skills
+• Local businesses can search and verify skilled labor
+• Completed jobs build a reputation score visible to future employers
+• Connect workers with local job opportunities in their area`
+    },
+    3: {
+        number: 3,
+        title: '"Arogya-Vahini" — The Universal Rural Referral & Health Vault',
+        description: `The Problem: In rural India, the referral process is broken. When a patient at a village Primary Health Center (PHC) is referred to a district hospital, they carry physical papers that often get lost or damaged. The city specialist has to restart all tests, wasting time and money.
+
+The Task: Build a Secure, Token-Based Health Referral Portal that:
+• Digitizes the patient journey from the village clinic to the specialist hospital
+• Uses a secure token/QR to carry the patient's health summary
+• Allows specialists to view the complete referral history
+• Works offline and syncs when connectivity is available`
+    }
+};
+
 export default function FullStack() {
     const [step, setStep] = useState<'ticket' | 'otp' | 'dice' | 'problem'>('ticket');
     const [ticketId, setTicketId] = useState('');
@@ -111,7 +147,8 @@ export default function FullStack() {
         setError('');
 
         try {
-            const assignResponse = await ky.get(GOOGLE_SCRIPT_API_URL, {
+            // Save the dice result to backend (fire and forget)
+            await ky.get(GOOGLE_SCRIPT_API_URL, {
                 searchParams: {
                     action: 'assignProblem',
                     ticketId: ticketId.trim(),
@@ -119,37 +156,25 @@ export default function FullStack() {
                 },
                 timeout: 30000
             }).json<any>();
-
-            if (assignResponse.result === 'success') {
-                await fetchAssignedProblem();
-            } else {
-                setError(assignResponse.message || 'Failed to assign problem');
-            }
-        } catch (err: any) {
-            setError(err.message || 'Failed to save dice result');
+        } catch {
+            // Ignore backend errors — always show local PS
         } finally {
+            // Always display local PS content immediately
+            const idx = ((number - 1) % 3) + 1;
+            setProblem(FULLSTACK_PROBLEMS[idx] || FULLSTACK_PROBLEMS[1]);
+            setStep('problem');
             setLoading(false);
         }
     };
 
     const fetchAssignedProblem = async () => {
-        try {
-            const response = await ky.get(GOOGLE_SCRIPT_API_URL, {
-                searchParams: {
-                    action: 'getAssignedProblem',
-                    ticketId: ticketId.trim()
-                },
-                timeout: 30000
-            }).json<any>();
-
-            if (response.result === 'success') {
-                setProblem(response.problem);
-                setStep('problem');
-            } else {
-                setError('Failed to fetch problem details');
-            }
-        } catch (err) {
-            setError('Failed to load problem');
+        // Use local PS data — bypass backend placeholder content
+        if (_assignedProblem && typeof _assignedProblem === 'number') {
+            const ps = FULLSTACK_PROBLEMS[_assignedProblem] || FULLSTACK_PROBLEMS[1];
+            setProblem(ps);
+            setStep('problem');
+        } else {
+            setStep('dice');
         }
     };
 
@@ -224,9 +249,9 @@ export default function FullStack() {
                         <GlassCard className="p-8">
                             <h2 className="text-3xl font-bold text-white mb-4 text-center">Roll the Dice!</h2>
                             <p className="text-slate-300 mb-8 text-center">
-                                Roll the dice to discover your problem statement (1-6)
+                                Roll to discover your problem statement (1, 2, or 3)
                             </p>
-                            <DiceRoll onRollComplete={handleDiceRoll} isLocked={false} />
+                            <DiceRoll onRollComplete={handleDiceRoll} isLocked={false} maxFaces={3} />
                             {error && <p className="text-red-400 text-sm text-center mt-4">{error}</p>}
                         </GlassCard>
                     )}
