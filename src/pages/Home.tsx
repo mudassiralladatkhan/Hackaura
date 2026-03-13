@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { Zap, Calendar, Sparkles, Users, Trophy, Clock, Award, MapPin, Phone, Menu, X, Coffee, Utensils, Mail, Flame, School, Cpu, Lock, MessageSquare, ChevronRight, Shield, Code2 } from 'lucide-react';
+import { Zap, Calendar, Sparkles, Users, Trophy, Clock, Award, MapPin, Phone, Menu, X, Coffee, Utensils, Mail, Flame, School, Cpu, Lock, MessageSquare, ChevronRight, Shield, Code2, Send } from 'lucide-react';
 import { ParticleBackground } from '@/components/ui/particle-background';
 import { CountdownTimer } from '@/components/ui/countdown-timer';
 import { NeonButton } from '@/components/ui/neon-button';
@@ -203,10 +203,10 @@ export default function Home() {
                   Registrations Closed
                 </button>
 
-                <button disabled className="w-full sm:w-auto min-w-[200px] text-lg py-6 rounded-xl border border-purple-500/30 bg-purple-500/5 text-purple-500/50 font-semibold cursor-not-allowed flex items-center justify-center gap-2">
-                  <Lock className="w-5 h-5" />
+                <Link to="/submit" className="w-full sm:w-auto min-w-[200px] text-lg py-6 px-6 rounded-xl border border-purple-500/50 bg-purple-500/10 text-purple-300 font-semibold flex items-center justify-center gap-2 hover:bg-purple-500/20 hover:border-purple-400 hover:shadow-[0_0_25px_rgba(168,85,247,0.4)] transition-all">
+                  <Send className="w-5 h-5" />
                   Submit Project
-                </button>
+                </Link>
                 <Link to="/chatbot">
                   <NeonButton variant="secondary" className="w-full sm:w-auto min-w-[200px] text-lg py-6 border-pink-500/50 hover:bg-pink-500/10 hover:border-pink-400 text-pink-300 flex items-center justify-center gap-2">
                     <MessageSquare className="w-5 h-5" />

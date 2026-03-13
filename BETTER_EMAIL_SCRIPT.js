@@ -32,6 +32,57 @@ var CONFIG = {
     QUOTA_THRESHOLD: 5 // Switch to backup when primary quota drops below this
 };
 
+/* ================================================================
+   📧 MANUAL SENDER SWITCH — Run these functions from the editor!
+   ================================================================
+   FORCE values stored in Script Properties (survive saves/restarts)
+   -1 = AUTO (default — switch based on quota automatically)
+    0 = FORCE PRIMARY only
+    1 = FORCE Backup 1 (muffasirkhan0123@gmail.com)
+    2 = FORCE Backup 2 (babaleshwarpankaj@gmail.com)
+    3 = FORCE Backup 3 (muffasirkhan99@gmail.com)
+   ================================================================ */
+
+/** Switch to AUTO mode (uses quota threshold to decide) */
+function useAuto()     { _setForce(-1); }
+
+/** Force all emails via PRIMARY account */
+function usePrimary()  { _setForce(0);  }
+
+/** Force all emails via BACKUP 1 — muffasirkhan0123@gmail.com */
+function useBackup1()  { _setForce(1);  }
+
+/** Force all emails via BACKUP 2 — babaleshwarpankaj@gmail.com */
+function useBackup2()  { _setForce(2);  }
+
+/** Force all emails via BACKUP 3 — muffasirkhan99@gmail.com */
+function useBackup3()  { _setForce(3);  }
+
+function _setForce(n) {
+    PropertiesService.getScriptProperties().setProperty('FORCE_BACKUP', String(n));
+    var labels = { '-1': 'AUTO', '0': 'PRIMARY', '1': 'Backup 1 (muffasirkhan0123)', '2': 'Backup 2 (babaleshwarpankaj)', '3': 'Backup 3 (muffasirkhan99)' };
+    Logger.log('✅ Email sender set to: ' + (labels[String(n)] || n));
+}
+
+/** Check current sender mode and all account quotas */
+function checkQuotas() {
+    var force = PropertiesService.getScriptProperties().getProperty('FORCE_BACKUP');
+    var labels = { '-1': 'AUTO', '0': 'PRIMARY', '1': 'Backup 1', '2': 'Backup 2', '3': 'Backup 3' };
+    Logger.log('=== EMAIL QUOTA STATUS ===');
+    Logger.log('Current Mode: ' + (labels[String(force)] || 'AUTO'));
+    Logger.log('Primary quota remaining: ' + MailApp.getRemainingDailyQuota());
+    for (var i = 0; i < CONFIG.BACKUP_EMAILS.length; i++) {
+        try {
+            var resp = UrlFetchApp.fetch(CONFIG.BACKUP_EMAILS[i], { muteHttpExceptions: true });
+            var json = JSON.parse(resp.getContentText());
+            Logger.log('Backup ' + (i + 1) + ' remaining: ' + (json.remaining !== undefined ? json.remaining : 'N/A'));
+        } catch (e) {
+            Logger.log('Backup ' + (i + 1) + ': ERROR — ' + e.toString());
+        }
+    }
+    Logger.log('==========================');
+}
+
 /* 
    --------------------------------------------------------------
    PART 1: AUTO-EMAIL TRIGGER (onFormSubmit)
@@ -244,7 +295,41 @@ function onFormSubmit(e) {
 function sendEmailWithFailover(to, subject, htmlBody) {
     var remaining = MailApp.getRemainingDailyQuota();
 
-    // Try primary account first
+    // ── MANUAL OVERRIDE CHECK ──────────────────────────────────────
+    var forceStr = PropertiesService.getScriptProperties().getProperty('FORCE_BACKUP');
+    var force = forceStr !== null ? parseInt(forceStr, 10) : -1;
+
+    if (force === 0) {
+        // Force PRIMARY
+        Logger.log('[FORCED] Sending via PRIMARY. Remaining: ' + remaining);
+        MailApp.sendEmail({ to: to, subject: subject, htmlBody: htmlBody });
+        return;
+    }
+
+    if (force >= 1 && force <= CONFIG.BACKUP_EMAILS.length) {
+        // Force a specific backup (1-indexed)
+        var idx = force - 1;
+        Logger.log('[FORCED] Sending via BACKUP #' + force + '...');
+        try {
+            var forcedResp = UrlFetchApp.fetch(CONFIG.BACKUP_EMAILS[idx], {
+                method: 'post',
+                contentType: 'application/json',
+                payload: JSON.stringify({ action: 'sendEmail', to: to, subject: subject, htmlBody: htmlBody }),
+                muteHttpExceptions: true
+            });
+            var forcedResult = JSON.parse(forcedResp.getContentText());
+            if (forcedResult.result === 'success') {
+                Logger.log('[FORCED] Email sent via BACKUP #' + force + '. Remaining: ' + forcedResult.remaining);
+                return;
+            }
+            Logger.log('[FORCED] Backup #' + force + ' failed: ' + forcedResult.message + '. Falling back to AUTO...');
+        } catch (err) {
+            Logger.log('[FORCED] Backup #' + force + ' error: ' + err.toString() + '. Falling back to AUTO...');
+        }
+    }
+    // ── END MANUAL OVERRIDE ───────────────────────────────────────
+
+    // AUTO mode — try primary first
     if (remaining > CONFIG.QUOTA_THRESHOLD) {
         MailApp.sendEmail({ to: to, subject: subject, htmlBody: htmlBody });
         Logger.log('Email sent via PRIMARY account. Remaining quota: ' + (remaining - 1));
@@ -259,31 +344,21 @@ function sendEmailWithFailover(to, subject, htmlBody) {
             var response = UrlFetchApp.fetch(CONFIG.BACKUP_EMAILS[i], {
                 method: 'post',
                 contentType: 'application/json',
-                payload: JSON.stringify({
-                    action: 'sendEmail',
-                    to: to,
-                    subject: subject,
-                    htmlBody: htmlBody
-                }),
+                payload: JSON.stringify({ action: 'sendEmail', to: to, subject: subject, htmlBody: htmlBody }),
                 muteHttpExceptions: true
             });
-
             var result = JSON.parse(response.getContentText());
-
             if (result.result === 'success') {
                 Logger.log('Email sent via BACKUP #' + (i + 1) + '. Backup remaining: ' + result.remaining);
-                return; // Success! Stop trying
+                return;
             }
-
-            // This backup is also exhausted, try next
             Logger.log('Backup #' + (i + 1) + ' failed: ' + result.message + '. Trying next...');
-
         } catch (err) {
             Logger.log('Backup #' + (i + 1) + ' error: ' + err.toString() + '. Trying next...');
         }
     }
 
-    // All backups failed — last resort: try primary even if low
+    // All backups failed — last resort
     if (remaining > 0) {
         MailApp.sendEmail({ to: to, subject: subject, htmlBody: htmlBody });
         Logger.log('LAST RESORT: Email sent via primary. Remaining: ' + (remaining - 1));
@@ -1401,11 +1476,28 @@ function doGet(e) {
             }
             otpSheet.appendRow([new Date(), ticketId, otp]);
 
-            MailApp.sendEmail({
-                to: teamEmail,
-                subject: "Hackaura Validation OTP",
-                htmlBody: `<h2>OTP: ${otp}</h2><p>Valid for 15 mins.</p>`
-            });
+            var otpSubject = "🔐 Hackaura 2026 — Your Verification OTP";
+            var otpHtml = `
+                <!DOCTYPE html>
+                <html>
+                <body style="margin:0;padding:0;background:#000;font-family:Arial,sans-serif;">
+                  <div style="max-width:480px;margin:40px auto;background:#0f1115;border:1px solid #2d3748;border-radius:16px;overflow:hidden;">
+                    <div style="background:linear-gradient(135deg,#09090b,#1e1b4b);padding:30px;text-align:center;border-bottom:1px solid #333;">
+                      <h2 style="margin:0;color:#22d3ee;font-size:22px;">Hackaura 2026</h2>
+                      <p style="margin:8px 0 0;color:#94a3b8;font-size:13px;">OTP Verification</p>
+                    </div>
+                    <div style="padding:30px;text-align:center;">
+                      <p style="color:#94a3b8;font-size:15px;margin-bottom:20px;">Hello Team <strong style="color:#fff;">${teamName}</strong>,</p>
+                      <p style="color:#64748b;font-size:13px;margin-bottom:10px;">Your one-time verification code is:</p>
+                      <div style="letter-spacing:10px;font-size:42px;font-weight:900;color:#22d3ee;font-family:monospace;margin:20px 0;">${otp}</div>
+                      <p style="color:#4b5563;font-size:12px;margin-top:20px;">Valid for 15 minutes. Do not share this code.</p>
+                    </div>
+                  </div>
+                </body>
+                </html>
+            `;
+
+            sendEmailWithFailover(teamEmail, otpSubject, otpHtml);
 
             return createCORSResponse({ 'result': 'success', 'message': 'OTP sent' });
         }
